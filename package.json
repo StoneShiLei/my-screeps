@@ -8,6 +8,7 @@
     "lint": "eslint \"src/**/*.ts\"",
     "build": "rollup -c",
     "push-main": "rollup -c --environment DEST:main",
+    "push-dev": "rollup -c --environment DEST:dev",
     "push-pserver": "rollup -c --environment DEST:pserver",
     "push-season": "rollup -c --environment DEST:season",
     "push-sim": "rollup -c --environment DEST:sim",
@@ -56,6 +57,7 @@
     "prettier": "^2.0.4",
     "rollup": "^2.6.1",
     "rollup-plugin-clear": "^2.0.7",
+    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-screeps": "^1.0.0",
     "rollup-plugin-typescript2": "^0.27.0",
     "sinon": "^6.3.5",
@@ -65,7 +67,6 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "rollup-plugin-copy": "^3.4.0",
     "source-map": "~0.6.1"
   },
   "directories": {

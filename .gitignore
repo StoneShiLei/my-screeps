@@ -17,7 +17,8 @@
 
 # Screeps Config
 screeps.json
-
+.screeps.yaml
+.screeps-multimeter.history
 # ScreepsServer data from integration tests
 /server
 
