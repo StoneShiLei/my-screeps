@@ -4,10 +4,12 @@ export default class Harvester {
 
     work(creep:Creep){
         if(creep.store.getFreeCapacity() > 0){
-            const source = creep.room.find(FIND_SOURCES)[0];
-            if(creep.harvest(source) == ERR_NOT_IN_RANGE){
-                creep.moveTo(source);
-            }
+            if(!creep.memory.data.harvesterData?.sourceID) return
+                const source = Game.getObjectById(creep.memory.data.harvesterData.sourceID);
+                if(!source) return
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE){
+                    creep.moveTo(source);
+                }
         }else{
             const targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {

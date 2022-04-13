@@ -4,12 +4,6 @@ declare namespace NodeJS {
   }
 }
 
-interface CreepMemory {
-  role: string;
-  room?: string;
-  working: boolean;
-}
-
 interface Memory {
   uuid: number;
   log: any;
