@@ -22,7 +22,7 @@ export default {
     format: "cjs",
     sourcemap: true
   },
-
+  external: ['movement','watch-client'] ,
   plugins: [
     clear({ targets: ["dist"] }),
     resolve({ rootDir: "src" }),
@@ -32,7 +32,8 @@ export default {
     copy({
       targets: [
           { src: "./src/utils/watch-client.js", dest: "./dist/" },
-          { src: "./src/utils/superMove.js", dest: "./dist/" },
+          // { src: "./src/utils/superMove.js", dest: "./dist/" },
+          { src: "./src/utils/movement.js", dest: "./dist/" },
       ]
   }),
   ]

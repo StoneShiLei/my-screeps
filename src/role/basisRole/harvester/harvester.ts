@@ -8,7 +8,7 @@ export default class Harvester {
                 const source = Game.getObjectById(creep.memory.data.harvesterData.sourceID);
                 if(!source) return
                 if(creep.harvest(source) == ERR_NOT_IN_RANGE){
-                    creep.moveTo(source);
+                    creep.goTo(source);
                 }
         }else{
             const targets = creep.room.find(FIND_STRUCTURES, {
@@ -20,7 +20,7 @@ export default class Harvester {
             });
             if(targets.length > 0){
                 if(creep.transfer(targets[0],RESOURCE_ENERGY) == ERR_NOT_IN_RANGE){
-                    creep.moveTo(targets[0]);
+                    creep.goTo(targets[0]);
                 }
             }
         }

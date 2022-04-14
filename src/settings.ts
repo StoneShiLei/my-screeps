@@ -9,3 +9,9 @@ export const creepDefaultMemory: CreepMemory = {
     // pathCache: [],
     data:{}
 }
+
+ /**
+ * 废墟和墓碑的类型常量
+ */
+export const RUIN = "ruin";
+export const TOMBSTONE = "tombstone"

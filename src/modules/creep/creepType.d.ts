@@ -1,5 +1,15 @@
 
+interface Creep{
+    posLock: boolean,
+    goTo(target: RoomPosition | { pos: RoomPosition }, range?: number): boolean;
+    goToRoom(room: string): boolean;
+    getEngryFrom(target: AllEnergySource): ScreepsReturnCode
+    transferTo(target:  AnyCreep | Structure, RESOURCE: ResourceConstant, moveOpt?: MoveToOpts): ScreepsReturnCode
+}
+
 interface CreepMemory {
+    sourceId?: Id<AllEnergySource>
+    targetId?: Id<Source | StructureWithStore | ConstructionSite>
     role: string;
     spawnRoom: string;
     working: boolean;
