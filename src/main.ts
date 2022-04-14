@@ -5,17 +5,22 @@ import BodyAutoConfig from "modules/bodyConfig/bodyConfig";
 import { mountRoom } from "modules/room";
 import mountRoomPosition from "modules/roomPosition";
 import CreepReleaser from "modules/spawnController/creepReleaser";
-require('superMove')
+import { mountCreep } from "modules/creep";
+import movement from 'movement';
+import watchClient from 'watch-client';
+// require('superMove')
 
 
 //挂载room
 mountRoom()
 //挂载position
 mountRoomPosition()
+//挂载creep
+mountCreep()
 
 
 export const loop = ErrorMapper.wrapLoop(() => {
-
+  movement.prepare();
 
 
   for(const roomName in Game.rooms){
@@ -33,17 +38,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   const worker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker');
 
-  // const spawn = Game.spawns['Spawn1'];
-  // const X = spawn.room.find(FIND_SOURCES).sort();
-  // console.log(X)
-
-
-  if(worker.length < 2) {
+  if(worker.length < 3) {
     const newName = 'Worker' + Game.time;
       const spawn = Game.spawns['Spawn1'];
       const bodyConfig = BodyAutoConfig.bodyConfigs.worker;
       const bodyParts = BodyAutoConfig.createBodyGetter(bodyConfig)(spawn.room,spawn);
-      spawn.spawnCreep(bodyParts, newName, {memory:{role: 'worker', working: false, spawnRoom: spawn.room.name,data:{}}});
+      spawn.spawnCreep(bodyParts, newName, {memory:{role: 'worker', working: true, spawnRoom: spawn.room.name,data:{}}});
   }
 
   // const tower = Game.getObjectById<StructureTower>('49f58a91ce4979c2874cd624');
@@ -75,5 +75,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
 }
 
 
-  require('watch-client')();
+  movement.process();
+  watchClient();
 });
