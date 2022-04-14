@@ -8,17 +8,6 @@ export default class Worker {
         if(creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.working = false;
             creep.say('🔄 harvest');
-
-            let resource:AllEnergySource | null = null
-            if(!creep.memory.sourceId){
-                resource = EnergyUtil.getRoomEnergyTarget(creep.room)
-                if(!resource) resource = creep.room.find(FIND_SOURCES,{filter:s => s.canUse()})[0]
-                if(!resource){
-                    creep.say('no energy!')
-                    return
-                }
-                creep.memory.sourceId = resource.id
-            }
         }
         if(!creep.memory.working && creep.store.getFreeCapacity() == 0) {
             creep.memory.working = true;
@@ -27,6 +16,7 @@ export default class Worker {
 
         const closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (structure) => structure.structureType != STRUCTURE_WALL &&
+                    structure.structureType != STRUCTURE_RAMPART &&
                     structure.hits < structure.hitsMax
                 });
         const constructSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
@@ -46,19 +36,33 @@ export default class Worker {
                 creep.goTo(creep.room.controller);
             }
         }
-        else if(creep.memory.working && creep.room.controller != null){
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.goTo(creep.room.controller);
-            }
-        }
         else{
+
+
+            if(!creep.memory.sourceId){
+                let resource:AllEnergySource | null = null
+                resource = EnergyUtil.getRoomEnergyTarget(creep.room)
+                if(!resource) resource = creep.room.find(FIND_SOURCES,{filter:s => s.canUse()})[0]
+                if(!resource){
+                    creep.say('no energy!')
+                    return
+                }
+                creep.memory.sourceId = resource.id
+            }
 
             if(creep.memory.sourceId){
                 const resource = Game.getObjectById(creep.memory.sourceId)
+
                 if(!resource || (resource instanceof Structure && resource.store[RESOURCE_ENERGY] < 300) ||
                 (resource instanceof Source && resource.energy == 0) ||
                 ((resource instanceof Ruin || resource instanceof Tombstone) && resource.store[RESOURCE_ENERGY] === 0)) {
                     delete creep.memory.sourceId
+                    return
+                }
+
+                if(resource && resource instanceof Source && !resource.canUse()) {
+                    delete creep.memory.sourceId
+                    return
                 }
 
                 if(!resource){

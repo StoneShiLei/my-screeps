@@ -19,3 +19,15 @@ const roles = {
 //     })
 //     return config
 // }
+
+
+function testFunc ():String | Number{
+    return "1"
+}
+
+let result = testFunc()
+if(result instanceof String ){
+    console.log(result)
+}else if(result instanceof Number){
+    console.log(result)
+}
