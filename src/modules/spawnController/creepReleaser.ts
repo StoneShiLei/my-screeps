@@ -1,7 +1,8 @@
 import BodyAutoConfig from "modules/bodyConfig/bodyConfig";
-import { creepDefaultMemory } from "settings";
+import { CREEP_DEFAULT_MEMORY } from "settings";
 import Utils from "utils/utils";
 import { CreepNameGenerator } from "./creepNameGenerator";
+import { creepRoleConfigs } from "role";
 
 
 export default class CreepReleaser {
@@ -33,24 +34,21 @@ export default class CreepReleaser {
             const creepName = CreepNameGenerator.harvester(this.roomName,index)
             if(this.room.find(FIND_MY_CREEPS).filter(creep => creep.name == creepName).length != 0) return
 
-            const bodyConfig = BodyAutoConfig.bodyConfigs.worker;
-            const creepMemory = creepDefaultMemory
-            creepMemory.data = {
-                harvesterData:{
-                    sourceID:souce.id,
-                    targetID:souce.getContainer()?.id,
-                    workRoom:this.roomName,
-                    harvestRoom:this.roomName,
-                }
-            }
+            const creepMemory = CREEP_DEFAULT_MEMORY
             creepMemory.role = 'harvester'
             creepMemory.working = false
             creepMemory.spawnRoom = this.roomName
+            creepMemory.data.harvesterData = {
+                sourceID:souce.id,
+                targetID:souce.getContainer()?.id,
+                workRoom:this.roomName,
+                harvestRoom:this.roomName,
+            }
 
 
 
             this.room.find(FIND_MY_SPAWNS).map((spawn) =>{
-                const bodyParts = BodyAutoConfig.createBodyGetter(bodyConfig)(spawn.room,spawn);
+                const bodyParts = creepRoleConfigs["harvester"].body(this.room,spawn,creepMemory.data)
 
                 let resultCode:ScreepsReturnCode
                 if(Memory.creeps[creepName]){

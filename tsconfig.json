@@ -12,6 +12,9 @@
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
+    "paths": {
+      "~/*":["src/*"],
+    },
   },
   "exclude": [
     "node_modules"

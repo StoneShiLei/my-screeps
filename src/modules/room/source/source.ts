@@ -72,7 +72,7 @@ export default class SourceExtension extends Source {
         const { containerId } = this.room.memory.source[this.id]
         if(!containerId) return null
 
-        const container = Game.getObjectById<StructureContainer>(containerId)
+        const container = Game.getObjectById(containerId)
         if(!container){
             delete this.room.memory.source[this.id].containerId
             return null
@@ -101,7 +101,7 @@ export default class SourceExtension extends Source {
         const { LinkId } = this.room.memory.source[this.id]
         if (!LinkId) return null
 
-        const link = Game.getObjectById<StructureLink>(LinkId)
+        const link = Game.getObjectById(LinkId)
         if (!link) {
             delete this.room.memory.source[this.id].LinkId
             return null

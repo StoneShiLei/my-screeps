@@ -1,59 +1,44 @@
 
 interface Creep{
-    posLock: boolean,
-    goTo(target: RoomPosition | { pos: RoomPosition }, range?: number): boolean;
-    goToRoom(room: string): boolean;
+    goTo(target:RoomPosition,opt?:GoToOpt):ScreepsReturnCode
+
     getEngryFrom(target: AllEnergySource): ScreepsReturnCode
     transferTo(target:  AnyCreep | Structure, RESOURCE: ResourceConstant, moveOpt?: MoveToOpts): ScreepsReturnCode
+
+    upgradeRoom(roomName: string): ScreepsReturnCode
+    buildStructure(targetConstruction?: ConstructionSite): CreepActionReturnCode | ERR_NOT_ENOUGH_RESOURCES | ERR_RCL_NOT_ENOUGH | ERR_NOT_FOUND | ERR_RCL_NOT_ENOUGH
+
+    changeToGetEnergyStage():void
+    posLock():void
+    posUnlock():void
+
+    steadyWall(): OK | ERR_NOT_FOUND
+    fillDefenseStructure():boolean
 }
 
 interface CreepMemory {
     sourceId?: Id<AllEnergySource>
     targetId?: Id<Source | StructureWithStore | ConstructionSite>
-    role: string;
+
+    repairStructureId?: Id<AnyStructure>
+
+    constructionSiteInfo?:{
+        id?: Id<ConstructionSite>
+        type?: StructureConstant
+        pos?: RoomPosition
+    }
+
+    fillWallId?: Id<StructureWall | StructureRampart>
+    fillStructureId?: Id<StructureWithStore>
+
+    dontPullMe?:boolean
+
     spawnRoom: string;
-    working: boolean;
-    data:CreepData
+    cantRespawn?: boolean
+
+
 }
 
-interface CreepData{
-    harvesterData?:HarvesterData
-    // transporterData?:TransporterData
-    workerData?:WorkerData
-    centerData?:CenterData
-}
-
-interface EmptyData{}
-
-interface HarvesterData{
-    //资源id
-    sourceID:Id<Source>
-    //工作目标id
-    targetID?:Id<Structure>
-    //为该房间工作
-    workRoom:string
-    //要采集的房间
-    harvestRoom:string
-    //工作模式
-    // harvestMode?:AllHarvestMode
-    //能量丢弃位置 roomName,x,y
-    droppedPos?:string
-}
-
-interface WorkerData{
-    //该 creep 的工作房间
-    workRoom: string
-}
-
-// interface TransporterData{
-//     //要使用的资源存放建筑 id
-//     sourceID?:Id<StructureWithStore>
-//     //该 creep 的工作房间
-//     //例如一个外矿搬运者需要知道自己的老家在哪里
-//     workRoom: string
-// }
-
-interface CenterData {
-    x: number
-    y: number
+interface GoToOpt{
+    range:number
 }

@@ -9,16 +9,23 @@ declare module "movement" {
   export function process(): void;
 }
 
+declare module "superMove" {
+  export function deletePathInRoom(roomName:string):void
+}
+
 declare module "watch-client"
 
-interface Memory {
-  uuid: number;
-  log: any;
+interface RoomObject{
+  onWork():void
 }
 
 type AnyObject = { [key: string]: any }
 
-type Colors = 'green' | 'blue' | 'yellow' | 'red'
+type Colors = GREEN | BLUE | YELLOW | RED
+type GREEN = 'green'
+type BLUE = 'blue'
+type YELLOW = 'yellow'
+type RED = 'red'
 
 type StructureWithStore =
  StructureTower |
