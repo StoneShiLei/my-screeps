@@ -40,9 +40,14 @@ interface CreepData{
     centerData?:CenterData
 }
 
-interface EmptyData{}
+interface BaseData{
+    //该角色的creep唯一id
+    id:number
+}
 
-interface HarvesterData{
+interface EmptyData extends BaseData{}
+
+interface HarvesterData extends BaseData{
     //资源id
     sourceID:Id<Source>
     //工作目标id
@@ -57,12 +62,12 @@ interface HarvesterData{
     droppedPos?:string
 }
 
-interface WorkerData{
+interface WorkerData extends BaseData{
     //该 creep 的工作房间
     workRoom: string
 }
 
-interface TransporterData{
+interface TransporterData extends BaseData{
     //要使用的资源存放建筑 id
     sourceID?:Id<StructureWithStore>
     //该 creep 的工作房间
@@ -82,7 +87,7 @@ interface TransporterData{
     onWorkType?:AllTransportAction
 }
 
-interface CenterData {
+interface CenterData  extends BaseData{
     x: number
     y: number
 }

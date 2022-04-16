@@ -179,7 +179,7 @@ export default class TransporterConfig implements RoleConfig {
                     return result == OK
                 }
                 else{
-                    const [x,y,roomName] = from
+                    const [x,y,roomName] = from as [number,number,string]
                     const targetPos = new RoomPosition(x,y,roomName)
 
                     const targetRes = targetPos.lookFor(LOOK_RESOURCES).find(r => r.resourceType === resourceType)
@@ -209,7 +209,7 @@ export default class TransporterConfig implements RoleConfig {
                     return result == OK
                 }
                 else{
-                    const [x,y,roomName] = to
+                    const [x,y,roomName] = to as [number,number,string]
                     const targetPos = new RoomPosition(x,y,roomName)
 
                     creep.goTo(targetPos,{range:1})

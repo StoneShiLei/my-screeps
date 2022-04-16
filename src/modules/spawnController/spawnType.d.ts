@@ -1,7 +1,13 @@
 interface Room{
     sources?:Source[] //room的source列表
 
-    workerNum:number
+
+}
+
+interface RoomMemory {
 
     transporterNum:number
+    workerNum:number
 }
+
+type BaseUnits = Worker | Transporter

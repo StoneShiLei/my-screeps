@@ -106,7 +106,7 @@ export default class HarvesterConfig implements RoleConfig {
                 if (!workRoom) return false
 
                 // 如果有搬运工了就无脑采集
-                if ((workRoom.transporterNum ?? 0) <= 0 && creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true
+                if ((workRoom.memory.transporterNum ?? 0) <= 0 && creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) return true
 
                 creep.harvest(source)
                 this.goToDropPos(creep, source)
@@ -123,7 +123,7 @@ export default class HarvesterConfig implements RoleConfig {
                 if (!workRoom) return false
 
                 // 有运输工了就回去挖能量
-                if (creep.store[RESOURCE_ENERGY] <= 0 || (workRoom.transporterNum ?? 0) > 0) return true
+                if (creep.store[RESOURCE_ENERGY] <= 0 || (workRoom.memory.transporterNum ?? 0) > 0) return true
 
                 // 找到 spawn 然后把身上的能量全塞进去，不搜索 extension，因为启动时还没有 extension
                 // 就算是重建，只要保证 spawn 里有能量也能孵化搬运工了

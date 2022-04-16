@@ -3,63 +3,110 @@ import { CREEP_DEFAULT_MEMORY } from "settings";
 import Utils from "utils/utils";
 import { CreepNameGenerator } from "./creepNameGenerator";
 import { creepRoleConfigs } from "role";
+import { max, words } from "lodash";
+import RoomSpawnController from "./spawnController";
+import SpawnTask from "./spawnTask";
 
 
 export default class CreepReleaser {
 
-    protected roomName:string
+    readonly spawnController:RoomSpawnController
 
-    constructor(roomName:string){
-        this.roomName = roomName;
+    constructor(spawnController:RoomSpawnController){
+        this.spawnController = spawnController;
     }
 
-    public get room():Room{
-        if(!Game.rooms[this.roomName]){
-            Utils.log(`无法访问房间实例，模块已停止运行`, ["CreepReleaser"],  true,'red')
-            throw new Error(`${this.roomName} CreepReleaser 房间实例不存在`)
+    releaseHarvester():OK|ERR_NOT_FOUND{
+        if(!this.spawnController.room.sources){
+            this.spawnController.room.sources = this.spawnController.room.find(FIND_SOURCES)
         }
-        return Game.rooms[this.roomName]
+
+        const roomName = this.spawnController.room.name;
+        const sources = this.spawnController.room.sources;
+
+        if(sources.length == 0) return ERR_NOT_FOUND
+
+        sources.map((source,index) =>{
+            this.spawnController.addTask(new SpawnTask(CreepNameGenerator.harvester(roomName,index),"harvester",{
+                harvesterData:{workRoom:roomName,harvestRoom:roomName,sourceID:source.id,id:index}
+            }))
+        })
+
+        return OK
     }
 
-    /**
-     * 发布采集者  如果已经有同名的了则跳过
-     */
-    public releaseHarvester(){
-        if(!this.room.sources){
-            this.room.sources = this.room.find(FIND_SOURCES).sort();
+    releaseBaseUnit(type:BaseUnits,num:number):OK {
+        const room = this.spawnController.room
+        debugger
+        const creeps = this.spawnController.room.find(FIND_MY_CREEPS,{filter:creep => creep.memory.role == type &&
+            ((type === 'transporter' && creep.memory.data.transporterData?.workRoom == room.name) ||
+            (type === 'worker' && creep.memory.data.workerData?.workRoom === room.name)) })
+
+        let maxId:number
+
+        if(creeps.length == 0){
+            maxId = -1
+        }
+        else{
+            if(type === 'transporter'){
+                maxId = _.max(creeps,(creep) => creep.memory.data.transporterData?.id).memory.data.transporterData?.id || 0
+            }
+            else{
+                maxId = _.max(creeps,(creep) => creep.memory.data.workerData?.id).memory.data.workerData?.id || 0
+            }
         }
 
-        const sources = this.room.sources;
-        (sources || []).map((souce,index) =>{
-            const creepName = CreepNameGenerator.harvester(this.roomName,index)
-            if(this.room.find(FIND_MY_CREEPS).filter(creep => creep.name == creepName).length != 0) return
 
-            const creepMemory = CREEP_DEFAULT_MEMORY
-            creepMemory.role = 'harvester'
-            creepMemory.working = false
-            creepMemory.spawnRoom = this.roomName
-            creepMemory.data.harvesterData = {
-                sourceID:souce.id,
-                targetID:souce.getContainer()?.id,
-                workRoom:this.roomName,
-                harvestRoom:this.roomName,
+
+        for(let i=maxId+1;i<maxId+num+1;i++){
+            const creepName = CreepNameGenerator[type](room.name,i)
+            if(creepName in Game.creeps) continue
+
+            this.spawnController.addTask({
+                name:creepName,
+                role:type,
+                data:type === 'worker'? {workerData:{workRoom:room.name,id:i}} :{transporterData:{workRoom:room.name,id:i}}
+            })
+        }
+
+        return OK
+    }
+
+    removeBaseUnit(type:BaseUnits,num:number,immediate:boolean):OK {
+        const room = this.spawnController.room
+
+        const creeps = this.spawnController.room.find(FIND_MY_CREEPS,{filter:creep => creep.memory.role == type &&
+            ((type === 'transporter' && creep.memory.data.transporterData?.workRoom == room.name) ||
+            (type === 'worker' && creep.memory.data.workerData?.workRoom === room.name)) })
+
+        let maxId:number
+        if(type === 'transporter'){
+            maxId = _.max(creeps,(creep) => creep.memory.data.transporterData?.id).memory.data.transporterData?.id || 0
+        }
+        else{
+            maxId = _.max(creeps,(creep) => creep.memory.data.workerData?.id).memory.data.workerData?.id || 0
+        }
+
+        for(let i=maxId;i>=0;i--){
+            let creep:Creep | null
+            if(type === 'transporter'){
+                creep = _.find(creeps,(creep) => creep.memory.data.transporterData?.id == i) ?? null
+            }
+            else{
+                creep = _.find(creeps,(creep) => creep.memory.data.workerData?.id == i) ?? null
             }
 
-
-
-            this.room.find(FIND_MY_SPAWNS).map((spawn) =>{
-                const bodyParts = creepRoleConfigs["harvester"].body(this.room,spawn,creepMemory.data)
-
-                let resultCode:ScreepsReturnCode
-                if(Memory.creeps[creepName]){
-                    resultCode = spawn.spawnCreep(bodyParts, creepName);
+            if(creep){
+                if(immediate){
+                    delete Memory.creeps[creep.name]
+                    creep.suicide()
                 }
                 else{
-                    resultCode = spawn.spawnCreep(bodyParts, creepName, { memory: creepMemory});
+                    creep.memory.cantRespawn = true
                 }
+            }
+        }
 
-                if(resultCode == OK) return
-            })
-        })
+        return OK
     }
 }

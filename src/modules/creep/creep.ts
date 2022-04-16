@@ -138,6 +138,14 @@ export default class CreepExtension extends Creep {
                     this.memory.fillWallId = structure.id as Id<StructureWall | StructureRampart>
                 }
 
+                //如果是container  则绑定到source
+                if(structure.structureType == STRUCTURE_CONTAINER){
+                   const source = structure.pos.findClosestByRange(FIND_SOURCES)
+                   if(source){
+                       source.setContainer(structure as StructureContainer)
+                   }
+                }
+
                 //完成建筑后 清空房间移动路径缓存 重建路径
                 SuperMove.deletePathInRoom(this.room.name)
             }

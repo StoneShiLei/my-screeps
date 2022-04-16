@@ -1,6 +1,6 @@
 declare namespace NodeJS {
   interface Global {
-
+    memory?:Memory
   }
 }
 
@@ -15,8 +15,9 @@ declare module "superMove" {
 
 declare module "watch-client"
 
+
 interface RoomObject{
-  onWork():void
+  onWork?():void
 }
 
 type AnyObject = { [key: string]: any }

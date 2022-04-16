@@ -17,6 +17,7 @@ interface Creep{
 }
 
 interface CreepMemory {
+
     sourceId?: Id<AllEnergySource>
     targetId?: Id<Source | StructureWithStore | ConstructionSite>
 
