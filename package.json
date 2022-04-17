@@ -67,7 +67,8 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "source-map": "~0.6.1"
+    "source-map": "~0.6.1",
+    "typescript-ioc": "^3.2.2"
   },
   "directories": {
     "test": "test"

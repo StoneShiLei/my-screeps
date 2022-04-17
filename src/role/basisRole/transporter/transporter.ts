@@ -20,6 +20,7 @@ export default class TransporterConfig implements RoleConfig {
         const spawns = creep.room.find<StructureSpawn>(FIND_STRUCTURES,
             {filter:s => s && s.structureType === STRUCTURE_SPAWN && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0})
         const spawnStructures = [...extensions,...spawns]
+
         if(spawnStructures.length > 0){
             creep.memory.data.transporterData.onWorkType = 'fillExtensionAction'
             return this.actionStrategy['fillExtensionAction'].source(creep)
@@ -30,13 +31,13 @@ export default class TransporterConfig implements RoleConfig {
             filter:s => s.structureType === STRUCTURE_TOWER &&
             s.store[RESOURCE_ENERGY] <= 900
         })
-        if(towers.length <= 0){
+        if(towers.length > 0){
             creep.memory.data.transporterData.onWorkType = 'fillTowerAction'
             return this.actionStrategy['fillTowerAction'].source(creep)
         }
 
         //如果有storage  定期从container拿到storage
-        if(creep.room.storage && !(Game.time % 100))
+        if(creep.room.storage)
         {
             const containers = creep.room.find<StructureContainer>(FIND_STRUCTURES,{
                 filter:s => s.structureType === STRUCTURE_CONTAINER &&
@@ -57,6 +58,7 @@ export default class TransporterConfig implements RoleConfig {
     }
 
     workWithTarget(creep: Creep): boolean {
+
         if(!creep.memory.data.transporterData){
             creep.say("My data is null")
             return false
@@ -107,7 +109,6 @@ export default class TransporterConfig implements RoleConfig {
                     creep.changeToGetEnergyStage()
                     return true
                 }
-
                 let target:StructureTower | null = null
 
                 if(creep.memory.fillStructureId){
@@ -142,6 +143,7 @@ export default class TransporterConfig implements RoleConfig {
                 }
 
                 const result = creep.transfer(target,RESOURCE_ENERGY)
+                if(result === ERR_NOT_IN_RANGE) creep.goTo(target.pos,{range:1})
                 if(result != OK && result != ERR_NOT_IN_RANGE){
                     creep.say(`fillTower ${result}`)
                     Utils.log(`填塔任务异常，transferTo 返回值: ${result}`)

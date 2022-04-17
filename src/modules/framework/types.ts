@@ -1,3 +1,5 @@
+import { type } from "os"
+
 /**
  * 生命周期回调
  */
@@ -81,7 +83,7 @@
 
  declare global {
     interface Memory {
-        [appName:string]:boolean
+        [appName:string]:boolean | number | string
     }
  }
 
