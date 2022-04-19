@@ -79,6 +79,29 @@ export default class Utils{
         return _.padLeft(Math.ceil(Math.random()*Math.pow(2,32)).toString(16).toLocaleUpperCase(),8,"0")
     }
 
+    /**
+     * 获取hashCode
+     * @param str
+     * @returns
+     */
+    static hashCode(str:string):number{
+        let hash = 5381;
+        for(let i=0;i<str.length;i++){
+            let char = str.charCodeAt(i);
+            hash = ((hash << 5) + hash) + char;
+        }
+        return hash
+    }
+
+    /**
+     * 线性同余随机数
+     * @param seed
+     * @returns
+     */
+    static randomNum(seed:number){
+        return (seed * 9301 + 49297 ) % 233280;
+    }
+
 }
 
 

@@ -1,5 +1,4 @@
-import { TaskAction, TaskService, TaskServiceProxy } from "taskService";
-import { SpawnTaskService } from "taskService/spawnTaskService/spawnTaskService";
+import { TaskAction, TaskServiceProxy } from "taskService";
 import { Inject } from "typescript-ioc";
 
 export class CreepExtension extends Creep {
@@ -8,9 +7,9 @@ export class CreepExtension extends Creep {
     private _taskService!: TaskServiceProxy;
 
 
-    addTask(task:Task):void;
-    addTask(task:Task[]):void;
-    addTask(task:Task | Task[]):void{
+    addTask(this:Creep,task:Task):Creep;
+    addTask(this:Creep,task:Task[]):Creep;
+    addTask(this:Creep,task:Task | Task[]):Creep{
         if(task instanceof Array){
             _.forEach(task,(task) =>{
                 this.tasks.push(task)
@@ -19,15 +18,24 @@ export class CreepExtension extends Creep {
         else{
             this.tasks.push(task)
         }
+
+        return this
     }
 
-    removeTopTask(){
-        this.tasks.pop()
+    popTopTask(this:Creep):Creep{
+       this.tasks.pop()
+       return this
     }
 
-    doTopTaskJob(){
-        const action = this.getTopAction()
-        action(this)
+    doWorkWithTopTask():void{
+        if(this.hasTask()){
+            const action = this.getTopAction()
+            action(this)
+        }
+    }
+
+    hasTask():boolean{
+        return this.tasks.length > 0
     }
 
     registerMyTasks(){
@@ -56,8 +64,29 @@ export class CreepExtension extends Creep {
         return this.memory.tasks
     }
 
+    goTo(): GotoReturnCode
+    goTo(target:Task): GotoReturnCode
+    goTo(target:RoomObject): GotoReturnCode
+    goTo(target?:RoomObject | Task): GotoReturnCode{
+        if(!target) {
+            const pos = new RoomPosition(this.topTask.x,this.topTask.y,this.topTask.roomName)
+            return this.moveTo(pos)
+        } else if('pos' in target){
+            return this.moveTo(target.pos)
+        } else {
+            const pos = new RoomPosition(target.x,target.y,target.roomName)
+            return this.moveTo(pos)
+        }
+    }
+
     private getTopAction():TaskFunction{
         const task = this.topTask
-       return this._taskService[task.serviceName as keyof TaskServiceProxy].actions[task.actionName as keyof TaskAction]
+        const action = this._taskService[task.serviceName as keyof TaskServiceProxy].actions[task.actionName as keyof TaskAction]
+        if(action)  {
+            return action
+        }
+        else{
+            throw Error(`Action ${task.actionName} not found in service ${task.serviceName}`)
+        }
     }
 }

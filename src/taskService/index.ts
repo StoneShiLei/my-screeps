@@ -1,7 +1,7 @@
 import { Inject, Singleton } from "typescript-ioc";
-import { SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
+import { SpawnActionName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
 import { SpawnTaskService } from "./spawnTaskService/spawnTaskService";
-import { WorkTaskAction } from "./workTaskService/workTaskAction";
+import { WorkActionName, WorkTaskAction } from "./workTaskService/workTaskAction";
 import { WorkTaskService } from "./workTaskService/workTaskService";
 
 
@@ -18,3 +18,5 @@ export class TaskServiceProxy {
 
 export type TaskService = SpawnTaskService | WorkTaskService
 export type TaskAction = SpawnTaskAction | WorkTaskAction
+export type ServiceName = "spawnTaskService" | "workTaskService"
+export type ActionName = SpawnActionName | WorkActionName

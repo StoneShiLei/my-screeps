@@ -3,38 +3,26 @@ import { createApp } from "modules/framework";
 import { TaskServiceProxy } from "taskService";
 import { Container } from "typescript-ioc";
 import mountAll from "mount"
+import { creepManagerCallbacks, creepRunner, roomManagerCallbacks, roomRunner } from "manager";
+import { BodyConfig } from "modules/bodyConfig/bodyConfig";
 
 
 
-// const app = createApp({roomRunner,creepRunner})
-const app = createApp()
+const app = createApp({roomRunner,creepRunner})
 app.on(mountAll())
-
-
+app.on(roomManagerCallbacks())
+app.on(creepManagerCallbacks())
 app.on({
-  tickStart:()=>{
-    Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],'ceep' + Game.time)
-    for(let creep of Object.values(Game.creeps)){
-      if(creep.tasks.length == 0){
-        creep.addTask({
-          serviceName:'spawnTaskService',
-          actionName:'func1',
-          haveToReg:true,
-          haveToUnreg:true,
-          targetId:'',
-          roomName:creep.room.name,
-          x:creep.pos.x,
-          y:creep.pos.y
-        })
-      }
+  tickStart: () => {
+    const x:BodySet = [[WORK,2],[CARRY,1],[MOVE,1]]
+    const y = BodyConfig.calcBodyParts(x);
+    console.log(y)
+    console.log(BodyConfig.getBodyCosts(y))
 
-      creep.registerMyTasks()
-      creep.unregisterMyTopTask()
-      creep.doTopTaskJob()
-    }
-  },
-  tickEnd:()=>{
-
+    const z:BodySet = {"work":2,"carry":1,"move":1}
+    const zy = BodyConfig.calcBodyParts(z);
+    console.log(zy)
+    console.log(BodyConfig.getBodyCosts(zy))
   }
 })
 
