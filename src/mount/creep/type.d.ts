@@ -1,5 +1,9 @@
 
 interface Creep{
+    bottomTask:Task
+    topTask:Task
+    tasks:Task[]
+
     addTask(task:Task):void
     addTask(task:Task[]):void
 
@@ -9,12 +13,8 @@ interface Creep{
 
     registerMyTasks():void
     unregisterMyTopTask():void
-
-    get bottomTask():Task
-    get topTask():Task
-    get tasks():Task[]
 }
 
-interface CreepMemory{
+// interface CreepMemory{
 
-}
+// }

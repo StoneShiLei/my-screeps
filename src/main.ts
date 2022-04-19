@@ -13,9 +13,7 @@ app.on(mountAll())
 
 app.on({
   tickStart:()=>{
-
     Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],'ceep' + Game.time)
-
     for(let creep of Object.values(Game.creeps)){
       if(creep.tasks.length == 0){
         creep.addTask({

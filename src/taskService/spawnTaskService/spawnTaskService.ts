@@ -13,9 +13,9 @@ export class SpawnTaskService extends BaseTaskService{
 
 
 
-    registerTask(creep:Creep):void{
-
-    }
+    // registerTask(creep:Creep):void{
+    //     console
+    // }
 
     private genName(){
         return `0x${Utils.randomId()}`

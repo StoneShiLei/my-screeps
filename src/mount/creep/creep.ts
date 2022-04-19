@@ -43,15 +43,15 @@ export class CreepExtension extends Creep {
         this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].unregisterTask(this)
     }
 
-    get bottomTask():Task{
+    bottomTaskGetter():Task{
         return this.tasks.head()
     }
 
-    get topTask():Task{
+    topTaskGetter():Task{
         return this.tasks.last()
     }
 
-    get tasks():Task[]{
+    tasksGetter():Task[]{
         if(!this.memory.tasks) this.memory.tasks = []
         return this.memory.tasks
     }
