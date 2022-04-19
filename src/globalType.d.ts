@@ -4,11 +4,6 @@ declare namespace NodeJS {
   }
 }
 
-declare module "movement" {
-  export function prepare(): void;
-  export function process(): void;
-}
-
 declare module "superMove" {
   export function deletePathInRoom(roomName:string):void
 }
@@ -17,7 +12,7 @@ declare module "watch-client"
 
 
 interface RoomObject{
-  onWork?():void
+  run?():void
 }
 
 type AnyObject = { [key: string]: any }

@@ -3,25 +3,6 @@
 export default class Utils{
 
     /**
-     * 执行 Hash Map 中子元素对象的 work 方法
-     *
-     * @param hashMap 游戏对象的 hash map。如 Game.creeps、Game.spawns 等
-     * @param showCpu [可选] 传入指定字符串来启动该 Map 的数量统计
-     */
-    static doing(...hashMaps: object[]): void {
-        hashMaps.forEach((obj, index) => {
-            // 遍历执行 work
-            Object.values(obj).forEach(item => {
-                try{
-                    if (item.onWork) item.onWork()
-                }
-                catch(e){
-                    console.log(e)
-                }
-            })
-        })
-    }
-    /**
      * 给目标类型添加getter
      * @param target
      * @param name
@@ -90,4 +71,38 @@ export default class Utils{
         return OK
     }
 
+    /**
+     * 随机id
+     * @returns
+     */
+    static randomId():string{
+        return _.padLeft(Math.ceil(Math.random()*Math.pow(2,32)).toString(16).toLocaleUpperCase(),8,"0")
+    }
+
+    /**
+     * 获取hashCode
+     * @param str
+     * @returns
+     */
+    static hashCode(str:string):number{
+        let hash = 5381;
+        for(let i=0;i<str.length;i++){
+            let char = str.charCodeAt(i);
+            hash = ((hash << 5) + hash) + char;
+        }
+        return hash
+    }
+
+    /**
+     * 线性同余随机数
+     * @param seed
+     * @returns
+     */
+    static randomNum(seed:number){
+        return (seed * 9301 + 49297 ) % 233280;
+    }
+
 }
+
+
+

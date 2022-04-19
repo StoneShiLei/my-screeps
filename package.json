@@ -67,6 +67,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "reflect-metadata": "^0.1.13",
     "source-map": "~0.6.1",
     "typescript-ioc": "^3.2.2"
   },
