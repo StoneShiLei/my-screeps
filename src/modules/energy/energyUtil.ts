@@ -1,4 +1,11 @@
-import { RUIN, TOMBSTONE } from "settings";
+ /**
+ * 废墟和墓碑的类型常量
+ */
+export const RUIN = "ruin";
+export const TOMBSTONE = "tombstone"
+
+
+
 
 export default class EnergyUtil {
   /**
@@ -71,11 +78,11 @@ export default class EnergyUtil {
       allEnergyTargets = [...structureTargets];
 
       // 查找 source 旁边地上扔的
-      const sources = room.find(FIND_SOURCES);
-      const droppedEnergyTargets = sources.map(source => source.getDroppedInfo().energy).filter(Boolean);
-      for (const item of droppedEnergyTargets) {
-        if (item) allEnergyTargets.push(item);
-      }
+      // const sources = room.find(FIND_SOURCES);
+      // const droppedEnergyTargets = sources.map(source => source.getDroppedInfo().energy).filter(Boolean);
+      // for (const item of droppedEnergyTargets) {
+      //   if (item) allEnergyTargets.push(item);
+      // }
 
       //缓存到房间实例上
       room._energyFilterObj = allEnergyTargets;

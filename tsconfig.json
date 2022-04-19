@@ -9,6 +9,7 @@
     "sourceMap": true,
     "strict": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,

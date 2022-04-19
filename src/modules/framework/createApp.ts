@@ -6,10 +6,10 @@ import { collectCost, showCpuCost, SHOW_BASE_CPU_COST } from './cpuLogger'
  * bot 名称的后缀，会加到指定的名称后
  * 防止不小心覆盖 Memory 的关键字段
  */
-const BOT_NAME_SUFFIX = 'Framework'
+const BOT_NAME_SUFFIX = '-Bot'
 
-const DEFAULT_OPTIONS: CreateOptions = {
-    name: `hulu${BOT_NAME_SUFFIX}`
+export const DEFAULT_OPTIONS: CreateOptions = {
+    name: `Hulu${BOT_NAME_SUFFIX}`
 }
 
 /**

@@ -1,19 +1,4 @@
-/**
- * Creep的默认内存
- */
-export const CREEP_DEFAULT_MEMORY: CreepMemory = {
-    role: 'worker',
-    ready: false,
-    working: false,
-    spawnRoom: 'W1N1',
-    data:{}
-}
 
- /**
- * 废墟和墓碑的类型常量
- */
-export const RUIN = "ruin";
-export const TOMBSTONE = "tombstone"
 
 /**
  * transporter 触发后事处理的最小生命
