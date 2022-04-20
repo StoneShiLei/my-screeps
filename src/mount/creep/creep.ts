@@ -7,9 +7,9 @@ export class CreepExtension extends Creep {
     private _taskService!: TaskServiceProxy;
 
 
-    addTask(this:Creep,task:Task):Creep;
-    addTask(this:Creep,task:Task[]):Creep;
-    addTask(this:Creep,task:Task | Task[]):Creep{
+    addTask(task:Task):Creep;
+    addTask(task:Task[]):Creep;
+    addTask(task:Task | Task[]):Creep{
         if(task instanceof Array){
             _.forEach(task,(task) =>{
                 this.tasks.push(task)
@@ -22,20 +22,24 @@ export class CreepExtension extends Creep {
         return this
     }
 
-    popTopTask(this:Creep):Creep{
+    popTopTask():Creep{
        this.tasks.pop()
        return this
     }
 
     doWorkWithTopTask():void{
-        if(this.hasTask()){
+        if(this.hasTasks()){
             const action = this.getTopAction()
             action(this)
         }
     }
 
-    hasTask():boolean{
+    hasTasks():boolean{
         return this.tasks.length > 0
+    }
+
+    isIdle():boolean{
+        return this.tasks.length === 0
     }
 
     registerMyTasks(){
@@ -64,18 +68,34 @@ export class CreepExtension extends Creep {
         return this.memory.tasks
     }
 
+    storeUsed():number{
+        return this.store.getUsedCapacity()
+    }
+
+    storeUnused():number{
+        return this.store.getFreeCapacity()
+    }
+
+    storeIsFull():boolean{
+        return this.store.getFreeCapacity() <= 0
+    }
+
+    storeIsEmpty():boolean{
+        return this.store.getUsedCapacity() <= 0
+    }
+
     goTo(): GotoReturnCode
     goTo(target:Task): GotoReturnCode
     goTo(target:RoomObject): GotoReturnCode
     goTo(target?:RoomObject | Task): GotoReturnCode{
         if(!target) {
             const pos = new RoomPosition(this.topTask.x,this.topTask.y,this.topTask.roomName)
-            return this.moveTo(pos)
+            return this.moveTo(pos,{ visualizePathStyle:{stroke: '#67ffed'} })
         } else if('pos' in target){
-            return this.moveTo(target.pos)
+            return this.moveTo(target.pos,{ visualizePathStyle:{stroke: '#67ffed'} })
         } else {
             const pos = new RoomPosition(target.x,target.y,target.roomName)
-            return this.moveTo(pos)
+            return this.moveTo(pos,{ visualizePathStyle:{stroke: '#67ffed'} })
         }
     }
 
@@ -89,4 +109,6 @@ export class CreepExtension extends Creep {
             throw Error(`Action ${task.actionName} not found in service ${task.serviceName}`)
         }
     }
+
+
 }

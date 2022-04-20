@@ -32,4 +32,12 @@ export class BodyConfig{
     }
 
 
+    public static getPartCount(creep:Creep,body:BodyPartConstant){
+        const name:BodyPartName = `${body}+`
+        if(creep.memory.bodyParts) creep.memory.bodyParts = {}
+        if(creep.memory.bodyParts[name]) return creep.memory.bodyParts[name]
+
+        creep.memory.bodyParts[name] = creep.body.filter(part => part.type === body).length
+        return creep.memory.bodyParts[name]
+    }
 }

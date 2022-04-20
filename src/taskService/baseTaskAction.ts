@@ -1,4 +1,4 @@
 
-export class BaseTaskAction{
+export abstract class BaseTaskAction{
 
 }

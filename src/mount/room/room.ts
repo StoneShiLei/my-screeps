@@ -14,7 +14,6 @@ export class RoomExtension extends Room {
     }
 
     setCreeps(creeps:Creep[]):void{
-        debugger
         if(!this._creeps) this._creeps = {}
         this._creeps['creeps'] = creeps
     }
@@ -45,10 +44,46 @@ export class RoomExtension extends Room {
         }
     }
 
-    update():void{
+    updateRoomInfo():void{
         const level = this.controller?.level ?? 0
         if(level < 3) this.roomLevel = 'Low'
         else if(level < 4 || !this.storage || !this.storage.my) this.roomLevel = 'middle'
         else this.roomLevel = 'high'
+    }
+
+    isDownGrade():boolean{
+        if(!this.controller) return false
+
+        const roomExtNum = (this.get(STRUCTURE_EXTENSION) as StructureExtension[]).length
+        const thisLevelExtNum = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][this.level]
+
+        //判断是否降级
+        return this.controller.progressTotal < this.controller.progress || (roomExtNum > thisLevelExtNum)
+    }
+
+    getEnergyAvailable():number{
+        if(!this.isDownGrade()) return this.energyAvailable
+
+        const exts = this.get(STRUCTURE_EXTENSION) as StructureExtension[]
+        const spawns = this.get(STRUCTURE_SPAWN) as StructureSpawn[]
+
+        const extEnergyCount = exts.filter(ext => ext.isActive()).reduce((a,b) => a + b.store[RESOURCE_ENERGY],0)
+        const spawnEnergyCount = spawns.filter(spawn => spawn.isActive()).reduce((a,b) => a + b.store[RESOURCE_ENERGY],0)
+        return extEnergyCount + spawnEnergyCount
+    }
+
+    getEnergyCapacityAvailable():number{
+        if(!this.isDownGrade()) return this.energyCapacityAvailable
+
+        const exts = this.get(STRUCTURE_EXTENSION) as StructureExtension[]
+        const spawns = this.get(STRUCTURE_SPAWN) as StructureSpawn[]
+
+        const extEnergyCount = exts.filter(ext => ext.isActive()).reduce((a,b) => a + b.store.getCapacity<RESOURCE_ENERGY>(),0)
+        const spawnEnergyCount = spawns.filter(spawn => spawn.isActive()).reduce((a,b) => a + b.store.getCapacity<RESOURCE_ENERGY>(),0)
+        return extEnergyCount + spawnEnergyCount
+    }
+
+    randomPosition():RoomPosition{
+        return new RoomPosition(Utils.randomNumRange(1,49),Utils.randomNumRange(1,49),this.name)
     }
 }

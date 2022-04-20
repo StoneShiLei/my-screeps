@@ -1,28 +1,43 @@
-import superMove from "superMove"
 import { createApp } from "modules/framework";
-import { TaskServiceProxy } from "taskService";
-import { Container } from "typescript-ioc";
 import mountAll from "mount"
 import { creepManagerCallbacks, creepRunner, roomManagerCallbacks, roomRunner } from "manager";
-import { BodyConfig } from "modules/bodyConfig/bodyConfig";
+import mountModules from "modules/index";
+import { TaskHelper } from "taskService/taskHelper";
+import { ErrorHelper } from "utils/erroHelper";
 
 
+const app = createApp({
+  roomRunner:roomRunner(),
+  creepRunner:creepRunner()
+})
 
-const app = createApp({roomRunner,creepRunner})
+app.on(mountModules())
 app.on(mountAll())
+
 app.on(roomManagerCallbacks())
 app.on(creepManagerCallbacks())
+
+
 app.on({
   tickStart: () => {
-    const x:BodySet = [[WORK,2],[CARRY,1],[MOVE,1]]
-    const y = BodyConfig.calcBodyParts(x);
-    console.log(y)
-    console.log(BodyConfig.getBodyCosts(y))
+    const room = Game.rooms['sim']
 
-    const z:BodySet = {"work":2,"carry":1,"move":1}
-    const zy = BodyConfig.calcBodyParts(z);
-    console.log(zy)
-    console.log(BodyConfig.getBodyCosts(zy))
+    // console.log(JSON.stringify((room.get('extension') as StructureExtension[]).length))
+    // const id = Game.flags['Flag1'].id
+    // console.log(id)
+    const container = Game.getObjectById<StructureContainer>('61fc4e83493c2f9c4644925a')
+
+    const creep = Game.creeps['test12']
+    debugger
+// console.log(container,creep)
+    if(container != null && !creep.hasTasks()){
+      creep.addTask(TaskHelper.genTaskWithTarget(container,'transportTaskService','transportResource',
+      {resouceType:RESOURCE_ENERGY,resourceCount:30},false,false))
+    }
+
+  },
+  tickEnd:()=>{
+    ErrorHelper.throwAllErrors()
   }
 })
 

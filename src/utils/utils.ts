@@ -102,6 +102,20 @@ export default class Utils{
         return (seed * 9301 + 49297 ) % 233280;
     }
 
+    /**
+     * 生成范围随机数
+     * @param start
+     * @param end
+     * @returns
+     */
+    static randomNumRange(start:number,end?:number){
+        if(end==undefined){
+            end = start
+            start = 0
+        }
+        let range = end-start
+        return start + Math.floor(Math.random()*range)
+    }
 }
 
 

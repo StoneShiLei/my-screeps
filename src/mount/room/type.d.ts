@@ -6,7 +6,14 @@ interface Room {
     hashCode():number
     setCreeps(creeps:Creep[]):void
     creeps(role?:Role,spawned?:boolean):Creep[]
-    update():void
+
+    updateRoomInfo():void
+
+    isDownGrade():boolean
+    getEnergyAvailable():number
+    getEnergyCapacityAvailable():number
+
+    randomPosition():RoomPosition
 }
 
 interface RoomMemory {

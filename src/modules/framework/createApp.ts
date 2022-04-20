@@ -120,7 +120,7 @@ export const createApp = function (opt: Partial<CreateOptions> = {}) {
     }
 
     const runAllRoom = () => Object.values(Game.rooms).map(room => {if(roomRunner) errorMapper(roomRunner, room)})
-    const runAllCreep = () => Object.values(Game.creeps).map(creep => {if(creepRunner) errorMapper(creepRunner, creep)})
+    const runAllCreep = () => Object.values(Game.creeps).map(creep => { if(creepRunner) errorMapper(creepRunner, creep)})
     const runAllPowerCreep = () => Object.values(Game.powerCreeps).map(creep => {if(powerCreepRunner)errorMapper(powerCreepRunner, creep)} )
 
     /**

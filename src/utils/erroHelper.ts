@@ -1,9 +1,9 @@
 
 export class ErrorHelper {
 
-    errors:string[] = []
+    static errors:string[] = []
 
-    catchError(func:Function,message?:string){
+    static catchError(func:(...args: any[]) => unknown,message?:string){
         try{
             return func()
         }
@@ -17,7 +17,7 @@ export class ErrorHelper {
         }
     }
 
-    throwAllErrors(){
+    static throwAllErrors(){
         if(this.errors.length > 0){
             const temp = this.errors;
             this.errors = []

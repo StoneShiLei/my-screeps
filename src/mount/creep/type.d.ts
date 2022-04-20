@@ -10,7 +10,8 @@ interface Creep{
 
     doWorkWithTopTask():void
 
-    hasTask():boolean
+    hasTasks():boolean
+    isIdle():boolean
 
     registerMyTasks():void
     unregisterMyTopTask():void
@@ -18,6 +19,12 @@ interface Creep{
     goTo(): GotoReturnCode
     goTo(target:RoomObject): GotoReturnCode
     goTo(target?:Task):GotoReturnCode
+
+    storeUsed():number
+    storeUnused():number
+    storeIsFull():boolean
+    storeIsEmpty():boolean
+
 }
 
 interface CreepMemory{

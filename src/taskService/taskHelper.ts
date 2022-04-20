@@ -4,7 +4,7 @@ export class TaskHelper {
 
 
     static genTaskWithTarget(target:TaskTarget,serviceName:ServiceName,actionName:ActionName,
-        haveToReg:boolean = false,haveToUnreg:boolean = false,opt:TaskOpt = {}):Task {
+        opt?:TaskOpt,haveToReg:boolean = false,haveToUnreg:boolean = false,):Task {
         const task:Task = {
             serviceName:serviceName,
             actionName:actionName,
@@ -26,7 +26,7 @@ export class TaskHelper {
             actionName:actionName,
             haveToReg:haveToReg,
             haveToUnreg:haveToUnreg,
-            targetId:flag.name,
+            targetId:flag.id,
             roomName:flag.pos.roomName,
             x:flag.pos.x,
             y:flag.pos.y,
