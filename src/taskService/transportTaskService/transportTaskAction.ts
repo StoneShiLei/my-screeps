@@ -36,11 +36,11 @@ export class TransportTaskAction extends BaseTaskAction{
             //阻塞锁  防止1tick多任务时进行无效的拿起和放下操作
             creep._moveResourceActiveOK = true
 
+            //todo
             if(!opt.resourceCount) opt.resourceCount = 1e5
             const freeCapacity = creep.store.getFreeCapacity(opt.resouceType)
             const num = Math.min(freeCapacity,opt.resourceCount,target.store[opt.resouceType])
             creep.store[opt.resouceType] += num
-
             target.store[opt.resouceType] -= num
 
             creep.popTopTask()
