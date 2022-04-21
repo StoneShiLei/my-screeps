@@ -1,6 +1,28 @@
 
 
+const workerBodyConfig = {
+    lowLevelWorkerBodyCalctor:function(room:Room){
+        let totalEnergy = room.getEnergyCapacityAvailable()
+        if(!room.creeps("worker").length) totalEnergy = room.getEnergyAvailable()
+
+        let body = [WORK,CARRY,MOVE,MOVE]
+        let bodyEnergy = BodyConfig.getBodyCosts(body)
+        let out:BodyPartConstant[] = []
+        let count = 0;
+        for(let i=1; i*bodyEnergy<=totalEnergy; i++){
+            out = out.concat(body)
+            count += 1
+            if(count >= 12) break
+        }
+        return out;
+    }
+}
+
+
 export class BodyConfig{
+
+    static workerBodyConfig = workerBodyConfig
+
 
 
 
@@ -33,11 +55,13 @@ export class BodyConfig{
 
 
     public static getPartCount(creep:Creep,body:BodyPartConstant){
-        const name:BodyPartName = `${body}+`
-        if(creep.memory.bodyParts) creep.memory.bodyParts = {}
+        const name:BodyPartName = `${body}+` as BodyPartName
+        if(!creep.memory.bodyParts) creep.memory.bodyParts = {}
         if(creep.memory.bodyParts[name]) return creep.memory.bodyParts[name]
 
         creep.memory.bodyParts[name] = creep.body.filter(part => part.type === body).length
         return creep.memory.bodyParts[name]
     }
 }
+
+

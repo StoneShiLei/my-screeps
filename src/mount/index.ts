@@ -5,6 +5,7 @@ import { ArrayExtension } from "./array/array";
 import { CreepExtension } from "./creep/creep";
 import { FlagExtension } from "./flag/flag";
 import { RoomExtension } from "./room/room";
+import RoomPositionExtension from "./roomPosition/roomPosition";
 import { SpawnExtension } from "./spawn/spawn";
 
 
@@ -13,6 +14,7 @@ export default function():AppLifecycleCallbacks{
     Utils.assignPrototype(Array, ArrayExtension)
     Utils.assignPrototype(Creep,CreepExtension)
     Utils.assignPrototype(Room,RoomExtension)
+    Utils.assignPrototype(RoomPosition,RoomPositionExtension)
     Utils.assignPrototype(StructureSpawn,SpawnExtension)
     Utils.assignPrototype(Flag,FlagExtension)
 

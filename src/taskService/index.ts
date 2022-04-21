@@ -1,11 +1,13 @@
 import { Inject, Singleton } from "typescript-ioc";
-import { SpawnActionName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
+import { SourceActionName, SourceRegName, SourceTaskAction } from "./sourceTaskService/sourceTaskAction";
+import { SourceTaskService } from "./sourceTaskService/sourceTaskService";
+import { SpawnActionName, SpawnRegName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
 import { SpawnTaskService } from "./spawnTaskService/spawnTaskService";
-import { TransportActionName, TransportTaskAction } from "./transportTaskService/transportTaskAction";
+import { TransportActionName, TransportRegName, TransportTaskAction } from "./transportTaskService/transportTaskAction";
 import { TransportTaskService } from "./transportTaskService/transportTaskService";
-import { UpgradeActionName, UpgradeTaskAction } from "./upgradeTaskService/upgradeTaskAction";
+import { UpgradeActionName, UpgradeRegName, UpgradeTaskAction } from "./upgradeTaskService/upgradeTaskAction";
 import { UpgradeTaskService } from "./upgradeTaskService/upgradeTaskService";
-import { WorkActionName, WorkTaskAction } from "./workTaskService/workTaskAction";
+import { WorkActionName, WorkRegName, WorkTaskAction } from "./workTaskService/workTaskAction";
 import { WorkTaskService } from "./workTaskService/workTaskService";
 
 
@@ -24,11 +26,40 @@ export class TaskServiceProxy {
     @Inject
     upgradeTaskService!:UpgradeTaskService
 
+    @Inject
+    sourceTaskService!:SourceTaskService
+
 }
 
-export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService
-export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction
+export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService | SourceTaskService
+export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction | SourceTaskAction
 
-export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService"
-export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName
+export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService"
+export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName
+export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName
 
+
+declare global {
+    interface RoomMemory{
+        serviceDataMap?:ServiceDataMap
+    }
+}
+
+export type ServiceDataMap = {
+    [key in ServiceName]?:ServiceData
+}
+export type ServiceData = {
+    [key:string]:Data
+}
+export type Data = {
+    roomName:string,
+    targetId:string,
+    x:number,
+    y:number,
+    creeps:string[],
+    spawnTime:number,
+    pathTime:number,
+    containerId:string,
+    linkIdA:string,
+    linkIdB:string,
+}

@@ -2,7 +2,7 @@ interface Room {
     mass_stores:MassStore[]
     my:boolean
     level:number
-    update:void
+    update():void
     get<T extends CacheReturnType>(key:GetKey):T
 }
 

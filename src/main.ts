@@ -4,6 +4,8 @@ import { creepManagerCallbacks, creepRunner, roomManagerCallbacks, roomRunner } 
 import mountModules from "modules/index";
 import { TaskHelper } from "taskService/taskHelper";
 import { ErrorHelper } from "utils/erroHelper";
+import { Container } from "typescript-ioc";
+import { TaskServiceProxy } from "taskService";
 
 
 const app = createApp({
@@ -20,20 +22,36 @@ app.on(creepManagerCallbacks())
 
 app.on({
   tickStart: () => {
-    const room = Game.rooms['sim']
+    // debugger
+    // const room = Game.rooms['E48S6']
+    // const creep = room.creeps("worker").head()
+    // console.log('room var is ' + room._creeps)
 
+    // console.log('creep is ' + creep)
+    // console.log('creeps is ' + room.creeps())
     // console.log(JSON.stringify((room.get('extension') as StructureExtension[]).length))
     // const id = Game.flags['Flag1'].id
     // console.log(id)
-    const container = Game.getObjectById<StructureContainer>('61fc4e83493c2f9c4644925a')
+    // const container1 = Game.getObjectById<StructureContainer>('52b1d1b3199bee0569673a54')
+    // const container2 = Game.getObjectById<StructureContainer>('3d9a6944e2bf0780cf53edbd')
+    // const creep = Game.creeps['test12']
+    // if(container1  && container2&& creep &&creep.isIdle() &&! creep.spawning && Game.time % 50 === 0){
+    //   creep.addTask(TaskHelper.genTaskWithTarget(container2,"transportTaskService","fillResource",{
+    //     resouceType:RESOURCE_ENERGY,resourceCount:170
+    //   }))
+      // creep.addTask(TaskHelper.genTaskWithTarget(container1,"transportTaskService","transportResource",{
+      //   resouceType:RESOURCE_ENERGY,resourceCount:70
+      // }))
 
-    const creep = Game.creeps['test12']
-    debugger
-// console.log(container,creep)
-    if(container != null && !creep.hasTasks()){
-      creep.addTask(TaskHelper.genTaskWithTarget(container,'transportTaskService','transportResource',
-      {resouceType:RESOURCE_ENERGY,resourceCount:30},false,false))
-    }
+      // const service = Container.get(TaskServiceProxy)
+      // if(room.creeps('worker').length != 1 && container2){
+      //   service.spawnTaskService.trySpawn(room,room.name,'worker',10,[TaskHelper.genTaskWithTarget(container2,"transportTaskService","transportResource",{
+      //     resouceType:RESOURCE_ENERGY,resourceCount:170
+      //   })],(room:Room) => [WORK,CARRY,MOVE])
+      // }
+
+    //@ts-ignore
+    // console.log((container1 as AnyStoreStructure).store.getFreeCapacity())
 
   },
   tickEnd:()=>{

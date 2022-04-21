@@ -15,17 +15,4 @@ type BLUE = 'blue'
 type YELLOW = 'yellow'
 type RED = 'red'
 
-type StructureWithStore =
- StructureTower |
- StructureStorage |
- StructureContainer |
- StructureExtension |
- StructureFactory |
- StructureSpawn |
- StructurePowerSpawn |
- StructureLink |
- StructureTerminal |
- StructureNuker
-
-
 

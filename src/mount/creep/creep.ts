@@ -32,6 +32,16 @@ export class CreepExtension extends Creep {
             const action = this.getTopAction()
             action(this)
         }
+        else{
+            this.memory.dontPullMe = false;
+        }
+    }
+
+    topTargetGetter():TaskTarget | null{
+        if(!this.hasTasks()) return null
+
+        const target = Game.getObjectById<TaskTarget>(this.topTask.targetId)
+        return target
     }
 
     hasTasks():boolean{
@@ -39,20 +49,22 @@ export class CreepExtension extends Creep {
     }
 
     isIdle():boolean{
-        return this.tasks.length === 0
+        return !this.tasks.length
     }
 
     registerMyTasks(){
         _.forEach(this.tasks,(task) =>{
-            if(task.haveToReg){
-                this._taskService[task.serviceName as keyof TaskServiceProxy].registerTask(this)
+            if(task.regName){
+                const regFunc:(creep:Creep) => void = this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].actions[this.topTask.regName as keyof TaskAction]
+                regFunc(this)
             }
         })
     }
 
     unregisterMyTopTask(){
-        if(!this.topTask.haveToUnreg) return
-        this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].unregisterTask(this)
+        if(!this.topTask.unregName) return
+        const unregFunc:(creep:Creep) => void = this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].actions[this.topTask.unregName as keyof TaskAction]
+        unregFunc(this)
     }
 
     bottomTaskGetter():Task{
@@ -81,7 +93,7 @@ export class CreepExtension extends Creep {
     }
 
     storeIsEmpty():boolean{
-        return this.store.getUsedCapacity() <= 0
+        return this.store.getUsedCapacity() == 0
     }
 
     goTo(): GotoReturnCode
@@ -96,6 +108,13 @@ export class CreepExtension extends Creep {
         } else {
             const pos = new RoomPosition(target.x,target.y,target.roomName)
             return this.moveTo(pos,{ visualizePathStyle:{stroke: '#67ffed'} })
+        }
+    }
+
+    sayTopTask():void{
+        const task = this.topTask
+        if(task){
+            this.say(task.actionName)
         }
     }
 

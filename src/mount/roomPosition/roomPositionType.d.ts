@@ -7,4 +7,7 @@ interface RoomPosition{
      */
     getFreeSpace(): RoomPosition[]
 
+    nearPos(range:number): RoomPosition[]
+
+    walkable(withCreep?:boolean): boolean
 }

@@ -3,6 +3,7 @@ interface Creep{
     bottomTask:Task
     topTask:Task
     tasks:Task[]
+    topTarget:TaskTarget | null
 
     addTask(task:Task):Creep
     addTask(task:Task[]):Creep
@@ -25,11 +26,12 @@ interface Creep{
     storeIsFull():boolean
     storeIsEmpty():boolean
 
+    sayTopTask():void
 }
 
 interface CreepMemory{
     roomName:string
-    dontPullMe:boolean
+    dontPullMe?:boolean
 }
 
 

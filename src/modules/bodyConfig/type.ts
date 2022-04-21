@@ -13,7 +13,7 @@ type BodySet = {
 
 
 interface CreepMemory{
-    bodyParts:BodyParts
+    bodyParts?:BodyParts
 }
 
 type BodyPartName = 'move+' | 'work+' | 'carry+' | 'attack+' | 'ranged_attack+' | 'heal+' | 'claim+' | 'tough+';
@@ -27,3 +27,6 @@ type BodyParts = {
     'claim+'?: number
     'tough+'?: number
 }
+
+
+type BodyCalcFunc = (...args: any[])=>BodyPartConstant[]
