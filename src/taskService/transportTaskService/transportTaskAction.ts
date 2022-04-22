@@ -2,8 +2,9 @@ import { TaskServiceProxy } from "taskService";
 import { BaseTaskAction } from "taskService/baseTaskAction";
 import { TaskHelper } from "taskService/taskHelper";
 import { Container, Singleton } from "typescript-ioc"
+import { TransportTaskNameEntity } from "./transportTaskNameEntity";
 
-export type TransportActionName = 'transportResource' | 'fillResource' | 'goToNearAndPopTask' | 'pickupResource'
+export type TransportActionName = 'transportResource' | 'fillResource' | 'goToNearAndPopTask' | 'pickupResource' | 'goToAndPopTask'
 export type TransportRegName = 'registerTranDrops' | 'reg2'
 
 @Singleton
@@ -142,6 +143,22 @@ export class TransportTaskAction extends BaseTaskAction{
         creep.doWorkWithTopTask()
     }
 
+    goToAndPopTask(creep:Creep){
+        const target = creep.topTarget
+        if(!target) {
+            creep.popTopTask()
+            return
+        }
+        if(!creep.pos.isEqualTo(target.pos)){
+            creep.goTo(target)
+            return
+        }
+
+        creep.memory.dontPullMe = true;
+        creep.popTopTask()
+        creep.doWorkWithTopTask()
+    }
+
     pickupResource(creep:Creep){
         const target = creep.topTarget as Resource
         if(!target){
@@ -151,7 +168,7 @@ export class TransportTaskAction extends BaseTaskAction{
 
         const result = creep.pickup(target)
         if(result === ERR_NOT_IN_RANGE){
-            creep.addTask(TaskHelper.genTaskWithTarget(target,"transportTaskService","goToNearAndPopTask"))
+            creep.addTask(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("goToNearAndPopTask")))
             creep.doWorkWithTopTask()
         }
 

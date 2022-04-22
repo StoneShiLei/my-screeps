@@ -1,5 +1,6 @@
 import { BaseTaskAction } from "taskService/baseTaskAction"
 import { TaskHelper } from "taskService/taskHelper"
+import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity"
 import { Singleton } from "typescript-ioc"
 
 export type SpawnActionName = 'fillHive'
@@ -8,7 +9,7 @@ export type SpawnRegName = 'registerFillHiveInRoom'
 @Singleton
 export class SpawnTaskAction extends BaseTaskAction {
 
-    registerFillHiveInRoom(creep:Creep) {
+    registerFillHiveInRoom(creep:Creep):void {
         const room = Game.rooms[creep.memory.roomName]
         room._hiveEnergySending = room._hiveEnergySending ?? 0
         room._hiveEnergySendingReg = room._hiveEnergySendingReg ?? {}
@@ -43,7 +44,7 @@ export class SpawnTaskAction extends BaseTaskAction {
         }
 
         room._hiveEnergySendingReg[target.id] = true
-        creep.addTask(TaskHelper.genTaskWithTarget(target,"transportTaskService","fillResource",{resouceType:RESOURCE_ENERGY}))
+        creep.addTask(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("fillResource"),{resouceType:RESOURCE_ENERGY}))
         creep.doWorkWithTopTask()
     }
 

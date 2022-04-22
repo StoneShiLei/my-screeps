@@ -2,6 +2,7 @@ import { BaseTaskAction } from "taskService/baseTaskAction";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
 import { Inject } from "typescript-ioc";
+import { WorkTaskNameEntity } from "./workTaskNameEntity";
 import { WorkTaskAction } from "./workTaskAction";
 
 export class WorkTaskService extends BaseTaskService{
@@ -13,6 +14,6 @@ export class WorkTaskService extends BaseTaskService{
         const target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES)
         if(!target) return []
 
-        return [TaskHelper.genTaskWithTarget(target,"workTaskService","buildConst")]
+        return [TaskHelper.genTaskWithTarget(target,new WorkTaskNameEntity("buildConst"))]
     }
 }

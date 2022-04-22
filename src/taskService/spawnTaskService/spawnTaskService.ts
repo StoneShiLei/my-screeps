@@ -5,6 +5,7 @@ import { TaskHelper } from "taskService/taskHelper";
 import { Inject, Singleton } from "typescript-ioc";
 import Utils from "utils/utils";
 import { SpawnTaskAction } from "./spawnTaskAction";
+import { SpawnTaskNameEntity } from "./spawnTaskNameEntity";
 
 @Singleton
 export class SpawnTaskService extends BaseTaskService{
@@ -17,10 +18,10 @@ export class SpawnTaskService extends BaseTaskService{
 
     genFillHiveTask(creep:Creep,room:Room){
         room._hiveEnergySending += creep.store[RESOURCE_ENERGY] > 0 ? creep.store[RESOURCE_ENERGY] : creep.store.getFreeCapacity(RESOURCE_ENERGY)
-        return TaskHelper.genTaskWithTarget(creep,"spawnTaskService","fillHive",{resouceType:RESOURCE_ENERGY},"registerFillHiveInRoom")
+        return TaskHelper.genTaskWithTarget(creep,new SpawnTaskNameEntity("fillHive"),{resouceType:RESOURCE_ENERGY},new SpawnTaskNameEntity(undefined,"registerFillHiveInRoom"))
     }
 
-    trySpawn(spawnRoom:Room,targetRoomName:string,role:Role,priority:number,tasks:Task[],bodyFunc:BodyCalcFunc,opt?:SpawnOptions):string | undefined{
+    trySpawn(spawnRoom:Room,targetRoomName:string,role:Role,priority:number,tasks:Task[],bodyFunc:BodyCalcFunc,bodyFuncArgs:BodyCalcFuncArgs,opt?:SpawnOptions):string | undefined{
         if(!spawnRoom || !spawnRoom.my) {
             console.log(`the room not yours,cannot spawn in ${targetRoomName}`)
             return undefined
@@ -43,6 +44,7 @@ export class SpawnTaskService extends BaseTaskService{
             name: name,
             spawnOptions: opts,
             bodyFunc: bodyFunc,
+            bodyFuncArgs: bodyFuncArgs,
         })
         return name
     }
@@ -55,7 +57,7 @@ export class SpawnTaskService extends BaseTaskService{
         room._spawnQueue = _.sortByOrder(room._spawnQueue,(task) => task.priority,'desc')
         for(let spawnTask of room._spawnQueue){
 
-            const body = spawnTask.bodyFunc(room)
+            const body = spawnTask.bodyFunc(spawnTask.bodyFuncArgs)
             const spend = BodyConfig.getBodyCosts(body)
             if(room._currentEnergyAvailable < spend){
                 room._spawnQueue = []

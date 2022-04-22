@@ -39,9 +39,13 @@ export type ActionName = SpawnActionName | WorkActionName | TransportActionName 
 export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName
 
 
+
+
+
+
 declare global {
     interface RoomMemory{
-        serviceDataMap?:ServiceDataMap
+        serviceDataMap:ServiceDataMap
     }
 }
 
@@ -59,7 +63,7 @@ export type Data = {
     creeps:string[],
     spawnTime:number,
     pathTime:number,
-    containerId:string,
-    linkIdA:string,
-    linkIdB:string,
+    containerId:string | undefined,
+    linkIdA:string | undefined,
+    linkIdB:string | undefined,
 }

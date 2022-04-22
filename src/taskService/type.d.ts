@@ -3,12 +3,13 @@ interface CreepMemory {
     tasks:Task[];
 }
 
-type Role = "worker" | "transporter"
+type Role = "worker" | "transporter" | "energyHarvester"
 
 
 interface Task {
     serviceName:string
     actionName: string;
+    regServiceName?:string
     regName?:string;
     unregName?:string;
     targetId: Id<TaskTarget> | string;

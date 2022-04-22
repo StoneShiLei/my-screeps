@@ -22,6 +22,28 @@ app.on(creepManagerCallbacks())
 
 app.on({
   tickStart: () => {
+
+    // try{
+    //   const func:(...args: any[])=>number = function(str:string,num1:number,num2:number):number{
+    //     console.log(str)
+    //     return num1 + num2
+    //   }
+
+    //   const obj = {
+    //     a:"1",
+    //     b:1,
+    //     c:2
+    //   }
+
+    //   const result =  func(obj)
+    //   console.log(result)
+    // }
+    // catch(e){
+    //   if(e instanceof Error){
+    //     console.log(e.stack)
+    //   }
+    // }
+
     // debugger
     // const room = Game.rooms['E48S6']
     // const creep = room.creeps("worker").head()

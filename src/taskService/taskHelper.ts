@@ -1,15 +1,18 @@
-import { ActionName, RegName, ServiceName } from "taskService";
+import { ActionName, Data, RegName, ServiceName } from "taskService";
+import { BaseTaskNameEntity } from "./baseTaskNameEntity";
 
 export class TaskHelper {
 
 
-    static genTaskWithTarget(target:TaskTarget,serviceName:ServiceName,actionName:ActionName,
-        opt?:TaskOpt,reg?:RegName,unreg?:RegName):Task {
+    static genTaskWithTarget(target:TaskTarget,entity:BaseTaskNameEntity,
+        opt?:TaskOpt,regEntity?:BaseTaskNameEntity):Task {
+        if(!entity.actionName) throw new Error("actionName is not defined")
         const task:Task = {
-            serviceName:serviceName,
-            actionName:actionName,
-            regName:reg,
-            unregName:unreg,
+            serviceName:entity.serviceName,
+            actionName:entity.actionName,
+            regServiceName:regEntity?.serviceName,
+            regName:regEntity?.regName,
+            unregName:regEntity?.unregName,
             targetId:target.id,
             roomName:target.pos.roomName,
             x:target.pos.x,
@@ -19,17 +22,19 @@ export class TaskHelper {
         return task
     }
 
-    static genTaskWithOutView(targetId:string,roomName:string,x:number,y:number,serviceName:ServiceName,actionName:ActionName,
-        opt?:TaskOpt,reg?:RegName,unreg?:RegName):Task {
+    static genTaskWithServiceData(data:Data,entity:BaseTaskNameEntity,
+        opt?:TaskOpt,regEntity?:BaseTaskNameEntity):Task {
+            if(!entity.actionName) throw new Error("actionName is not defined")
             const task:Task = {
-                serviceName:serviceName,
-                actionName:actionName,
-                regName:reg,
-                unregName:unreg,
-                targetId:targetId,
-                roomName:roomName,
-                x:x,
-                y:y,
+                serviceName:entity.serviceName,
+                actionName:entity.actionName,
+                regServiceName:regEntity?.serviceName,
+                regName:regEntity?.regName,
+                unregName:regEntity?.unregName,
+                targetId:data.targetId,
+                roomName:data.roomName,
+                x:data.x,
+                y:data.y,
                 opt:opt
             }
             return task

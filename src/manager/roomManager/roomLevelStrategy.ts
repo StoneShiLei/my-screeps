@@ -25,7 +25,7 @@ export const roomLevelStrategy = {
                 const source = Game.getObjectById<Source>(data.targetId) as Source
                 //计算出source附近的空位 * 1.5倍数量
                 const posLen = source.pos.nearPos(1).filter(pos => pos.walkable()).length
-                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.hasTasks() && creep.topTask.targetId === source.id).length
+                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === source.id).length
 
                 if(Math.min(6,Math.ceil(targetCount)) > 0){
 
@@ -35,7 +35,7 @@ export const roomLevelStrategy = {
                         const spawnRoom = room.getClosestSpawnRoom(7,3,15)
                         if(!spawnRoom) return
                         if(spawnRoom.name != room.name && room.creeps("worker",false).length >=4) return
-                        service.spawnTaskService.trySpawn(spawnRoom,room.name,"worker",999,[],BodyConfig.workerBodyConfig.lowLevelWorkerBodyCalctor)
+                        service.spawnTaskService.trySpawn(spawnRoom,room.name,"worker",999,[],BodyConfig.workerBodyConfig.lowLevelWorkerBodyCalctor,{spawnRoom:spawnRoom})
                     }
                     else{}
                 }
@@ -45,7 +45,6 @@ export const roomLevelStrategy = {
         //填充hive、建造工地、升级
         room.creeps("worker").filter(creep => !creep.storeIsEmpty() && creep.isIdle()).forEach(creep =>{
             if(room.hiveIsNeedToFill()){
-                console.log(5)
                 creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
             }else if(room.level > 1 && room.constructionIsNeedBuild() && !room.isDownGrade()){
                 creep.addTask(service.workTaskService.genBuildTask(creep))
@@ -55,8 +54,17 @@ export const roomLevelStrategy = {
             }
         })
 
+
+        // service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
     },
     middleLevel:function(room:Room){
+
+        if(room.creeps("worker",false).length + room.creeps("transporter",false).length === 0) {
+            service.spawnTaskService.trySpawn(room,room.name,"worker",999,[],BodyConfig.workerBodyConfig.middleLevelWorkerBodyCalctor,{spawnRoom:room})
+        }
+
+        service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
+
 
     },
     highLevel:function(room:Room){

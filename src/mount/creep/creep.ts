@@ -54,8 +54,9 @@ export class CreepExtension extends Creep {
 
     registerMyTasks(){
         _.forEach(this.tasks,(task) =>{
-            if(task.regName){
-                const regFunc:(creep:Creep) => void = this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].actions[this.topTask.regName as keyof TaskAction]
+            if(task.regName && task.regServiceName){
+                const regFunc:(creep:Creep) => void = this._taskService[task.regServiceName as keyof TaskServiceProxy].actions[task.regName as keyof TaskAction]
+
                 regFunc(this)
             }
         })
@@ -63,7 +64,7 @@ export class CreepExtension extends Creep {
 
     unregisterMyTopTask(){
         if(!this.topTask.unregName) return
-        const unregFunc:(creep:Creep) => void = this._taskService[this.topTask.serviceName as keyof TaskServiceProxy].actions[this.topTask.unregName as keyof TaskAction]
+        const unregFunc:(creep:Creep) => void = this._taskService[this.topTask.regServiceName as keyof TaskServiceProxy].actions[this.topTask.unregName as keyof TaskAction]
         unregFunc(this)
     }
 

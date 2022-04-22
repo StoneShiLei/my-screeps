@@ -19,6 +19,7 @@ interface SpawnTask {
     name:string
     spawnOptions:SpawnOptions
     bodyFunc:BodyCalcFunc
+    bodyFuncArgs:BodyCalcFuncArgs
 }
 
 interface Game {
