@@ -3,7 +3,13 @@ interface CreepMemory {
     tasks:Task[];
 }
 
-type Role = "worker" | "transporter" | "energyHarvester"
+interface Room {
+    _used:{
+        [key:string]:boolean
+    }
+}
+
+type Role = "worker" | "transporter" | "energyHarvester" | "upgrader"
 
 
 interface Task {
@@ -22,7 +28,7 @@ interface Task {
 type TaskFunction = (creep:Creep) => void
 type TaskOpt = TransportTaskOpt
 type TransportTaskOpt = {
-    resouceType?:ResourceConstant;
+    resourceType?:ResourceConstant;
     resourceCount?:number
     fromStorage?:boolean
 }

@@ -4,6 +4,7 @@ import { Container } from "typescript-ioc"
 
 const service = Container.get(TaskServiceProxy)
 
+
 export const roomLevelStrategy = {
     lowLevel:function(room:Room){
 
@@ -46,11 +47,20 @@ export const roomLevelStrategy = {
         room.creeps("worker").filter(creep => !creep.storeIsEmpty() && creep.isIdle()).forEach(creep =>{
             if(room.hiveIsNeedToFill()){
                 creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
-            }else if(room.level > 1 && room.constructionIsNeedBuild() && !room.isDownGrade()){
+            }
+            else if(room.level > 1 && room.constructionIsNeedBuild() && !room.isDownGrade()){
                 creep.addTask(service.workTaskService.genBuildTask(creep))
             }
             else {
-                creep.addTask(service.upgradeTaskService.genUpgradeTask(room))
+                //临时维修逻辑
+                const repairTask = service.workTaskService.genRepairTask(creep)
+                if(repairTask.length){
+                    creep.addTask(repairTask)
+                }
+                else{
+                    creep.addTask(service.upgradeTaskService.genUpgradeTask(room))
+                }
+
             }
         })
 
@@ -63,9 +73,50 @@ export const roomLevelStrategy = {
             service.spawnTaskService.trySpawn(room,room.name,"worker",999,[],BodyConfig.workerBodyConfig.middleLevelWorkerBodyCalctor,{spawnRoom:room})
         }
 
+        //生成持续挖矿任务并生成creep
         service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
 
+        //worker挖矿任务
+        _.values<Data>(room.memory.serviceDataMap["sourceTaskService"]).forEach(data => {
+            if(data.creeps.length ===0){
+                const posLen = Game.getObjectById<Source>(data.targetId)?.pos.nearPos(1).filter(pos => pos.walkable()).length ?? 0
+                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === data.targetId).length
+                if(Math.min(6,Math.ceil(targetCount)) > 0){
+                    const creep = room.creeps("worker").filter(creep => creep.storeIsEmpty() && creep.isIdle()).head()
+                    if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
+                }
+            }
+        })
 
+        // 有工地的时候在造worker 或者全死光了
+        // 当worker少于2 或 空闲的transporter数量大于worker的数量
+        // 且 当 空闲的worker少于2时
+        if((room.get<ConstructionSite[]>("constructionSite").length || room.creeps(undefined,false).length == 0) &&
+        (room.creeps("worker",false).length < 2 || ((room.creeps("transporter").filter(t => t.isIdle()).length > room.creeps("worker",false).length) &&
+        room.creeps("worker",false).filter(w => w.isIdle()).length < 2))){
+            service.spawnTaskService.trySpawn(room,room.name,"worker",999,[],BodyConfig.workerBodyConfig.middleLevelWorkerBodyCalctor,{spawnRoom:room})
+        }
+
+        //升级
+        const upgradeMap = room.memory.serviceDataMap["upgradeTaskService"]
+        if(upgradeMap && Game.getObjectById(upgradeMap[STRUCTURE_CONTAINER].targetId)){
+            if(room.creeps("upgrader").length == 0 ||
+            room.creeps("upgrader").length < room.creeps("transporter").filter(t => t.isIdle() && t.store[RESOURCE_ENERGY] > 0).length - 1){
+                service.upgradeTaskService.trySpawnUpgrader(room)
+            }
+        }
+
+        const pickTasks = service.transportTaskService.genPickupTranTask(room,true)
+        const tranTasks = service.sourceTaskService.genEnergyTranTask(room)
+        room.creeps("transporter").filter(e => e.storeIsEmpty() && e.isIdle()).forEach(creep => {
+            if(tranTasks.length){
+                creep.addTask(tranTasks.pop() as Task)
+            }
+            else if(pickTasks.length){
+                creep.addTask(pickTasks.pop() as Task)
+            }
+            else{}
+        })
     },
     highLevel:function(room:Room){
 

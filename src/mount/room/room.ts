@@ -55,9 +55,13 @@ export class RoomExtension extends Room {
 
         //更新建筑缓存
         this.update()
-        //更新souce、container、link缓存
+        //更新souce配套设施缓存
         this._taskService.sourceTaskService.update(this)
+
+        //更新controller配套设施缓存
+        this._taskService.upgradeTaskService.update(this)
     }
+
 
     isDownGrade():boolean{
         if(!this.controller) return false
@@ -65,7 +69,6 @@ export class RoomExtension extends Room {
         const roomExtNum = (this.get(STRUCTURE_EXTENSION) as StructureExtension[]).length
         const thisLevelExtNum = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][this.level]
 
-        //判断是否降级
         return this.controller.progressTotal < this.controller.progress || (roomExtNum > thisLevelExtNum)
     }
 

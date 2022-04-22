@@ -1,5 +1,6 @@
 import { TaskAction, TaskServiceProxy } from "taskService";
 import { Inject } from "typescript-ioc";
+import autoPlanner63 from "autoPlanner63"
 
 export class CreepExtension extends Creep {
 
@@ -115,7 +116,8 @@ export class CreepExtension extends Creep {
     sayTopTask():void{
         const task = this.topTask
         if(task){
-            this.say(task.actionName)
+            // this.say(task.actionName)
+            autoPlanner63.HelperVisual.showText(this,task.actionName)
         }
     }
 

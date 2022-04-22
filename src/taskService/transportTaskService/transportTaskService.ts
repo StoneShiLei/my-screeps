@@ -17,7 +17,7 @@ export class TransportTaskService extends BaseTaskService{
     genMassStoreEnergyTranTask(room:Room,energyCount:number = 6600):Task[]{
         if(room.storage && room.storage.store.energy >= 2000){
             return [TaskHelper.genTaskWithTarget(room.storage,new TransportTaskNameEntity("transportResource"),{
-                resouceType:RESOURCE_ENERGY,resourceCount:energyCount
+                resourceType:RESOURCE_ENERGY,resourceCount:energyCount
             })]
         }
 
@@ -28,15 +28,15 @@ export class TransportTaskService extends BaseTaskService{
         return []
     }
 
-    genMassStoreTranTask(room:Room,resouceType:ResourceConstant,carryAbleCount:number,regNameEntity?:BaseTaskNameEntity):Task[]{
+    genMassStoreTranTask(room:Room,resourceType:ResourceConstant,carryAbleCount:number,regNameEntity?:BaseTaskNameEntity):Task[]{
         const tasks:Task[] = []
 
         for(let target of [room.storage,room.terminal]){
             if(!target) continue;
-            const currentCount = Math.min(target.store[resouceType] ?? 0,carryAbleCount)
+            const currentCount = Math.min(target.store[resourceType] ?? 0,carryAbleCount)
             carryAbleCount -= currentCount
             if(currentCount > 0) tasks.push(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("transportResource"),{
-                resouceType,resourceCount:currentCount
+                resourceType,resourceCount:currentCount
             },regNameEntity))
 
             if(carryAbleCount <= 0) break;
@@ -64,11 +64,11 @@ export class TransportTaskService extends BaseTaskService{
                 if(drops.store.getUsedCapacity(onlyEnergy ? RESOURCE_ENERGY : undefined)){
                     if(onlyEnergy){
                         return [TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("transportResource"),
-                        {resouceType:RESOURCE_ENERGY},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
+                        {resourceType:RESOURCE_ENERGY},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
                     }
                     else{
-                        return _.keys(drops.store).map(resouceType => TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("transportResource"),{
-                            resouceType:resouceType as ResourceConstant},new TransportTaskNameEntity(undefined,"registerTranDrops")))
+                        return _.keys(drops.store).map(resourceType => TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("transportResource"),{
+                            resourceType:resourceType as ResourceConstant},new TransportTaskNameEntity(undefined,"registerTranDrops")))
                     }
                 }
                 return undefined
@@ -80,7 +80,7 @@ export class TransportTaskService extends BaseTaskService{
             .filter(d => !room._roomDropRegMap[d.id])
             .filter(d => (d.resourceType != RESOURCE_ENERGY || d.amount > 100) && (onlyEnergy ? d.resourceType == RESOURCE_ENERGY : true))
             .map(drops =>{
-                return [TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("pickupResource"),{resouceType:drops.resourceType},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
+                return [TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("pickupResource"),{resourceType:drops.resourceType},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
             })
         const temp2:Task[] = []
         pickTasks.forEach(t => temp2.concat(t))

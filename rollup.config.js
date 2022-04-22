@@ -34,6 +34,8 @@ export default {
           { src: "./src/utils/watch-client.js", dest: "./dist/" },
           { src: "./src/modules/superMove/superMove.js", dest: "./dist/" },
           { src: "./src/modules/structureCache/structureCache.js", dest: "./dist/" },
+          { src: "./src/modules/autoPlanner63/autoPlanner63.js", dest: "./dist/" },
+          { src: "./src/modules/autoPlanner63/algo_wasm_priorityqueue.wasm", dest: "./dist/" },
       ]
   }),
   ]

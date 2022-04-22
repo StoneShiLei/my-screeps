@@ -5,7 +5,7 @@ import { TransportTaskNameEntity } from "taskService/transportTaskService/transp
 import { Container, Singleton } from "typescript-ioc";
 
 export type SourceActionName = 'harvestEnergy' | 'harvestEnergyKeeper' | 'harvestEnergyOutterKeeper'
-export type SourceRegName = 'registerSources'
+export type SourceRegName = 'registerSources' | 'registerSourcesTranInRoom'
 
 @Singleton
 export class SourceTaskAction extends BaseTaskAction {
@@ -25,6 +25,12 @@ export class SourceTaskAction extends BaseTaskAction {
                 rmHarList.push(creep.id)
             }
         }
+    }
+
+    registerSourcesTranInRoom(creep:Creep){
+        const room = Game.rooms[creep.memory.roomName]
+        room._used = room._used || {}
+        room._used[creep.topTask.targetId] = true
     }
 
     harvestEnergyKeeper(creep:Creep){
@@ -157,9 +163,9 @@ export class SourceTaskAction extends BaseTaskAction {
         if(!map) return
 
         const sourceData = map[creep.topTask.targetId]
-        const pathTime = Game.time - sourceData.spawnTime //（接触时间 - 出生时间  = 移动时间）
+        const pathTime = Game.time - (sourceData.spawnTime ?? 0) //（接触时间 - 出生时间  = 移动时间）
         // （移动时间）+ 生的时间 -  这样下次走到那边就可以刚刚好前面那只死掉,再缓冲 10tick 理论上走到后寿命不足1500t 不和能量重生重合
-        sourceData["spawnTime"] -= pathTime + creep.body.length * 3 - 10
+        sourceData["spawnTime"] = (sourceData["spawnTime"] ?? 0) - pathTime + creep.body.length * 3 - 10
         sourceData["pathTime"] = pathTime
     }
 }

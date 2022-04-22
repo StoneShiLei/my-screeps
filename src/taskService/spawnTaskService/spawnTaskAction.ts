@@ -44,7 +44,7 @@ export class SpawnTaskAction extends BaseTaskAction {
         }
 
         room._hiveEnergySendingReg[target.id] = true
-        creep.addTask(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("fillResource"),{resouceType:RESOURCE_ENERGY}))
+        creep.addTask(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}))
         creep.doWorkWithTopTask()
     }
 

@@ -39,7 +39,7 @@ export class CreepManager extends BaseManager{
     }
     run(target: Creep): void {
         const creep = target;
-        creep.sayTopTask()
+        // creep.sayTopTask()
         creep.doWorkWithTopTask()
     }
 

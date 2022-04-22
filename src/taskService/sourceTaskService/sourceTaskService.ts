@@ -1,7 +1,8 @@
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
-import { Data, ServiceData, TaskServiceProxy } from "taskService";
+import { Data, ServiceData, ServiceDataMap, TaskServiceProxy } from "taskService";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
+import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 import { Container, Inject, Singleton } from "typescript-ioc";
 import { SourceTaskAction } from "./sourceTaskAction";
 import { SourceTaskNameEntity } from "./sourceTaskNameEntity";
@@ -22,6 +23,33 @@ export class SourceTaskService extends BaseTaskService{
 
     genHarvestOuterTask(data:Data):Task[]{
         return [TaskHelper.genTaskWithServiceData(data,new SourceTaskNameEntity("harvestEnergyOutterKeeper"),undefined,new SourceTaskNameEntity(undefined,"registerSources"))]
+    }
+
+    genEnergyTranTask(room:Room,minEnergy:number = 1200):Task[]{
+        const rm = room.memory
+        room._used = room._used || {}
+
+        let tasks:Task[] = []
+
+        if(!rm) return tasks
+
+        if(room.level == 8) minEnergy = 1600
+
+        let maxContainerEnergyCount = 0;
+        for(let data of _.values<Data>(rm.serviceDataMap["sourceTaskService"])){
+            if(!data.containerId) continue
+            const container = Game.getObjectById<StructureContainer>(data.containerId)
+            if(container && container.store[RESOURCE_ENERGY] > maxContainerEnergyCount){
+                maxContainerEnergyCount = container.store[RESOURCE_ENERGY]
+            }
+            if(container && container.store[RESOURCE_ENERGY] > minEnergy && !room._used[container.id]){
+                tasks.push(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("transportResource"),{
+                    resourceType:RESOURCE_ENERGY
+                },new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+            }
+        }
+
+        return tasks
     }
 
     trySpawnHarvesterKeeper(workRoom:string,spawnRoom:Room){
@@ -57,7 +85,7 @@ export class SourceTaskService extends BaseTaskService{
 
             sourceData.creeps = sourceData.creeps.filter(creepId => Game.getObjectById<Creep>(creepId))
 
-            if(sourceData.targetId && (Game.time - sourceData.spawnTime > 1500 || sourceData.creeps.length === 0)){
+            if(sourceData.targetId && (Game.time - (sourceData.spawnTime ?? 0) > 1500 || sourceData.creeps.length === 0)){
                 const tasks = (workRoom == spawnRoom.name) ? this.genHarvestTask(sourceData) : this.genHarvestOuterTask(sourceData)
                 service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"energyHarvester",900,tasks,BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,
                 {energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:workRoom !== spawnRoom.name})

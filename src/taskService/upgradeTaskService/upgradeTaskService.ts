@@ -1,8 +1,10 @@
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
-import { Inject, Singleton } from "typescript-ioc";
+import { Container, Inject, Singleton } from "typescript-ioc";
 import { UpgradeTaskNameEntity } from "./upgradeTaskNameEntity";
 import { UpgradeTaskAction } from "./upgradeTaskAction";
+import { TaskServiceProxy } from "taskService";
+import { BodyConfig } from "modules/bodyConfig/bodyConfig";
 
 @Singleton
 export class UpgradeTaskService extends BaseTaskService{
@@ -14,7 +16,70 @@ export class UpgradeTaskService extends BaseTaskService{
         if(room.controller && room.controller.my){
             return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgrade"))]
         }
-
         return[]
     }
+
+    genUpgradeKeeperTask(room:Room):Task[]{
+        if(!room.controller || !room.controller.my) return []
+        return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgradeKeeper"))]
+    }
+
+    trySpawnUpgrader(room:Room):void{
+        const rm = room.memory.serviceDataMap["upgradeTaskService"]
+        if(!rm || !room.controller) return
+        const data = rm[STRUCTURE_CONTROLLER]
+        if(!data.creeps) data.creeps = []
+
+        if(!data.containerId || !Game.getObjectById(data.containerId)) return
+
+        data.creeps = data.creeps.filter(e => Game.getObjectById(e))
+
+        if(room.level < 8 || !room.storage){
+            let minUpgraderCount = 0;
+            if(!room.storage || room.controller.progress >= room.controller.progressTotal){
+                this._trySpawnUpgrader(room)
+            }
+            else if(((room.storage.store[RESOURCE_ENERGY]-(room.level-3.5)*10000) / 100000  > room.creeps("upgrader",false).length) ||
+            room.controller.ticksToDowngrade < 500 ||
+            (room.storage.store[RESOURCE_ENERGY]>10000 && minUpgraderCount > room.creeps("upgrader",false).length)){
+                this._trySpawnUpgrader(room)
+            }
+            else{}
+        }
+    }
+
+    update(room:Room){
+        if(!room.controller) return
+        let map = room.memory.serviceDataMap["upgradeTaskService"] || {}
+        let data = map[STRUCTURE_CONTROLLER] || {}
+        let container = room.controller.pos.findInRange(FIND_STRUCTURES,1,{filter:s=>s.structureType == STRUCTURE_CONTAINER}).head()
+        if(container && data.containerId  && !Game.getObjectById(data.containerId)) data.containerId = container.id
+
+        if(container){
+            const link = room.get<StructureLink[]>("link").filter(e => container.pos.isNearTo(e)).head()
+            if(link) {
+                data.linkIdA = link.id
+                data.linkIdB = link.id
+            }
+        }
+
+        data.targetId = room.controller.id
+        data.x = room.controller.pos.x
+        data.y = room.controller.pos.y
+        data.roomName = room.name
+        data.creeps = map[STRUCTURE_CONTROLLER].creeps || []
+
+        map[STRUCTURE_CONTROLLER] = data
+    }
+
+    private _trySpawnUpgrader(room:Room):void{
+        const tasks = this.genUpgradeKeeperTask(room)
+        if(!tasks.length) return
+
+        const service = Container.get(TaskServiceProxy)
+        service.spawnTaskService.trySpawn(room,room.name,"upgrader",100,tasks,
+        BodyConfig.upgraderBodyConfig.lowLevelUpgraderBodyCalctor,{spawnRoom:room})
+    }
+
+
 }

@@ -1,7 +1,7 @@
 import { BaseTaskAction } from "taskService/baseTaskAction"
 import { Singleton } from "typescript-ioc"
 
-export type UpgradeActionName = 'upgrade'
+export type UpgradeActionName = 'upgrade' | 'upgradeKeeper'
 export type UpgradeRegName = 'registerUpgrade'
 
 @Singleton

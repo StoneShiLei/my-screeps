@@ -66,12 +66,36 @@ const harvesterBodyConfig:BodyConfigCalctor = {
     }
 }
 
+const upgraderBodyConfig:BodyConfigCalctor = {
+    lowLevelUpgraderBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const room = args.spawnRoom
+        if(!room) throw new Error("args.spawnRoom is null")
+
+        let current = 0;
+        let cost = BodyConfig.getBodyCosts([WORK,WORK,MOVE])
+        let num = 0
+        let energy = room.getEnergyCapacityAvailable()
+        while(current + cost <= energy - BODYPART_COST[CARRY] * Math.ceil(num/5)){ // 超过 10个 work 加一个 carry
+            num += 1
+            current += cost
+            if(num >= 16) break;
+        }
+
+        let is16 = 0
+        if(num === 16){
+            num -= 1;
+            is16 = 2;
+        }
+        return BodyConfig.calcBodyParts({work:num * 2,carry:Math.ceil(num/5) + is16 ,move:num});
+    }
+}
+
 
 export class BodyConfig{
 
     static workerBodyConfig:BodyConfigCalctor = workerBodyConfig
     static harvesterBodyConfig:BodyConfigCalctor = harvesterBodyConfig
-
+    static upgraderBodyConfig:BodyConfigCalctor = upgraderBodyConfig
 
 
     public static getBodyCosts(body:BodyPartConstant[]){
