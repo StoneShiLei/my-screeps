@@ -122,7 +122,7 @@ global.structuresColor= {
     "nuker": "cyan",
     "factory": "yellow"
 }
-helpervisual={
+let helpervisual={
     //线性同余随机数
     rnd : function( seed ){
     return ( seed * 9301 + 49297 ) % 233280; //为何使用这三个数?
@@ -1516,7 +1516,7 @@ let pro={
 
 global.ManagerPlanner = pro;
 
-loop = function () {
+let loop = function () {
     let roomStructsData = undefined //放全局变量
 
     let p = Game.flags.p; // 触发器

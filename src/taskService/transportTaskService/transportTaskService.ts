@@ -44,16 +44,17 @@ export class TransportTaskService extends BaseTaskService{
         return tasks;
     }
 
-    genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
+    takeCachedPickupTranTask(room:Room,idleCreeps:Creep[],onlyEnergy:boolean = false){
         let pickTasks = this._pickupTaskCacheMap[room.name] ?? []
+        //捡起资源 性能消耗高  9tick更新一次task
         if(Game.time + room.hashCode() % 9 == 0){
-            pickTasks = this._genPickupTranTask(room,onlyEnergy) // generatorCarryMineralTask
+            pickTasks = this.genPickupTranTask(room,onlyEnergy) // generatorCarryMineralTask
         }
+        if(idleCreeps.length > 0 && pickTasks.length > 0) idleCreeps.pop()?.addTask(pickTasks.pop())
         this._pickupTaskCacheMap[room.name] = pickTasks;
-        return pickTasks
     }
 
-    private _genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
+    genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
         room._roomDropRegMap = room._roomDropRegMap ?? {}
 
         const tombstones = room.find(FIND_TOMBSTONES) as unknown as AnyStoreStructure[]

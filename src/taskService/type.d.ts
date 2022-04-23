@@ -5,7 +5,7 @@ interface CreepMemory {
 
 interface Room {
     _used:{
-        [key:string]:boolean
+        [key:string]:number
     }
 }
 

@@ -5,6 +5,7 @@ import { UpgradeTaskNameEntity } from "./upgradeTaskNameEntity";
 import { UpgradeTaskAction } from "./upgradeTaskAction";
 import { TaskServiceProxy } from "taskService";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
+import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 
 @Singleton
 export class UpgradeTaskService extends BaseTaskService{
@@ -14,14 +15,42 @@ export class UpgradeTaskService extends BaseTaskService{
 
     genUpgradeTask(room:Room):Task[]{
         if(room.controller && room.controller.my){
-            return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgrade"))]
+            return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgrade"),undefined,
+            new UpgradeTaskNameEntity(undefined,"registerUpgrade"))]
         }
         return[]
     }
 
     genUpgradeKeeperTask(room:Room):Task[]{
         if(!room.controller || !room.controller.my) return []
-        return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgradeKeeper"))]
+        return [TaskHelper.genTaskWithTarget(room.controller,new UpgradeTaskNameEntity("upgradeKeeper"),undefined,
+        new UpgradeTaskNameEntity(undefined,"registerUpgrade"))]
+    }
+
+    genFillUpgradeEnergyTask(room:Room,carryCap?:number):Task[]{
+        const map = room.memory.serviceDataMap.upgradeTaskService
+        if(!map || !carryCap) return []
+        const data = map[STRUCTURE_CONTROLLER]
+        room._used = room._used || {}
+
+        if(data.linkIdA){
+            // const link = Game.getObjectById(data.linkIdA)
+        }
+
+        if(data.containerId){
+            const container = Game.getObjectById<StructureContainer>(data.containerId)
+            if(container){
+                room._used[container.id] = room._used[container.id] ?? 0
+                const num1 = room._used[container.id] + container.store[RESOURCE_ENERGY] + Math.min(1000,Math.max(carryCap-400,0))
+                const num2 = room._used[container.id] + container.store.getUsedCapacity(RESOURCE_ENERGY)
+                if(num1 < 2000 && num2 < 800){
+                    return[TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
+                    ,new UpgradeTaskNameEntity(undefined,"registerUpgradeTranEnergyInRoom"))]
+                }
+            }
+        }
+
+        return []
     }
 
     trySpawnUpgrader(room:Room):void{
@@ -67,9 +96,10 @@ export class UpgradeTaskService extends BaseTaskService{
         data.x = room.controller.pos.x
         data.y = room.controller.pos.y
         data.roomName = room.name
-        data.creeps = map[STRUCTURE_CONTROLLER].creeps || []
+        data.creeps = map[STRUCTURE_CONTROLLER]?.creeps || []
 
         map[STRUCTURE_CONTROLLER] = data
+        room.memory.serviceDataMap["upgradeTaskService"] = map
     }
 
     private _trySpawnUpgrader(room:Room):void{

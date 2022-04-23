@@ -35,13 +35,10 @@ export class SourceTaskService extends BaseTaskService{
 
         if(room.level == 8) minEnergy = 1600
 
-        let maxContainerEnergyCount = 0;
         for(let data of _.values<Data>(rm.serviceDataMap["sourceTaskService"])){
             if(!data.containerId) continue
             const container = Game.getObjectById<StructureContainer>(data.containerId)
-            if(container && container.store[RESOURCE_ENERGY] > maxContainerEnergyCount){
-                maxContainerEnergyCount = container.store[RESOURCE_ENERGY]
-            }
+
             if(container && container.store[RESOURCE_ENERGY] > minEnergy && !room._used[container.id]){
                 tasks.push(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("transportResource"),{
                     resourceType:RESOURCE_ENERGY

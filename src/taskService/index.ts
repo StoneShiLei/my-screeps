@@ -3,6 +3,8 @@ import { SourceActionName, SourceRegName, SourceTaskAction } from "./sourceTaskS
 import { SourceTaskService } from "./sourceTaskService/sourceTaskService";
 import { SpawnActionName, SpawnRegName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
 import { SpawnTaskService } from "./spawnTaskService/spawnTaskService";
+import { TowerActionName, TowerRegName, TowerTaskAction } from "./towerTaskService/towerTaskAction";
+import { TowerTaskService } from "./towerTaskService/towerTaskService";
 import { TransportActionName, TransportRegName, TransportTaskAction } from "./transportTaskService/transportTaskAction";
 import { TransportTaskService } from "./transportTaskService/transportTaskService";
 import { UpgradeActionName, UpgradeRegName, UpgradeTaskAction } from "./upgradeTaskService/upgradeTaskAction";
@@ -29,14 +31,17 @@ export class TaskServiceProxy {
     @Inject
     sourceTaskService!:SourceTaskService
 
+    @Inject
+    towerTaskService!:TowerTaskService
+
 }
 
-export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService | SourceTaskService
-export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction | SourceTaskAction
+export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService | SourceTaskService | TowerTaskService
+export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction | SourceTaskAction | TowerTaskAction
 
-export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService"
-export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName
-export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName
+export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService" | "towerTaskService"
+export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName | TowerActionName
+export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName
 
 
 

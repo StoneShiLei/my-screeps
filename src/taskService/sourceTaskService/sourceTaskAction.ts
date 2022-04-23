@@ -30,7 +30,7 @@ export class SourceTaskAction extends BaseTaskAction {
     registerSourcesTranInRoom(creep:Creep){
         const room = Game.rooms[creep.memory.roomName]
         room._used = room._used || {}
-        room._used[creep.topTask.targetId] = true
+        room._used[creep.topTask.targetId] = 1
     }
 
     harvestEnergyKeeper(creep:Creep){

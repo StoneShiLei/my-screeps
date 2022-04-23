@@ -5,8 +5,8 @@ interface Creep{
     tasks:Task[]
     topTarget:TaskTarget | null
 
-    addTask(task:Task):Creep
-    addTask(task:Task[]):Creep
+    addTask(task:Task | undefined):Creep
+    addTask(task:Task[] | undefined[]):Creep
     popTopTask():Creep
 
     doWorkWithTopTask():void

@@ -60,6 +60,9 @@ export class RoomExtension extends Room {
 
         //更新controller配套设施缓存
         this._taskService.upgradeTaskService.update(this)
+
+        //更新tower缓存目标
+        this._taskService.towerTaskService.update(this)
     }
 
 

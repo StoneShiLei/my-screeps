@@ -1,22 +1,37 @@
+import { BodyConfig } from "modules/bodyConfig/bodyConfig"
 import { BaseTaskAction } from "taskService/baseTaskAction"
 import { Singleton } from "typescript-ioc"
 
 export type UpgradeActionName = 'upgrade' | 'upgradeKeeper'
-export type UpgradeRegName = 'registerUpgrade'
+export type UpgradeRegName = 'registerUpgrade' | 'unregisterUpgrade' | 'registerUpgradeTranEnergyInRoom'
 
 @Singleton
 export class UpgradeTaskAction extends BaseTaskAction {
 
-    // registerUpgrade(creep:Creep){
-    //     const rm = Memory.rooms[creep.memory.roomName]
+    registerUpgrade(creep:Creep){
+        const map = Memory.rooms[creep.memory.roomName].serviceDataMap['upgradeTaskService']
+        if(!map) return
+        const data = map[STRUCTURE_CONTROLLER]
+        if(creep.spawning) data.spawnTime = Game.time
 
-    //     if(rm && rm.serviceDataMap && rm.serviceDataMap['upgradeTaskService']){
-    //         const source = rm.serviceDataMap['upgradeTaskService']
-    //         if(creep){
-    //             source.spawnTime = Game.time
-    //         }
-    //     }
-    // }
+        if(!_.contains(data.creeps,creep.id)) data.creeps.push(creep.id)
+    }
+
+    unregisterUpgrade(creep:Creep){
+        const map = Memory.rooms[creep.memory.roomName].serviceDataMap['upgradeTaskService']
+        if(!map) return
+        const data = map[STRUCTURE_CONTROLLER]
+        data.creeps = _.without(data.creeps,creep.id)
+    }
+
+
+    registerUpgradeTranEnergyInRoom(creep:Creep){
+        const room = Game.rooms
+        room._used = room._used || {}
+        const id = creep.topTask.targetId
+        room._used[id] = (room._used[id] || 0) + BodyConfig.getPartCount(creep,CARRY) * 50
+    }
+
 
     upgrade(creep:Creep) {
         if(creep.store[RESOURCE_ENERGY] == 0) creep.popTopTask()

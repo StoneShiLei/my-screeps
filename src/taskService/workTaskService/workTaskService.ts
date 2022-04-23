@@ -17,12 +17,4 @@ export class WorkTaskService extends BaseTaskService{
 
         return [TaskHelper.genTaskWithTarget(target,new WorkTaskNameEntity("buildConst"))]
     }
-
-    genRepairTask(creep:Creep):Task[]{
-        const target = creep.pos.findClosestByPath(FIND_STRUCTURES,
-            {filter:s => s.hits < s.hitsMax * 0.9 && s.structureType != STRUCTURE_RAMPART && s.structureType != STRUCTURE_WALL})
-        if(!target) return []
-
-        return [TaskHelper.genTaskWithTarget(target,new WorkTaskNameEntity("repairStructure"))]
-    }
 }

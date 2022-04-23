@@ -16,7 +16,8 @@ export class SpawnTaskService extends BaseTaskService{
 
 
 
-    genFillHiveTask(creep:Creep,room:Room){
+    genFillHiveTask(creep:Creep,room:Room):Task{
+
         room._hiveEnergySending += creep.store[RESOURCE_ENERGY] > 0 ? creep.store[RESOURCE_ENERGY] : creep.store.getFreeCapacity(RESOURCE_ENERGY)
         return TaskHelper.genTaskWithTarget(creep,new SpawnTaskNameEntity("fillHive"),{resourceType:RESOURCE_ENERGY},new SpawnTaskNameEntity(undefined,"registerFillHiveInRoom"))
     }

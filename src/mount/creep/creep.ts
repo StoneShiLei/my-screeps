@@ -8,16 +8,18 @@ export class CreepExtension extends Creep {
     private _taskService!: TaskServiceProxy;
 
 
-    addTask(task:Task):Creep;
-    addTask(task:Task[]):Creep;
-    addTask(task:Task | Task[]):Creep{
+    addTask(task:Task | undefined):Creep;
+    addTask(task:Task[] | undefined[]):Creep;
+    addTask(task:Task | Task[] | undefined | undefined[]):Creep{
         if(task instanceof Array){
             _.forEach(task,(task) =>{
-                this.tasks.push(task)
+                if(task)
+                    this.tasks.push(task)
             })
         }
         else{
-            this.tasks.push(task)
+            if(task)
+                this.tasks.push(task)
         }
 
         return this

@@ -66,6 +66,23 @@ const harvesterBodyConfig:BodyConfigCalctor = {
     }
 }
 
+const transporterBodyConfig:BodyConfigCalctor = {
+    transporterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const room = args.spawnRoom
+        if(!room) throw new Error("args.spawnRoom is null")
+
+        const totalEnergy = room.getEnergyCapacityAvailable()
+        let body = [CARRY,CARRY,MOVE]
+        let bodyEnergy = BodyConfig.getBodyCosts(body)
+        let num = 0
+        for(let i=1;i*bodyEnergy <= totalEnergy;i++){
+            if(num >= 17) break
+            num += 1
+        }
+        return BodyConfig.calcBodyParts({carry:num<17 ? num*2 : num*2-1,move:num});
+    }
+}
+
 const upgraderBodyConfig:BodyConfigCalctor = {
     lowLevelUpgraderBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
         const room = args.spawnRoom
@@ -96,6 +113,7 @@ export class BodyConfig{
     static workerBodyConfig:BodyConfigCalctor = workerBodyConfig
     static harvesterBodyConfig:BodyConfigCalctor = harvesterBodyConfig
     static upgraderBodyConfig:BodyConfigCalctor = upgraderBodyConfig
+    static transporterBodyConfig:BodyConfigCalctor = transporterBodyConfig
 
 
     public static getBodyCosts(body:BodyPartConstant[]){
@@ -126,7 +144,8 @@ export class BodyConfig{
     }
 
 
-    public static getPartCount(creep:Creep,body:BodyPartConstant):number{
+    public static getPartCount(creep?:Creep,body?:BodyPartConstant):number{
+        if(!creep || !body) return 0
         const name:BodyPartName = `${body}+` as BodyPartName
         if(!creep.memory.bodyParts) creep.memory.bodyParts = {}
         let parts = creep.memory.bodyParts[name]

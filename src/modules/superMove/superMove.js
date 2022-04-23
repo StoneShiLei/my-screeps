@@ -80,16 +80,15 @@ let config = {
     enableFlee: false   // 【未启用】是否添加flee()函数，注意这会在Creep.prototype上添加官方未有键值，flee()用法见最底下module.exports处
 }
 // 运行时参数
-let pathClearDelay = 5000;  // 清理相应时间内都未被再次使用的路径，同时清理死亡creep的缓存，设为undefined表示不清除缓存
+let pathClearDelay = 3000;  // 清理相应时间内都未被再次使用的路径，同时清理死亡creep的缓存，设为undefined表示不清除缓存
 let hostileCostMatrixClearDelay = 500; // 自动清理相应时间前创建的其他玩家房间的costMatrix
 let coreLayoutRange = 3; // 核心布局半径，在离storage这个范围内频繁检查对穿（减少堵路的等待
 let avoidRooms = ['W2N1']      // 永不踏入这些房间
 let avoidExits = {
-    'E35N7': 'E35N6',
     'fromRoom': 'toRoom'
 }   // 【未启用】单向屏蔽房间的一些出口，永不从fromRoom踏入toRoom
 /** @type {{id:string, roomName:string, taskQueue:{path:MyPath, idx:number, roomName:string}[]}[]} */
-let observers = ['5e3646219c6dc78024fd7097', '5e55e9b8673548d9468a2d3d', '5e36372d00fab883d281d95e'];  // 如果想用ob寻路，把ob的id放这里
+let observers = ['5e3646219c6dc78024fd7097'];  // 如果想用ob寻路，把ob的id放这里
 
 /***************************************
  *  局部缓存
@@ -1581,3 +1580,54 @@ module.exports = {
     clear: () => { }
     // clear: clearUnused
 }
+
+Creep.prototype.originMoveTo=originMoveTo;
+Creep.prototype.$moveTo=Creep.prototype.moveTo;
+Creep.prototype.moveTo=function (...e) {
+    if(this.memory.lastPos&&this.memory.lastPos.x == this.pos.x && this.memory.lastPos.y == this.pos.y){
+        this.memory.lastPos.time+=1;
+        if(this.memory.lastPos.time>6)
+            this.memory.dontPullMe = true;
+    }else{
+        this.memory.dontPullMe = false;
+        this.memory.lastPos = {x:this.pos.x,y:this.pos.y,time:0}
+    }
+    // this.say(this.memory.lastPos.time)
+    return this.$moveTo(...e)
+};
+
+Creep.prototype.$build=Creep.prototype.build;
+Creep.prototype.build=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$build(...e)
+};
+
+Creep.prototype.$repair=Creep.prototype.repair;
+Creep.prototype.repair=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$repair(...e)
+};
+
+Creep.prototype.$upgradeController=Creep.prototype.upgradeController;
+Creep.prototype.upgradeController=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$upgradeController(...e)
+};
+
+Creep.prototype.$dismantle=Creep.prototype.dismantle;
+Creep.prototype.dismantle=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$dismantle(...e)
+};
+
+Creep.prototype.$harvest=Creep.prototype.harvest;
+Creep.prototype.harvest=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$harvest(...e)
+};
+
+Creep.prototype.$attack=Creep.prototype.attack;
+Creep.prototype.attack=function (...e) {
+    this.memory.dontPullMe = true;
+    return this.$attack(...e)
+};
