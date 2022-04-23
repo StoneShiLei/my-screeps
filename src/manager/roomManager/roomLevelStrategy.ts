@@ -1,5 +1,5 @@
 import { BodyConfig } from "modules/bodyConfig/bodyConfig"
-import { Data, TaskServiceProxy } from "taskService"
+import { Data, ServiceData, TaskServiceProxy } from "taskService"
 import { Container } from "typescript-ioc"
 
 const service = Container.get(TaskServiceProxy)
@@ -63,25 +63,12 @@ export const roomLevelStrategy = {
         const idleEmptyTraners = room.creeps("transporter").filter(creep => creep.storeIsEmpty() && creep.isIdle())
         const idleNotEmptyTraners = room.creeps("transporter").filter(creep => !creep.storeIsEmpty() && creep.isIdle())
 
+
+
         //如果死光了立即生成1个worker
         if(room.creeps("worker",false).length + room.creeps("transporter",false).length === 0) {
             service.spawnTaskService.trySpawn(room,room.name,"worker",999,[],BodyConfig.workerBodyConfig.middleLevelWorkerBodyCalctor,{spawnRoom:room})
         }
-        //生成持续挖矿任务并生成creep
-        service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
-
-
-        //worker挖矿任务
-        _.values<Data>(room.memory.serviceDataMap["sourceTaskService"]).forEach(data => {
-            if(data.creeps.length === 0){
-                const posLen = Game.getObjectById<Source>(data.targetId)?.pos.nearPos(1).filter(pos => pos.walkable()).length ?? 0
-                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === data.targetId).length
-                if(Math.ceil(targetCount) > 0){
-                    const creep = idleEmptyWorkers.pop()
-                    if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
-                }
-            }
-        })
 
         // 有工地的时候在造worker 或者全死光了
         // 当worker少于2 或 空闲的transporter数量大于worker的数量
@@ -92,33 +79,17 @@ export const roomLevelStrategy = {
             service.spawnTaskService.trySpawn(room,room.name,"worker",999,[],BodyConfig.workerBodyConfig.middleLevelWorkerBodyCalctor,{spawnRoom:room})
         }
 
-        //升级
+        //生成持续挖矿任务并生成creep
+        service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
+
+        //生成upgrader
         const upgradeMap = room.memory.serviceDataMap["upgradeTaskService"]
-        if(upgradeMap && Game.getObjectById(upgradeMap[STRUCTURE_CONTAINER].targetId)){
+        if(upgradeMap && Game.getObjectById(upgradeMap[STRUCTURE_CONTROLLER].targetId)){
             if(room.creeps("upgrader").length == 0 ||
             room.creeps("upgrader").length < room.creeps("transporter").filter(t => t.isIdle() && t.store[RESOURCE_ENERGY] > 0).length - 1){
                 service.upgradeTaskService.trySpawnUpgrader(room)
             }
         }
-
-
-
-
-        //搬运房间内能量
-        const pickTasks = service.transportTaskService.genPickupTranTask(room,true)
-        const tranTasks = service.sourceTaskService.genEnergyTranTask(room)
-        const allTanerTasks = pickTasks.concat(tranTasks)
-        while(idleEmptyTraners.length > 0 && allTanerTasks.length > 0){
-            idleEmptyTraners.pop()?.addTask(allTanerTasks.shift())
-        }
-
-        //运力不足时生成transporter
-        if(!room.creeps("transporter",false).length || allTanerTasks.length){
-            service.spawnTaskService.trySpawn(room,room.name,"transporter",800,[],BodyConfig.transporterBodyConfig.transporterBodyCalctor,{spawnRoom:room})
-        }
-
-        //剩余任务分配给空闲的worker搬运
-        allTanerTasks.forEach(task => idleEmptyWorkers.pop()?.addTask(task))
 
 
 
@@ -141,18 +112,48 @@ export const roomLevelStrategy = {
         }
 
         //填充 控制器的能量
-        const tranCreep = idleEmptyTraners.pop()
-        const tranCount = BodyConfig.getPartCount(tranCreep,CARRY) * 50
+        const tranCount = BodyConfig.getPartCount(idleNotEmptyTraners.last(),CARRY) * 50
         const tranUpgraderEnergyTask = service.upgradeTaskService.genFillUpgradeEnergyTask(room,tranCount)
-        tranCreep?.addTask(tranUpgraderEnergyTask)
+        if(tranUpgraderEnergyTask.length) idleNotEmptyTraners.pop()?.addTask(tranUpgraderEnergyTask)
 
+
+
+        //搬运房间内能量
+        const pickTasks = service.transportTaskService.genPickupTranTask(room,true)
+        const tranTasks = service.sourceTaskService.genEnergyTranTask(room)
+        const allTanerTasks = pickTasks.concat(tranTasks)
+        while(idleEmptyTraners.length > 0 && allTanerTasks.length > 0){
+            idleEmptyTraners.pop()?.addTask(allTanerTasks.shift())
+        }
+
+        //运力不足时生成transporter
+        if(!room.creeps("transporter",false).length || allTanerTasks.length){
+            service.spawnTaskService.trySpawn(room,room.name,"transporter",0,[],BodyConfig.transporterBodyConfig.transporterBodyCalctor,{spawnRoom:room})
+        }
+
+
+
+        //worker挖矿任务
+        const sourceData:Data[] = _.values(room.memory.serviceDataMap["sourceTaskService"])
+        sourceData.forEach(data => {
+            if(data.creeps.length === 0){
+                const posLen = Game.getObjectById<Source>(data.targetId)?.pos.nearPos(1).filter(pos => pos.walkable()).length ?? 0
+                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === data.targetId).length
+                if(Math.ceil(targetCount) > 0){
+                    const creep = idleEmptyWorkers.pop()
+                    if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
+                }
+            }
+        })
+
+        //剩余任务分配给空闲的worker搬运
+        allTanerTasks.forEach(task => idleEmptyWorkers.pop()?.addTask(task))
 
         //分配剩余空闲的worker
         const lowEnergyTranTasks = service.sourceTaskService.genEnergyTranTask(room,room.hiveIsNeedToFill() ? 1200 : 500)
         while(idleEmptyWorkers.length && lowEnergyTranTasks.length){
             idleEmptyWorkers.pop()?.addTask(lowEnergyTranTasks.shift())
         }
-
         idleNotEmptyWorkers.forEach(creep =>{
             if(room.hiveIsNeedToFill()) creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
             else if(room.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))

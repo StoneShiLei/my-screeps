@@ -30,8 +30,8 @@ export class RoomExtension extends Room {
             if(this._creeps[key]) return this._creeps[key]
 
             this._creeps[key] = []
-            const roleCreeps =  this._creeps['creeps'].filter(creep => creep.memory.role === role && creep.spawning != spawned)
-            this._creeps[key] = roleCreeps
+            const roleCreeps =  this._creeps['creeps'].filter(creep => creep.memory.role === role)
+            this._creeps[key] = spawned ? roleCreeps.filter(creep => !creep.spawning) : roleCreeps
             return roleCreeps
         }
         else{

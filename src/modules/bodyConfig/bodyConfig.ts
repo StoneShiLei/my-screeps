@@ -10,7 +10,7 @@ const workerBodyConfig:BodyConfigCalctor = {
         if(!args || !args.spawnRoom) throw new Error("args.spawnRoom is null")
         const room = args.spawnRoom
         let totalEnergy = room.getEnergyCapacityAvailable()
-        if(!room.creeps("worker").length) totalEnergy = room.getEnergyAvailable()
+        if(room.creeps("worker").length < 2) totalEnergy = room.getEnergyAvailable()
 
         let body = [WORK,CARRY,MOVE,MOVE]
         let bodyEnergy = BodyConfig.getBodyCosts(body)
@@ -27,7 +27,7 @@ const workerBodyConfig:BodyConfigCalctor = {
         if(!args || !args.spawnRoom) throw new Error("args.spawnRoom is null")
         const room = args.spawnRoom
         let totalEnergy = room.getEnergyCapacityAvailable()
-        if(room.creeps("worker",false).length + room.creeps("transporter",false).length === 0) totalEnergy = room.getEnergyAvailable()
+        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 2) totalEnergy = room.getEnergyAvailable()
 
         let body = [WORK,CARRY,MOVE]
         let bodyEnergy = BodyConfig.getBodyCosts(body)
@@ -43,7 +43,6 @@ const workerBodyConfig:BodyConfigCalctor = {
 const harvesterBodyConfig:BodyConfigCalctor = {
 
     harvesterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
-        console.log(JSON.stringify(args))
         const isOutRoom = args.isOutRoom
         const energy = args.energy
         // const level = args.level

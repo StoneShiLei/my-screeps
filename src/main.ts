@@ -24,23 +24,23 @@ app.on(creepManagerCallbacks())
 app.on({
   tickStart: () => {
 
-    let roomStructsData:StructsData | undefined = undefined //放全局变量
+  //   let roomStructsData:StructsData | undefined = undefined //放全局变量
 
-    let p = Game.flags.p;
-    let pa = Game.flags.pa;
-    let pb = Game.flags.pb;
-    let pc = Game.flags.pc;
-    let pm = Game.flags.pm;
+  //   let p = Game.flags.p;
+  //   let pa = Game.flags.pa;
+  //   let pb = Game.flags.pb;
+  //   let pc = Game.flags.pc;
+  //   let pm = Game.flags.pm;
 
-    if(p) {
-      roomStructsData = autoPlanner63.ManagerPlanner.computeManor(p.pos.roomName,[pc,pm,pa,pb])
-      Game.flags.p.remove()
-  }
-  if(roomStructsData){
-      //这个有点消耗cpu 不看的时候记得关
-      autoPlanner63.HelperVisual.showRoomStructures(roomStructsData.roomName,roomStructsData.structMap)
-  }
-    // try{
+  //   if(p) {
+  //     roomStructsData = autoPlanner63.ManagerPlanner.computeManor(p.pos.roomName,[pc,pm,pa,pb])
+  //     Game.flags.p.remove()
+  // }
+  // if(roomStructsData){
+  //     //这个有点消耗cpu 不看的时候记得关
+  //     autoPlanner63.HelperVisual.showRoomStructures(roomStructsData.roomName,roomStructsData.structMap)
+  // }
+  //   // try{
     //   const func:(...args: any[])=>number = function(str:string,num1:number,num2:number):number{
     //     console.log(str)
     //     return num1 + num2

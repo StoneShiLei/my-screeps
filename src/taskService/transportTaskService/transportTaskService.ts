@@ -57,37 +57,35 @@ export class TransportTaskService extends BaseTaskService{
     genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
         room._roomDropRegMap = room._roomDropRegMap ?? {}
 
-        const tombstones = room.find(FIND_TOMBSTONES) as unknown as AnyStoreStructure[]
-        const ruins = room.find(FIND_RUINS) as unknown as AnyStoreStructure[]
-        let tasks = tombstones.concat(ruins).filter(s => !room._roomDropRegMap[s.id])
-            .map(drops =>{
-                // @ts-ignore
-                if(drops.store.getUsedCapacity(onlyEnergy ? RESOURCE_ENERGY : undefined)){
-                    if(onlyEnergy){
-                        return [TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("transportResource"),
-                        {resourceType:RESOURCE_ENERGY},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
-                    }
-                    else{
-                        return _.keys(drops.store).map(resourceType => TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("transportResource"),{
-                            resourceType:resourceType as ResourceConstant},new TransportTaskNameEntity(undefined,"registerTranDrops")))
-                    }
+        const tombstones = room.find(FIND_TOMBSTONES)
+        const ruins = room.find(FIND_RUINS)
+
+        let drops:(Tombstone | Ruin)[] = tombstones
+        drops = drops.concat(ruins).filter(s => !room._roomDropRegMap[s.id])
+
+        let dropsTask:Task[] = []
+        for(let drop of drops){
+            if(drop.store.getUsedCapacity(onlyEnergy ? RESOURCE_ENERGY : undefined)){
+                if(onlyEnergy){
+                    dropsTask.push(TaskHelper.genTaskWithTarget(drop,new TransportTaskNameEntity("transportResource"),
+                    {resourceType:RESOURCE_ENERGY},new TransportTaskNameEntity(undefined,"registerTranDrops")))
                 }
-                return undefined
-            })
-        const temp:Task[] = []
-        tasks.forEach(t => {if(t) temp.concat(t)})
+                else{
+                    const temps = _.keys(drop.store).map(resourceType => TaskHelper.genTaskWithTarget(drop,new TransportTaskNameEntity("transportResource"),{
+                        resourceType:resourceType as ResourceConstant},new TransportTaskNameEntity(undefined,"registerTranDrops")))
+                    dropsTask = dropsTask.concat(temps)
+                }
+            }
+        }
 
         let pickTasks = room.find(FIND_DROPPED_RESOURCES)
             .filter(d => !room._roomDropRegMap[d.id])
             .filter(d => (d.resourceType != RESOURCE_ENERGY || d.amount > 100) && (onlyEnergy ? d.resourceType == RESOURCE_ENERGY : true))
             .map(drops =>{
-                return [TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("pickupResource"),{resourceType:drops.resourceType},new TransportTaskNameEntity(undefined,"registerTranDrops"))]
+                return TaskHelper.genTaskWithTarget(drops,new TransportTaskNameEntity("pickupResource"),{resourceType:drops.resourceType},new TransportTaskNameEntity(undefined,"registerTranDrops"))
             })
-        const temp2:Task[] = []
-        pickTasks.forEach(t => temp2.concat(t))
 
-
-        const result:Task[] = []
-        return result.concat(temp,temp2)
+        dropsTask = dropsTask.concat(pickTasks)
+        return dropsTask
     }
 }

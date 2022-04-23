@@ -16,6 +16,7 @@ export class RoomManager extends BaseManager{
         const service = Container.get(TaskServiceProxy)
 
         Object.values(Game.rooms).forEach(room => {
+            if(!room) return
             const interval = Game.time + room.hashCode()
 
 
@@ -41,6 +42,7 @@ export class RoomManager extends BaseManager{
         const service = Container.get(TaskServiceProxy)
 
         Object.values(Game.rooms).forEach(room => {
+            if(!room) return
             const interval = Game.time + room.hashCode()
 
             //处理spawn队列
@@ -51,6 +53,8 @@ export class RoomManager extends BaseManager{
         this._firstActive = false;
     }
     run(room: Room): void {
+        if(!room) return
+
         const service = Container.get(TaskServiceProxy)
         const interval = Game.time + room.hashCode()
 
@@ -61,8 +65,8 @@ export class RoomManager extends BaseManager{
 
             //房间运营策略
             if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
-            else if(room.memory.roomLevel == 'middle') roomLevelStrategy.lowLevel(room) // ?
-            else roomLevelStrategy.highLevel(room)
+            else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
+            else roomLevelStrategy.middleLevel(room)
 
 
         }

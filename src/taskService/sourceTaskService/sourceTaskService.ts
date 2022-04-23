@@ -65,17 +65,20 @@ export class SourceTaskService extends BaseTaskService{
             const sourceData = sourcesData[sourceDataName]
 
             // 如果两个多个连在一起死掉一个 (1source 2creep)
-            let harCreeps = sourceData.creeps.map(creepId => Game.getObjectById<Creep>(creepId)).filter(creep => creep?.ticksToLive)
+            let harCreeps = sourceData.creeps.map(creepId => Game.getObjectById<Creep>(creepId)).filter(creep => creep && creep.ticksToLive)
 
             harCreeps.forEach(creepA => {
                 harCreeps.forEach(creepB => {
                     if(creepA && creepB){
-                        if(creepA.id !== creepB.id && creepA.pos.isNearTo(creepB)){
-                            creepA.suicide()
+                        if(creepA.id != creepB.id && creepA.pos.isNearTo(creepB) && creepA.ticksToLive && creepB.ticksToLive){
+                            if(creepA.ticksToLive < creepB.ticksToLive){
+                                creepA.suicide()
+                            }
+                            else{
+                                creepB.suicide()
+                            }
                         }
-                        else{
-                            creepB.suicide()
-                        }
+
                     }
                 })
             })
@@ -84,7 +87,7 @@ export class SourceTaskService extends BaseTaskService{
 
             if(sourceData.targetId && (Game.time - (sourceData.spawnTime ?? 0) > 1500 || sourceData.creeps.length === 0)){
                 const tasks = (workRoom == spawnRoom.name) ? this.genHarvestTask(sourceData) : this.genHarvestOuterTask(sourceData)
-                service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"energyHarvester",900,tasks,BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,
+                service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"energyHarvester",100,tasks,BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,
                 {energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:workRoom !== spawnRoom.name})
             }
         }

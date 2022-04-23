@@ -64,7 +64,7 @@ export default class Utils{
         prefix = this.colorful(prefix, true,color)
 
         const logContent = `${prefix}${content}`
-        console.log(logContent)
+
         // 转发到邮箱
         if (notify) Game.notify(logContent)
 

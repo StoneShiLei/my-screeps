@@ -12,8 +12,8 @@ import { SpawnExtension } from "./spawn/spawn";
 
 export default function():AppLifecycleCallbacks{
     Utils.assignPrototype(Array, ArrayExtension)
-    Utils.assignPrototype(Creep,CreepExtension)
     Utils.assignPrototype(Room,RoomExtension)
+    Utils.assignPrototype(Creep,CreepExtension)
     Utils.assignPrototype(RoomPosition,RoomPositionExtension)
     Utils.assignPrototype(StructureSpawn,SpawnExtension)
     Utils.assignPrototype(Flag,FlagExtension)

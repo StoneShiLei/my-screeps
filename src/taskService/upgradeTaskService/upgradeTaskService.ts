@@ -82,7 +82,7 @@ export class UpgradeTaskService extends BaseTaskService{
         let map = room.memory.serviceDataMap["upgradeTaskService"] || {}
         let data = map[STRUCTURE_CONTROLLER] || {}
         let container = room.controller.pos.findInRange(FIND_STRUCTURES,1,{filter:s=>s.structureType == STRUCTURE_CONTAINER}).head()
-        if(container && data.containerId  && !Game.getObjectById(data.containerId)) data.containerId = container.id
+        if(container) data.containerId = container.id
 
         if(container){
             const link = room.get<StructureLink[]>("link").filter(e => container.pos.isNearTo(e)).head()
@@ -107,7 +107,7 @@ export class UpgradeTaskService extends BaseTaskService{
         if(!tasks.length) return
 
         const service = Container.get(TaskServiceProxy)
-        service.spawnTaskService.trySpawn(room,room.name,"upgrader",100,tasks,
+        service.spawnTaskService.trySpawn(room,room.name,"upgrader",50,tasks,
         BodyConfig.upgraderBodyConfig.lowLevelUpgraderBodyCalctor,{spawnRoom:room})
     }
 
