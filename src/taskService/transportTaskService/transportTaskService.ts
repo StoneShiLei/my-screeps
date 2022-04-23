@@ -1,6 +1,8 @@
-import { RegName, ServiceName } from "taskService";
+import { link } from "fs";
+import { Data, RegName, ServiceName } from "taskService";
 import { BaseTaskNameEntity } from "taskService/baseTaskNameEntity";
 import { BaseTaskService } from "taskService/baseTaskService";
+import { SourceTaskNameEntity } from "taskService/sourceTaskService/sourceTaskNameEntity";
 import { TaskHelper } from "taskService/taskHelper";
 import { Inject, Singleton } from "typescript-ioc";
 import { TransportTaskAction } from "./transportTaskAction";
@@ -87,5 +89,106 @@ export class TransportTaskService extends BaseTaskService{
 
         dropsTask = dropsTask.concat(pickTasks)
         return dropsTask
+    }
+
+    genTranEnergyFromLinkTask(room:Room):Task[]{
+        const sourceMap = room.memory.serviceDataMap.sourceTaskService
+        const tranMap = room.memory.serviceDataMap.transportTaskService
+
+        if(!sourceMap || !tranMap) return []
+
+        const tranData = tranMap[STRUCTURE_STORAGE]
+        const tasks:Task[] = []
+
+        let needTran = 0
+        for(let sourceData of _.values<Data>(sourceMap)){
+            const container = sourceData.containerId ? Game.getObjectById<StructureContainer>(sourceData.containerId) : undefined
+            const linkA = sourceData.linkIdA ? Game.getObjectById<StructureLink>(sourceData.linkIdA) : undefined
+            const linkB = sourceData.linkIdB ? Game.getObjectById<StructureLink>(sourceData.linkIdB) : undefined
+            if(!needTran && container)
+                needTran = container.store[RESOURCE_ENERGY] && (linkA && linkB && (linkA.store.getFreeCapacity() === 0 && linkB.store.getFreeCapacity() === 0)) ? 0 : 800
+        }
+        let centerLink = tranData.linkIdA ? Game.getObjectById<StructureLink>(tranData.linkIdA) : undefined
+        if(needTran && centerLink && centerLink.store.getUsedCapacity() !== 0 && !room._used[centerLink.id]){
+            if(room.storage){
+                tasks.push(TaskHelper.genTaskWithTarget(room.storage,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+            }
+            else{
+                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+            }
+        }
+        return tasks
+    }
+
+    runTransformLink(room:Room){
+
+        const upgradeMap = room.memory.serviceDataMap.upgradeTaskService
+        const transportMap = room.memory.serviceDataMap.transportTaskService
+        const sourceMap = room.memory.serviceDataMap.sourceTaskService
+
+        if(!upgradeMap || !transportMap || !sourceMap) return
+
+        const upgradeData = upgradeMap[STRUCTURE_CONTAINER]
+        const transportData = transportMap[STRUCTURE_STORAGE]
+
+        let updateLink = upgradeData.linkIdA ? Game.getObjectById<StructureLink>(upgradeData.linkIdA) : undefined
+        let centerLink = transportData.linkIdA ? Game.getObjectById<StructureLink>(transportData.linkIdA) : undefined
+
+        if(!updateLink && !centerLink) return
+
+        for(let sourceId in sourceMap){
+            const sourceData = sourceMap[sourceId]
+
+            let sourceLinkA = sourceData.linkIdA ? Game.getObjectById<StructureLink>(sourceData.linkIdA) : undefined
+            let sourceLinkB = sourceData.linkIdB ? Game.getObjectById<StructureLink>(sourceData.linkIdB) : undefined
+            let minFreeSend = 100
+            let targetLink:StructureLink | undefined
+            if(sourceLinkA && sourceLinkB){
+                if(sourceLinkA.store.getFreeCapacity(RESOURCE_ENERGY) > minFreeSend || sourceLinkA.cooldown) targetLink = sourceLinkB
+                else targetLink = sourceLinkA
+            }
+
+            const container = sourceData.containerId ? Game.getObjectById<StructureContainer>(sourceData.containerId) : undefined
+            if(!targetLink) continue
+            const canSend = targetLink.store.getFreeCapacity(RESOURCE_ENERGY) <= minFreeSend
+            if(!canSend) continue
+
+            if(updateLink && canSend && updateLink.store.getUsedCapacity() === 0){
+                targetLink.transferEnergy(updateLink)
+                updateLink = null;
+                continue
+            }
+
+            if(centerLink && canSend && centerLink.store.getUsedCapacity() === 0){
+                if(container && container.store[RESOURCE_ENERGY] >
+                    ((sourceLinkA && sourceLinkB && (sourceLinkA.store.getFreeCapacity() === 0 && sourceLinkB.store.getFreeCapacity() === 0)) ? 0 : 800)){
+                        targetLink.transferEnergy(centerLink);
+                        centerLink = null
+                        continue
+                }
+            }
+        }
+
+        if(updateLink && updateLink.store.getUsedCapacity() === 0 && centerLink && centerLink.store.getUsedCapacity() !== 0){
+            centerLink.transferEnergy(updateLink)
+        }
+    }
+
+    update(room:Room){
+        const map = room.memory.serviceDataMap.transportTaskService ?? {}
+        const data = map[STRUCTURE_STORAGE] ?? {}
+        let centerLink:StructureLink | undefined
+        room.get<StructureLink[]>("link").forEach(link =>{
+            if(room.storage && link.pos.isNearTo(room.storage)) centerLink = link
+        })
+
+        if(centerLink) {
+            data.linkIdA = centerLink.id
+            data.linkIdB = centerLink.id
+        }
+
+        map[STRUCTURE_STORAGE] = data
+        room.memory.serviceDataMap.transportTaskService = map
     }
 }

@@ -26,9 +26,9 @@ export class UpgradeTaskAction extends BaseTaskAction {
 
 
     registerUpgradeTranEnergyInRoom(creep:Creep){
-        const room = Game.rooms
+        const room = Game.rooms[creep.memory.roomName]
         room._used = room._used || {}
-        const id = creep.topTask.targetId
+        const id:string = creep.topTask.targetId
         room._used[id] = (room._used[id] || 0) + BodyConfig.getPartCount(creep,CARRY) * 50
     }
 

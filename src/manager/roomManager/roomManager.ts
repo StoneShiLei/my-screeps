@@ -63,6 +63,9 @@ export class RoomManager extends BaseManager{
 
         if(interval % 3 === 0 || this._firstActive){
 
+            //link互传
+            ErrorHelper.catchError(()=>service.transportTaskService.runTransformLink(room))
+
             //房间运营策略
             if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
             else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)

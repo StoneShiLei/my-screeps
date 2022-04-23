@@ -1,5 +1,4 @@
 interface Room {
-    [x: string]: any
     mass_stores:MassStore[]
     my:boolean
     level:number

@@ -33,12 +33,18 @@ export class UpgradeTaskService extends BaseTaskService{
         const data = map[STRUCTURE_CONTROLLER]
         room._used = room._used || {}
 
-        if(data.linkIdA){
-            // const link = Game.getObjectById(data.linkIdA)
-        }
+        const container = data.containerId ? Game.getObjectById<StructureContainer>(data.containerId) : undefined
+        const upgradelink = data.linkIdA ? Game.getObjectById<StructureLink>(data.linkIdA) : undefined
+        if(!upgradelink || upgradelink && upgradelink.store.getUsedCapacity() === 0){
+            const tranMap = room.memory.serviceDataMap.transportTaskService
+            const centerLinkId = tranMap ? tranMap[STRUCTURE_STORAGE].linkIdA : undefined
+            const centerLink = centerLinkId ? Game.getObjectById<StructureLink>(centerLinkId) : undefined
 
-        if(data.containerId){
-            const container = Game.getObjectById<StructureContainer>(data.containerId)
+            if(centerLink && upgradelink && upgradelink.store.getUsedCapacity() === 0 && centerLink.store.getUsedCapacity() == 0){
+                return [TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
+                ,new UpgradeTaskNameEntity(undefined,"registerUpgradeTranEnergyInRoom"))]
+            }
+
             if(container){
                 room._used[container.id] = room._used[container.id] ?? 0
                 const num1 = room._used[container.id] + container.store[RESOURCE_ENERGY] + Math.min(1000,Math.max(carryCap-400,0))
@@ -48,6 +54,7 @@ export class UpgradeTaskService extends BaseTaskService{
                     ,new UpgradeTaskNameEntity(undefined,"registerUpgradeTranEnergyInRoom"))]
                 }
             }
+
         }
 
         return []
