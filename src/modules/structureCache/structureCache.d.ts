@@ -11,7 +11,7 @@ type MassStore = StructureContainer | StructureStorage | StructureTerminal | Str
 
 type CacheReturnType = ConstructionSite | BuildableStructureConstant |
 AnyStructure | AnyStructure[] | Source | Deposit | undefined |
-ConstructionSite[] | ConstructionSite
+ConstructionSite[] | ConstructionSite | Mineral
 
 
 type GetKey = STRUCTURE_SPAWN| STRUCTURE_EXTENSION| STRUCTURE_ROAD| STRUCTURE_WALL|

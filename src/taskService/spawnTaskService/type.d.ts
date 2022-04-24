@@ -7,6 +7,10 @@ interface Room{
     _hiveEnergySendingReg:HiveSendingReg
 }
 
+interface RoomMemory {
+    _carryBusy:{[tick:number]:number}
+}
+
 type HiveSendingReg = {
     [key:string]:boolean
 }

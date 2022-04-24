@@ -122,7 +122,11 @@ export class UpgradeTaskAction extends BaseTaskAction {
 
         const target = creep.topTarget as StructureController
         const result = creep.upgradeController(target)
-        if(result == ERR_NOT_IN_RANGE) creep.goTo(target)
+
+        if(result == ERR_NOT_IN_RANGE) {
+            creep.goTo(target)
+            return
+        }
 
         if(creep.store.getFreeCapacity(RESOURCE_ENERGY) >= 50){
             let store:AnyStoreStructure = creep.pos.findInRange<StructureLink>(FIND_STRUCTURES,4,{filter:s=>s.structureType == STRUCTURE_LINK}).head()

@@ -33,8 +33,8 @@ export class SpawnTaskAction extends BaseTaskAction {
         room._hiveEnergySendingReg = room._hiveEnergySendingReg ?? {}
 
         const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter:(structure) => (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN) &&
-            structure.store[RESOURCE_ENERGY] < structure.store.getCapacity(RESOURCE_ENERGY) &&
+            filter:(structure) => (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) &&
+            structure.store.getFreeCapacity() != 0 &&
             !room._hiveEnergySendingReg[structure.id]
         })
 

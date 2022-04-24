@@ -40,6 +40,9 @@ app.on({
       //这个有点消耗cpu 不看的时候记得关
       autoPlanner63.HelperVisual.showRoomStructures(roomStructsData.roomName,roomStructsData.structMap)
   }
+
+
+
   //   // try{
     //   const func:(...args: any[])=>number = function(str:string,num1:number,num2:number):number{
     //     console.log(str)

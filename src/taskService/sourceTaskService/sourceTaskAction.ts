@@ -3,8 +3,9 @@ import { BaseTaskAction } from "taskService/baseTaskAction";
 import { TaskHelper } from "taskService/taskHelper";
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 import { Container, Singleton } from "typescript-ioc";
+import { SourceTaskNameEntity } from "./sourceTaskNameEntity";
 
-export type SourceActionName = 'harvestEnergy' | 'harvestEnergyKeeper' | 'harvestEnergyOutterKeeper'
+export type SourceActionName = 'harvestEnergy' | 'harvestEnergyKeeper' | 'harvestEnergyOutterKeeper' | 'updateSourcesInfo'
 export type SourceRegName = 'registerSources' | 'registerSourcesTranInRoom'
 
 @Singleton
@@ -63,15 +64,17 @@ export class SourceTaskAction extends BaseTaskAction {
         }
 
         //委托函数指针时   this指向的是委托函数的对象 所以要显示指定实例
-        const thisAction = Container.get(SourceTaskAction)
+        //先压入updateSourceInfo任务，等走到目标位置后才会更新信息
         if(container && !container.pos.isEqualTo(creep)){
-            thisAction._updateSourcesInfo(creep)
+            creep.addTask(TaskHelper.genTaskWithTarget(source,new SourceTaskNameEntity("updateSourcesInfo")))
             creep.addTask(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("goToAndPopTask")))
+            creep.doWorkWithTopTask()
             return
         }
         else if(source && !source.pos.isNearTo(creep)){
-            thisAction._updateSourcesInfo(creep)
+            creep.addTask(TaskHelper.genTaskWithTarget(source,new SourceTaskNameEntity("updateSourcesInfo")))
             creep.addTask(TaskHelper.genTaskWithTarget(source,new TransportTaskNameEntity("goToNearAndPopTask")))
+            creep.doWorkWithTopTask()
         }
         else{}
 
@@ -156,16 +159,25 @@ export class SourceTaskAction extends BaseTaskAction {
         }
     }
 
-    _updateSourcesInfo(creep:Creep){
-        const rm = Memory.rooms[creep.topTask.roomName]
-        if(!rm) return
-        const map = rm.serviceDataMap["sourceTaskService"]
-        if(!map) return
+    updateSourcesInfo(creep:Creep){
+        const map = creep.room.memory.serviceDataMap["sourceTaskService"]
+        if(!map) {
+            creep.popTopTask().doWorkWithTopTask()
+            return
+        }
 
         const sourceData = map[creep.topTask.targetId]
-        const pathTime = Game.time - (sourceData.spawnTime ?? 0) //（接触时间 - 出生时间  = 移动时间）
+        if(!sourceData) {
+            creep.popTopTask().doWorkWithTopTask()
+            return
+        }
+        sourceData.spawnTime = sourceData.spawnTime || 0
+        sourceData.pathTime = Game.time - sourceData.spawnTime //（ 出生时间  - 接触时间  = 移动时间）
         // （移动时间）+ 生的时间 -  这样下次走到那边就可以刚刚好前面那只死掉,再缓冲 10tick 理论上走到后寿命不足1500t 不和能量重生重合
-        sourceData["spawnTime"] = (sourceData["spawnTime"] ?? 0) - pathTime + creep.body.length * 3 - 10
-        sourceData["pathTime"] = pathTime
+        sourceData.spawnTime -= sourceData.pathTime + creep.body.length * 3 - 10
+        map[creep.topTask.targetId] = sourceData
+        console.log('oooo',JSON.stringify(creep.room.memory.serviceDataMap["sourceTaskService"]))
+        console.log('map',JSON.stringify(map))
+        creep.popTopTask().doWorkWithTopTask()
     }
 }

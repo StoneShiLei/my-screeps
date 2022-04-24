@@ -16,7 +16,6 @@ export class RoomManager extends BaseManager{
         const service = Container.get(TaskServiceProxy)
 
         Object.values(Game.rooms).forEach(room => {
-            if(!room) return
             const interval = Game.time + room.hashCode()
 
 
@@ -42,7 +41,6 @@ export class RoomManager extends BaseManager{
         const service = Container.get(TaskServiceProxy)
 
         Object.values(Game.rooms).forEach(room => {
-            if(!room) return
             const interval = Game.time + room.hashCode()
 
             //处理spawn队列
@@ -53,8 +51,6 @@ export class RoomManager extends BaseManager{
         this._firstActive = false;
     }
     run(room: Room): void {
-        if(!room) return
-
         const service = Container.get(TaskServiceProxy)
         const interval = Game.time + room.hashCode()
 
@@ -72,6 +68,19 @@ export class RoomManager extends BaseManager{
             else roomLevelStrategy.middleLevel(room)
 
 
+
+            let hostileCnt = room.find(FIND_HOSTILE_CREEPS,{filter:e => e.owner.username != "Invader" && e.body.filter(e=>e.type==HEAL && e.boost).length >= 5 }).length;
+            if(!hostileCnt)return;
+            // room.controller.pos.createFlag("raL1_W19N21_crossShard_114514")
+            let MyRuinCnt = room.find(FIND_RUINS,{filter:e=>
+                    e.structure.structureType!=STRUCTURE_ROAD
+                    &&e.structure.structureType!=STRUCTURE_CONTAINER
+                    &&e.structure.structureType!=STRUCTURE_RAMPART
+                    &&e.structure.structureType!=STRUCTURE_EXTRACTOR
+                    &&e.structure.structureType!=STRUCTURE_LINK
+                    && (e.structure as OwnedStructure).owner&&(e.structure as OwnedStructure).owner?.username==room.controller?.owner?.username}).length
+            if(!MyRuinCnt)return;
+            room.controller?.activateSafeMode()
         }
     }
 

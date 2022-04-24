@@ -37,6 +37,16 @@ const workerBodyConfig:BodyConfigCalctor = {
             count += 1
         }
         return BodyConfig.calcBodyParts({work:count < 17 ? count : count - 1,carry: count, move: count});
+    },
+    highLevelWorkerBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        if(!args || !args.spawnRoom) throw new Error("args.spawnRoom is null")
+        const room = args.spawnRoom
+        let totalEnergy = room.getEnergyCapacityAvailable()
+        let body = BodyConfig.calcBodyParts({work:30,carry:10,move:10})
+        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 2 || BodyConfig.getBodyCosts(body) > totalEnergy){
+            return workerBodyConfig.middleLevelWorkerBodyCalctor(args)
+        }
+        return body
     }
 }
 

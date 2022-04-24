@@ -84,6 +84,30 @@ export class CreepExtension extends Creep {
         return this.memory.tasks
     }
 
+    mainRoomGetter():Room{
+        const roomName = this.memory.roomName
+        if(!roomName) throw Error(`Creep ${this.name} has no roomName`)
+        const room =  Game.rooms[roomName]
+        if(!room) throw Error(`Room ${roomName} not found`)
+        return room
+    }
+
+    /**
+     * 是否有指定资源以外的其他资源，
+     * 如果有，则返回true，否则返回false
+     * @param resourceType 要排除的资源类型，默认energy
+     * @param emptyCase 是否把store为空的情况也算作有资源
+     * @returns
+     */
+    storeHaveOtherResourceType(resourceType:ResourceConstant = RESOURCE_ENERGY,emptyCase:boolean = false):boolean{
+        if(emptyCase && this.storeIsEmpty()) return true
+        else if(this.storeIsEmpty()) return false
+        else{
+            const resourceTypes = _.without(_.keys(this.store),resourceType)
+            return resourceTypes.length > 0
+        }
+    }
+
     storeUsed():number{
         return this.store.getUsedCapacity()
     }
@@ -92,10 +116,18 @@ export class CreepExtension extends Creep {
         return this.store.getFreeCapacity()
     }
 
+    /**
+     * store为满
+     * @returns
+     */
     storeIsFull():boolean{
         return this.store.getFreeCapacity() <= 0
     }
 
+    /**
+     * store为空
+     * @returns
+     */
     storeIsEmpty():boolean{
         return this.store.getUsedCapacity() == 0
     }

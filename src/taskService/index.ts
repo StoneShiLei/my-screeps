@@ -1,4 +1,6 @@
 import { Inject, Singleton } from "typescript-ioc";
+import { MineralActionName, MineralRegName, MineralTaskAction } from "./mineralTaskService/mineralTaskAction";
+import { MineralTaskService } from "./mineralTaskService/mineralTaskService";
 import { SourceActionName, SourceRegName, SourceTaskAction } from "./sourceTaskService/sourceTaskAction";
 import { SourceTaskService } from "./sourceTaskService/sourceTaskService";
 import { SpawnActionName, SpawnRegName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
@@ -34,14 +36,17 @@ export class TaskServiceProxy {
     @Inject
     towerTaskService!:TowerTaskService
 
+    @Inject
+    mineralTaskService!:MineralTaskService
+
 }
 
-export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService | SourceTaskService | TowerTaskService
-export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction | SourceTaskAction | TowerTaskAction
+export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService | UpgradeTaskService | SourceTaskService | TowerTaskService | MineralTaskService
+export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction | SourceTaskAction | TowerTaskAction | MineralTaskAction
 
-export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService" | "towerTaskService"
-export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName | TowerActionName
-export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName
+export type ServiceName = "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService" | "towerTaskService" | "mineralTaskService"
+export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName | TowerActionName | MineralActionName
+export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName | MineralRegName
 
 
 
@@ -68,7 +73,8 @@ export type Data = {
     creeps:string[],
     spawnTime?:number,
     pathTime?:number,
-    containerId:string | undefined,
-    linkIdA:string | undefined,
-    linkIdB:string | undefined,
+    containerId?:string,
+    linkIdA?:string,
+    linkIdB?:string,
+    type?:string,
 }

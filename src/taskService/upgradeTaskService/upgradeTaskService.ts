@@ -69,9 +69,11 @@ export class UpgradeTaskService extends BaseTaskService{
         if(!data.containerId || !Game.getObjectById(data.containerId)) return
 
         data.creeps = data.creeps.filter(e => Game.getObjectById(e))
+        data.spawnTime = data.spawnTime || Game.time
+        data.pathTime = data.pathTime || 0
 
         if(room.level < 8 || !room.storage){
-            let minUpgraderCount = 0;
+            let minUpgraderCount = 1;
             if(!room.storage || room.controller.progress >= room.controller.progressTotal){
                 this._trySpawnUpgrader(room)
             }
@@ -81,6 +83,10 @@ export class UpgradeTaskService extends BaseTaskService{
                 this._trySpawnUpgrader(room)
             }
             else{}
+        }
+        else if((Game.cpu.bucket > 9000 && room.storage.store[RESOURCE_ENERGY] >= 50000 || room.controller.ticksToDowngrade < 5000) &&
+        (Game.time - data.spawnTime > 1500 || data.creeps.length == 0)){
+            this._trySpawnUpgrader(room)
         }
     }
 
@@ -114,7 +120,7 @@ export class UpgradeTaskService extends BaseTaskService{
         if(!tasks.length) return
 
         const service = Container.get(TaskServiceProxy)
-        service.spawnTaskService.trySpawn(room,room.name,"upgrader",50,tasks,
+        service.spawnTaskService.trySpawn(room,room.name,"upgrader",-10,tasks,
         BodyConfig.upgraderBodyConfig.lowLevelUpgraderBodyCalctor,{spawnRoom:room})
     }
 

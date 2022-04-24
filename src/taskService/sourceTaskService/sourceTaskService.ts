@@ -87,7 +87,8 @@ export class SourceTaskService extends BaseTaskService{
 
             if(sourceData.targetId && (Game.time - (sourceData.spawnTime ?? 0) > 1500 || sourceData.creeps.length === 0)){
                 const tasks = (workRoom == spawnRoom.name) ? this.genHarvestTask(sourceData) : this.genHarvestOuterTask(sourceData)
-                service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"energyHarvester",100,tasks,BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,
+
+                service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"energyHarvester",900,tasks,BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,
                 {energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:workRoom !== spawnRoom.name})
             }
         }
@@ -122,7 +123,7 @@ export class SourceTaskService extends BaseTaskService{
                 creeps:dataMap[source.id]?.creeps || [],
                 spawnTime:dataMap[source.id]?.spawnTime || 0,
                 pathTime:dataMap[source.id]?.pathTime || 0,
-                containerId: container ? container.id : undefined,
+                containerId: container?.id,
                 linkIdA:links[0] ? links[0].id : undefined,
                 linkIdB:links[1] ? links[1].id : undefined,
             }

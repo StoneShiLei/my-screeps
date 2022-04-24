@@ -4,11 +4,12 @@ interface Creep{
     topTask:Task
     tasks:Task[]
     topTarget:TaskTarget | null
+    mainRoom:Room
 
     addTask(task:Task | undefined):Creep
     addTask(task:Task[] | undefined[]):Creep
-    popTopTask():Creep
 
+    popTopTask():Creep
     doWorkWithTopTask():void
 
     hasTasks():boolean
@@ -21,6 +22,7 @@ interface Creep{
     goTo(target:RoomObject): GotoReturnCode
     goTo(target?:Task):GotoReturnCode
 
+    storeHaveOtherResourceType(resourceType:ResourceConstant,emptyCase:boolean):boolean
     storeUsed():number
     storeUnused():number
     storeIsFull():boolean

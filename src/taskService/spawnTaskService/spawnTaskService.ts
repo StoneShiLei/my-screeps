@@ -41,7 +41,7 @@ export class SpawnTaskService extends BaseTaskService{
 
         if(!spawnRoom._spawnQueue) spawnRoom._spawnQueue = []
         spawnRoom._spawnQueue.push({
-            priority: 1,
+            priority: priority,
             name: name,
             spawnOptions: opts,
             bodyFunc: bodyFunc,
@@ -56,6 +56,7 @@ export class SpawnTaskService extends BaseTaskService{
         if(!room._spawnQueue) return
 
         room._spawnQueue = _.sortByOrder(room._spawnQueue,(task) => task.priority,'desc')
+        // console.log(JSON.stringify(room._spawnQueue))
         for(let spawnTask of room._spawnQueue){
 
             const body = spawnTask.bodyFunc(spawnTask.bodyFuncArgs)
