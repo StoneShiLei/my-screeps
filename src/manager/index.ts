@@ -1,6 +1,7 @@
 import { AppLifecycleCallbacks } from "modules/framework/types"
 import { Container } from "typescript-ioc"
 import { CreepManager } from "./creepManager/creepManager"
+import { FlagManager } from "./flagManager/flagManager"
 import { RoomManager } from "./roomManager/roomManager"
 
 
@@ -32,4 +33,12 @@ export function creepManagerCallbacks():AppLifecycleCallbacks{
 export function creepRunner(): (creep: Creep) => void {
     const manager = Container.get(CreepManager)
     return (creep:Creep) => manager.run(creep)
+}
+
+export function flagManagerCallbacks():AppLifecycleCallbacks{
+    const manager = Container.get(FlagManager)
+    return {
+        tickStart:() => manager.tickStart(),
+        tickEnd:() => manager.tickEnd(),
+    }
 }

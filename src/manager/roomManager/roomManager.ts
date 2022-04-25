@@ -51,11 +51,20 @@ export class RoomManager extends BaseManager{
         this._firstActive = false;
     }
     run(room: Room): void {
+
+
+        if(!room.my) return;
+
         const service = Container.get(TaskServiceProxy)
         const interval = Game.time + room.hashCode()
 
         //炮塔
-        ErrorHelper.catchError(()=>service.towerTaskService.run(room))
+        ErrorHelper.catchError(()=>service.towerTaskService.towerRun(room))
+
+        if(interval % 6 === 0){
+            //外矿
+            ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room))
+        }
 
         if(interval % 3 === 0 || this._firstActive){
 

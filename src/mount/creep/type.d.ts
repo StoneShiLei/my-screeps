@@ -20,6 +20,7 @@ interface Creep{
 
     goTo(): GotoReturnCode
     goTo(target:RoomObject): GotoReturnCode
+    goTo(target:RoomPosition): GotoReturnCode
     goTo(target?:Task):GotoReturnCode
 
     storeHaveOtherResourceType(resourceType:ResourceConstant,emptyCase:boolean):boolean

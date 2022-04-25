@@ -46,5 +46,8 @@
         return result
     }
 
+    isBorder(): boolean{
+        return !(this.x > 0 && this.y > 0 && this.x < 49 && this.y < 49)
+    }
 
 }

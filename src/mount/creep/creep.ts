@@ -135,12 +135,15 @@ export class CreepExtension extends Creep {
     goTo(): GotoReturnCode
     goTo(target:Task): GotoReturnCode
     goTo(target:RoomObject): GotoReturnCode
-    goTo(target?:RoomObject | Task): GotoReturnCode{
+    goTo(target:RoomPosition): GotoReturnCode
+    goTo(target?:RoomObject | Task | RoomPosition): GotoReturnCode{
         if(!target) {
             const pos = new RoomPosition(this.topTask.x,this.topTask.y,this.topTask.roomName)
             return this.moveTo(pos,{ visualizePathStyle:{stroke: '#67ffed'} })
         } else if('pos' in target){
             return this.moveTo(target.pos,{ visualizePathStyle:{stroke: '#67ffed'} })
+        } else if(target instanceof RoomPosition){
+            return this.moveTo(target,{ visualizePathStyle:{stroke: '#67ffed'} })
         } else {
             const pos = new RoomPosition(target.x,target.y,target.roomName)
             return this.moveTo(pos,{ visualizePathStyle:{stroke: '#67ffed'} })

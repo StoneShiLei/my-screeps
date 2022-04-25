@@ -20,6 +20,9 @@ interface Room {
     getClosestSpawnRoom(level:number,minLevel:number,minRoomDistinct:number):Room | undefined
 
     constructionIsNeedBuild():boolean
+
+    setFlags(flags:Flag[]):void
+    flags(prefix?:string):Flag[] | undefined
 }
 
 interface RoomMemory {

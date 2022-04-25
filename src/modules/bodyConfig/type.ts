@@ -39,5 +39,6 @@ declare global {
         isOutRoom?:boolean
         level?:number
         data?:Data
+        maxPart?:number
     }
 }

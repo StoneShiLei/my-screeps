@@ -80,7 +80,7 @@ export const roomLevelStrategy = {
         }
 
         //生成持续挖矿任务并生成creep
-        service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
+        service.sourceTaskService.trySpawnInnerHarvesterKeeper(room)
 
         //生成upgrader   如果有traner卡能量(因没有storage存储) 则继续生成upgrader进行能量消耗
         const upgradeMap = room.memory.serviceDataMap["upgradeTaskService"]
@@ -332,7 +332,7 @@ const highLevelStrategy = {
 
     trySpawnSourceHarKeeper(room:Room){
         //生成持续挖矿任务并生成creep
-        service.sourceTaskService.trySpawnHarvesterKeeper(room.name,room)
+        service.sourceTaskService.trySpawnInnerHarvesterKeeper(room)
     },
 
     trySpawnMineralHarKeeper(room:Room){

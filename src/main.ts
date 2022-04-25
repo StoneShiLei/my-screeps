@@ -1,12 +1,13 @@
 import { createApp } from "modules/framework";
 import mountAll from "mount"
-import { creepManagerCallbacks, creepRunner, roomManagerCallbacks, roomRunner } from "manager";
+import { creepManagerCallbacks, creepRunner, flagManagerCallbacks, roomManagerCallbacks, roomRunner } from "manager";
 import mountModules from "modules/index";
 import { TaskHelper } from "taskService/taskHelper";
 import { ErrorHelper } from "utils/erroHelper";
 import { Container } from "typescript-ioc";
 import { TaskServiceProxy } from "taskService";
 import autoPlanner63 ,{StructMap, StructsData} from "autoPlanner63"
+import { SourceTaskNameEntity } from "taskService/sourceTaskService/sourceTaskNameEntity";
 
 
 const app = createApp({
@@ -19,7 +20,7 @@ app.on(mountAll())
 
 app.on(roomManagerCallbacks())
 app.on(creepManagerCallbacks())
-
+app.on(flagManagerCallbacks())
 
 app.on({
   tickStart: () => {
@@ -42,6 +43,8 @@ app.on({
   }
 
 
+  //@ts-ignore
+//  Game.getObjectById('626687a16ae82b9510fd3175').addTask(TaskHelper.genTaskWithServiceData(Memory.rooms['E49S6'].serviceDataMap.sourceTaskService['5bbcaff69099fc012e63b6e0'],new SourceTaskNameEntity("harvestOutterTransport")))
 
   //   // try{
     //   const func:(...args: any[])=>number = function(str:string,num1:number,num2:number):number{

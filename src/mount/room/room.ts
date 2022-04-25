@@ -5,6 +5,7 @@ import Utils from "utils/utils"
 export class RoomExtension extends Room {
 
     private _creeps:{[key in string]:Creep[]} = {}
+    private _flags:{[key in string]:Flag[]} = {}
 
     @Inject
     private _taskService!:TaskServiceProxy
@@ -159,5 +160,29 @@ export class RoomExtension extends Room {
     constructionIsNeedBuild():boolean{
         const sites = this.get(LOOK_CONSTRUCTION_SITES) as unknown as ConstructionSite[]
         return sites && sites.length > 0
+    }
+
+    setFlags(flags:Flag[]){
+
+        this._flags = this._flags || {}
+        this._flags["flags"] = flags
+    }
+
+    flags(prefix?:string):Flag[] | undefined{
+        this._flags = this._flags || {}
+        this._flags['flags'] = this._flags['flags'] || []
+
+        if(prefix){
+            const key = `${prefix}_flags`
+            let flags = this._flags[key]
+
+            if(!flags){
+                flags = this._flags['flags'].filter(e => e.getPrefix() == prefix)
+                this._flags[key] = flags
+            }
+
+            return flags
+        }
+        else return this._flags['flags']
     }
 }

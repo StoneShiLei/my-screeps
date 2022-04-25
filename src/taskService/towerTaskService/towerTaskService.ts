@@ -26,7 +26,7 @@ export class TowerTaskService extends BaseTaskService{
         return tasks
     }
 
-    run(room:Room){
+    towerRun(room:Room){
         if(!room.get<StructureTower[]>("tower").length) return
 
         if(!this._lastUpdateMap[room.name] || this._lastUpdateMap[room.name] <= 0){

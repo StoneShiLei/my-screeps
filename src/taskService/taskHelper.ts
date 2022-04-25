@@ -40,13 +40,15 @@ export class TaskHelper {
             return task
         }
 
-    static genTaskWithFlag(flag:Flag,serviceName:ServiceName,actionName:ActionName,
-        reg?:RegName,unreg?:RegName,opt:TaskOpt = {}):Task {
-        const task:Task = {
-            serviceName:serviceName,
-            actionName:actionName,
-            regName:reg,
-            unregName:unreg,
+    static genTaskWithFlag(flag:Flag,entity:BaseTaskNameEntity,
+        opt:TaskOpt = {},regEntity?:BaseTaskNameEntity):Task {
+            if(!entity.actionName) throw new Error("actionName is not defined")
+            const task:Task = {
+            serviceName:entity.serviceName,
+            actionName:entity.actionName,
+            regServiceName:regEntity?.serviceName,
+            regName:regEntity?.regName,
+            unregName:regEntity?.unregName,
             targetId:flag.id,
             roomName:flag.pos.roomName,
             x:flag.pos.x,

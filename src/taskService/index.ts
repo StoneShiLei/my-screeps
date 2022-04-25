@@ -71,6 +71,8 @@ export type Data = {
     x:number,
     y:number,
     creeps:string[],
+    tranCreeps?:string[],
+    defenseCreeps?:string[],
     spawnTime?:number,
     pathTime?:number,
     containerId?:string,

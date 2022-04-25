@@ -72,7 +72,62 @@ const harvesterBodyConfig:BodyConfigCalctor = {
         let carrCount = Math.min(2,Math.ceil(num/5))
         if(num > 10 && num === innerMaxPartCount) carrCount = Math.min(8,50 - num*3)
         return BodyConfig.calcBodyParts({work:num * 2,carry:carrCount,move:num});
-    }
+    },
+
+    outterTransporterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const energy = args.energy
+        const maxPart = args.maxPart
+        if(!energy) throw new Error("args.energy is undefinded")
+        if(!maxPart) throw new Error("args.maxPart is undefinded")
+
+        let current = 0
+        let cost = BodyConfig.getBodyCosts([CARRY,CARRY,MOVE])
+        let baseCost = BodyConfig.getBodyCosts([WORK,MOVE])
+        let num = 0
+        while(current + cost <= energy - baseCost){
+            num += 1
+            current += cost
+            if(num >= 17 || maxPart / 2 < num) break
+        }
+        return BodyConfig.calcBodyParts({carry:num < 17 ? num * 2 : num * 2 - 1,move:num})
+    },
+
+    outterBuildTransporterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const energy = args.energy
+        const maxPart = args.maxPart
+        if(!energy) throw new Error("args.energy is undefinded")
+        if(!maxPart) throw new Error("args.maxPart is undefinded")
+
+        let current = 0
+        let cost = BodyConfig.getBodyCosts([CARRY,CARRY,MOVE])
+        let baseCost = BodyConfig.getBodyCosts([WORK,MOVE])
+        let num = 0
+        while(current + cost <= energy - baseCost){
+            num += 1
+            current += cost
+            if(num >= 17 || maxPart / 2 < num) break
+        }
+        return BodyConfig.calcBodyParts({carry:(num < 17 ? num * 2 : num * 2 - 1) - 2,move:num,work:2})
+    },
+
+    outterHarDefenseBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        return BodyConfig.calcBodyParts({attack:4,ranged_attack:1,heal:1,move:10})
+    },
+
+    outterReverserBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const energy = args.energy
+        if(!energy) throw new Error("args.energy is undefinded")
+
+        let current = 0
+        let cost = BodyConfig.getBodyCosts([CLAIM,MOVE])
+        let num = 0
+        while(current + cost <= energy){
+            num += 1
+            current += cost
+            if(num >= 8) break
+        }
+        return BodyConfig.calcBodyParts({claim:num,move:num})
+    },
 }
 
 const transporterBodyConfig:BodyConfigCalctor = {
@@ -153,7 +208,7 @@ export class BodyConfig{
     }
 
 
-    public static getPartCount(creep?:Creep,body?:BodyPartConstant):number{
+    public static getPartCount(creep?:Creep | null,body?:BodyPartConstant):number{
         if(!creep || !body) return 0
         const name:BodyPartName = `${body}+` as BodyPartName
         if(!creep.memory.bodyParts) creep.memory.bodyParts = {}
