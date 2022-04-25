@@ -146,7 +146,7 @@ export class UpgradeTaskAction extends BaseTaskAction {
         }
 
         // 如果有工地则不升级
-        if(creep.ticksToLive && creep.ticksToLive % 300 === 0 && creep.room.find(FIND_CONSTRUCTION_SITES).length > 0){
+        if(creep.ticksToLive && creep.ticksToLive % 100 === 0 && creep.room.find(FIND_CONSTRUCTION_SITES).length > 0){
             creep.popTopTask()
             creep.doWorkWithTopTask()
         }

@@ -85,7 +85,7 @@ export class UpgradeTaskService extends BaseTaskService{
             else{}
         }
         else if((Game.cpu.bucket > 9000 && room.storage.store[RESOURCE_ENERGY] >= 50000 || room.controller.ticksToDowngrade < 5000) &&
-        (Game.time - data.spawnTime > 1500 || data.creeps.length == 0)){
+        (Game.time - data.spawnTime + data.pathTime * 0.8 > 1500 || data.creeps.length == 0)){
             this._trySpawnUpgrader(room)
         }
     }
