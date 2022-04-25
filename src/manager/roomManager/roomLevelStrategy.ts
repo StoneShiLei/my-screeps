@@ -91,7 +91,19 @@ export const roomLevelStrategy = {
             }
         }
 
-
+        //空闲worker挖矿任务
+        let sourceData:Data[] = _.values(room.memory.serviceDataMap["sourceTaskService"])
+        sourceData = sourceData.filter(data => Game.getObjectById<Source>(data.targetId)?.energy)
+        sourceData.forEach(data => {
+            if(data.creeps.length === 0){
+                const posLen = Game.getObjectById<Source>(data.targetId)?.pos.nearPos(1).filter(pos => pos.walkable()).length ?? 0
+                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === data.targetId).length
+                if(Math.ceil(targetCount) > 0){
+                    const creep = idleEmptyWorkers.pop()
+                    if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
+                }
+            }
+        })
 
 
         //填充Hive
@@ -136,20 +148,6 @@ export const roomLevelStrategy = {
 
         //剩余任务分配给空闲的worker搬运
         allTanerTasks.forEach(task => idleEmptyWorkers.pop()?.addTask(task))
-
-        //空闲worker挖矿任务
-        let sourceData:Data[] = _.values(room.memory.serviceDataMap["sourceTaskService"])
-        sourceData = sourceData.filter(data => Game.getObjectById<Source>(data.targetId)?.energy)
-        sourceData.forEach(data => {
-            if(data.creeps.length === 0){
-                const posLen = Game.getObjectById<Source>(data.targetId)?.pos.nearPos(1).filter(pos => pos.walkable()).length ?? 0
-                const targetCount = posLen * 1.5 - room.creeps("worker").filter(creep => creep.topTask && creep.topTask.targetId === data.targetId).length
-                if(Math.ceil(targetCount) > 0){
-                    const creep = idleEmptyWorkers.pop()
-                    if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
-                }
-            }
-        })
 
         //分配剩余空闲的worker
         const lowEnergyTranTasks = service.sourceTaskService.genEnergyTranTask(room,room.hiveIsNeedToFill() ? 1200 : 500)
