@@ -60,7 +60,7 @@ export class SourceTaskAction extends BaseTaskAction {
 
     registerSourcesTranOutterRoom(creep:Creep){
         const task = creep.topTask
-        const map = creep.room.memory.serviceDataMap.sourceTaskService
+        const map = Game.rooms[task.roomName].memory.serviceDataMap.sourceTaskService
         if(!map) return
         const data = map[task.targetId]
         if(!data) return
@@ -68,6 +68,8 @@ export class SourceTaskAction extends BaseTaskAction {
         if(!_.include(data.tranCreeps,creep.id)){
             data.tranCreeps.push(creep.id)
         }
+        map[task.targetId] = data
+        Game.rooms[task.roomName].memory.serviceDataMap.sourceTaskService = map
     }
 
     harvestEnergyKeeper(creep:Creep){
@@ -335,7 +337,6 @@ export class SourceTaskAction extends BaseTaskAction {
             }
             else if(road){
                 creep.build(road)
-                creep.memory.dontPullMe = false
                 return
             }
             else{

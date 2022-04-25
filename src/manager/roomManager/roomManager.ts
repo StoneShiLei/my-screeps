@@ -61,7 +61,7 @@ export class RoomManager extends BaseManager{
         //炮塔
         ErrorHelper.catchError(()=>service.towerTaskService.towerRun(room))
 
-        if(interval % 6 === 0){
+        if(interval % 6 === 0 || this._firstActive){
             //外矿
             ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room))
         }

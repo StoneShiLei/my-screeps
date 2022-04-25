@@ -131,6 +131,7 @@ export class SourceTaskService extends BaseTaskService{
             if(pathTime && container){
                 data.tranCreeps = data.tranCreeps || []
                 data.tranCreeps = data.tranCreeps.filter(e => Game.getObjectById<Creep>(e))
+
                 const tranCreeps = data.tranCreeps.map(e => Game.getObjectById<Creep>(e)).filter(e => e && (!e.ticksToLive || e.ticksToLive > e.body.length * 3))
                 const tranBuildCreep = tranCreeps.filter(e => BodyConfig.getPartCount(e,WORK) > 0).head()
 
@@ -141,12 +142,13 @@ export class SourceTaskService extends BaseTaskService{
                 const maxPart = Math.ceil(needCarryPartCount / Math.ceil(needCarryPartCount / 33)) //每个最大32Part 计算每个creep的part数量
                 const isNearToAny = tranCreeps.filter(e => e && e.pos.isNearTo(container)).head()
 
+
                 if(carryPartCount > 0 && !isNearToAny){
                     const tranBodyFunc = tranBuildCreep ? BodyConfig.harvesterBodyConfig.outterTransporterBodyCalctor : BodyConfig.harvesterBodyConfig.outterBuildTransporterBodyCalctor
                     const task = TaskHelper.genTaskWithServiceData(data,new SourceTaskNameEntity("harvestOutterTransport"),undefined,new SourceTaskNameEntity(undefined,"registerSourcesTranOutterRoom"))
                     const service = Container.get(TaskServiceProxy)
 
-                    // service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarTransporter",-65,[task],tranBodyFunc,{energy:spawnRoom.getEnergyCapacityAvailable(),maxPart:maxPart})
+                    service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarTransporter",-65,[task],tranBodyFunc,{energy:spawnRoom.getEnergyCapacityAvailable(),maxPart:maxPart})
                 }
             }
         })
@@ -224,6 +226,8 @@ export class SourceTaskService extends BaseTaskService{
                 x:source.pos.x,
                 y:source.pos.y,
                 creeps:dataMap[source.id]?.creeps || [],
+                tranCreeps:dataMap[source.id]?.tranCreeps || [],
+                defenseCreeps:dataMap[source.id]?.defenseCreeps || [],
                 spawnTime:dataMap[source.id]?.spawnTime || 0,
                 pathTime:dataMap[source.id]?.pathTime || 0,
                 containerId: container?.id,

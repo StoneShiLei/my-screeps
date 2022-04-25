@@ -28,7 +28,8 @@ export class SpawnTaskService extends BaseTaskService{
             return undefined
         }
         // Game._name_hash = (Game._name_hash ?? 0) + 1;
-        const name = this.genName()
+        // const name = this.genName()
+        const name = this.genName() + role
 
         let opts:SpawnOptions = {
             memory: {
