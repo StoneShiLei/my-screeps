@@ -53,8 +53,8 @@ export class SourceTaskService extends BaseTaskService{
         this._trySpawnHarvesterKeeper(spawnRoom.name,spawnRoom,900)
     }
 
-    trySpawnOutterHarvesterKeeper(workRoomName:string,spawnRoom:Room){
-        this._trySpawnHarvesterKeeper(workRoomName,spawnRoom,-60)
+    trySpawnOutterHarvesterKeeper(workRoomName:string,spawnRoom:Room,priority:number){
+        this._trySpawnHarvesterKeeper(workRoomName,spawnRoom,priority)
     }
 
     _trySpawnHarvesterKeeper(workRoom:string,spawnRoom:Room,priority:number){
@@ -102,7 +102,7 @@ export class SourceTaskService extends BaseTaskService{
         }
     }
 
-    trySpawnOutterDefenser(workRoom:string,spawnRoom:Room){
+    trySpawnOutterDefenser(workRoom:string,spawnRoom:Room,priority:number){
         const harRoom = Game.rooms[workRoom]
         if(!harRoom) return
 
@@ -113,11 +113,11 @@ export class SourceTaskService extends BaseTaskService{
             if(defenser) return
             const service = Container.get(TaskServiceProxy)
             const  task = TaskHelper.genTaskWithTarget(harRoom.get<Mineral>("mineral"),new SourceTaskNameEntity("outterRoomDefanse"))
-            service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarDefenser",-45,[task],BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,{energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:true})
+            service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarDefenser",priority,[task],BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,{energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:true})
         }
     }
 
-    trySpawnOutterTransporter(workRoom:string,spawnRoom:Room){
+    trySpawnOutterTransporter(workRoom:string,spawnRoom:Room,priority:number){
         const harRoom = Game.rooms[workRoom]
         if(!harRoom) return
 
@@ -148,7 +148,7 @@ export class SourceTaskService extends BaseTaskService{
                     const task = TaskHelper.genTaskWithServiceData(data,new SourceTaskNameEntity("harvestOutterTransport"),undefined,new SourceTaskNameEntity(undefined,"registerSourcesTranOutterRoom"))
                     const service = Container.get(TaskServiceProxy)
 
-                    service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarTransporter",-65,[task],tranBodyFunc,{energy:spawnRoom.getEnergyCapacityAvailable(),maxPart:maxPart})
+                    service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarTransporter",priority,[task],tranBodyFunc,{energy:spawnRoom.getEnergyCapacityAvailable(),maxPart:maxPart})
                 }
             }
         })
@@ -162,20 +162,28 @@ export class SourceTaskService extends BaseTaskService{
         const roomHarFlags = room.flags("har")
         if(!roomHarFlags?.length) return
 
-        //外矿房间角色生成优先级是最低的，防止影响房间内运营 按 defenser-45 -> scouter-50 -> reserver-55 -> harvester-60 -> transporter-65
+        //外矿房间角色生成优先级是最低的
+        //防止影响房间内运营 默认按 defenser-45 -> scouter-50 -> reserver-55 -> harvester-60 -> transporter-65
+        //从第二个房间开始除了defenser 其他角色优先级-=100
+        let defenserPriority = -45
+        let scouterPriority = -50
+        let reserverPriority = -55
+        let harvesterPriority = -60
+        let transporterPriority = -65
+
         roomHarFlags.sort().forEach(flag =>{
             if(Memory.rooms[flag.pos.roomName]){
-                this.trySpawnOutterDefenser(flag.pos.roomName,room)
+                this.trySpawnOutterDefenser(flag.pos.roomName,room,defenserPriority)
             }
         })
 
         const service = Container.get(TaskServiceProxy)
         roomHarFlags.sort().forEach(flag =>{
-            if(!Memory.rooms[flag.pos.roomName] || !Memory.rooms[flag.pos.roomName].serviceDataMap.sourceTaskService){
+            if(!Memory.rooms[flag.pos.roomName] || !Memory.rooms[flag.pos.roomName]?.serviceDataMap?.sourceTaskService){
                 const scouter = room.creeps("scouter",false).filter(c => c.topTask.roomName == flag.pos.roomName).head()
                 if(!scouter){
                     const task = TaskHelper.genTaskWithFlag(flag,new SourceTaskNameEntity("scouterToRoom"))
-                    service.spawnTaskService.trySpawn(room,room.name,"scouter",-50,[task],(args:BodyCalcFuncArgs)=> [MOVE],{})
+                    service.spawnTaskService.trySpawn(room,room.name,"scouter",scouterPriority,[task],(args:BodyCalcFuncArgs)=> [MOVE],{})
                 }
             }
             else{
@@ -188,15 +196,20 @@ export class SourceTaskService extends BaseTaskService{
                     if(!reserver && harRoom.controller && (!harRoom.controller.reservation || harRoom.controller.reservation.ticksToEnd < 1000)){
                         const task = TaskHelper.genTaskWithTarget(harRoom.controller,new SourceTaskNameEntity("reserveOutterHarvestRoom"))
 
-                        service.spawnTaskService.trySpawn(room,room.name,"reserver",-55,[task],
+                        service.spawnTaskService.trySpawn(room,room.name,"reserver",reserverPriority,[task],
                         BodyConfig.harvesterBodyConfig.outterReverserBodyCalctor,{energy:room.getEnergyCapacityAvailable()})
                     }
                 }
 
-                this.trySpawnOutterHarvesterKeeper(flag.pos.roomName,room)
-                this.trySpawnOutterTransporter(flag.pos.roomName,room)
+                this.trySpawnOutterHarvesterKeeper(flag.pos.roomName,room,harvesterPriority)
+                this.trySpawnOutterTransporter(flag.pos.roomName,room,transporterPriority)
             }
         })
+        //下一个外矿房间的角色生成优先级全员降低100
+        scouterPriority -= 100
+        reserverPriority -= 100
+        harvesterPriority -= 100
+        transporterPriority -= 100
     }
 
     update(room:Room){

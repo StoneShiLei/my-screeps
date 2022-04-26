@@ -404,6 +404,7 @@ export class SourceTaskAction extends BaseTaskAction {
         }
 
         if(!Memory.rooms[creep.room.name] || !Memory.rooms[creep.room.name]?.serviceDataMap?.sourceTaskService){
+            console.log(creep.room.name)
             creep.room.updateRoomInfo()
         }
         else{
