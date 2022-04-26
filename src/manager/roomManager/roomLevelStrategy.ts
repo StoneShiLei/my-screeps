@@ -217,20 +217,25 @@ const highLevelStrategy = {
 
         //搬出centerLink的能量
         const tranLinkTasks = service.transportTaskService.genTranEnergyFromLinkTask(room)
-        creepPool.idleEmptyTraners.pop()?.addTask(tranLinkTasks.shift())
+        if(tranLinkTasks.length) creepPool.idleEmptyTraners.pop()?.addTask(tranLinkTasks)
 
 
         //填充Hive
-        while(creepPool.idleNotEmptyTraners.length && room.hiveIsNeedToFill()){
-            const creep = creepPool.idleNotEmptyTraners.pop()
+        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && room.hiveIsNeedToFill()){
+            const creep = creepPool.idleNotEmptyTraners.length
+                         ? creepPool.idleNotEmptyTraners.pop()
+                         : creepPool.idleEmptyTraners.pop()
+
             creep?.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
             if(creep?.storeIsEmpty()) creep.addTask(massStoreTasks)
         }
 
         //填充tower
         const fillTowerTasks = service.towerTaskService.genFillTowerTask(room)
-        while(creepPool.idleNotEmptyTraners.length && fillTowerTasks.length){
-            const creep = creepPool.idleNotEmptyTraners.pop()
+        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && fillTowerTasks.length){
+            const creep = creepPool.idleNotEmptyTraners.length
+            ? creepPool.idleNotEmptyTraners.pop()
+            : creepPool.idleEmptyTraners.pop()
             creep?.addTask(fillTowerTasks.shift())
             if(creep?.storeIsEmpty()) creep.addTask(massStoreTasks)
         }
@@ -238,6 +243,10 @@ const highLevelStrategy = {
         //store不为空的将资源清空到大容量存储对象内
         creepPool.idleNotEmptyTraners
         .forEach(creep => creep.addTask(service.transportTaskService.genFillAllMainRoomMassStoreTask(creep)))
+
+
+
+
 
          //只筛取ttl大于50的搬运工进行以下任务
         creepPool.idleEmptyTraners = _.filter(creepPool.idleEmptyTraners,creep => creep.ticksToLive && creep.ticksToLive > 50)
@@ -256,10 +265,10 @@ const highLevelStrategy = {
 
         //填充剩余资源的任务
         if(massStoreTasks.length && creepPool.idleEmptyTraners.length){
-
             //运送升级能量
-            const upgradeFillTask = service.upgradeTaskService.genFillUpgradeEnergyTask(room,BodyConfig.getPartCount(creepPool.idleEmptyTraners.head())* 50)
-            creepPool.idleEmptyTraners.pop()?.addTask(upgradeFillTask)
+            const upgradeFillTask = service.upgradeTaskService.genFillUpgradeEnergyTask(room,BodyConfig.getPartCount(creepPool.idleEmptyTraners.head(),CARRY)* 50)
+            if(upgradeFillTask.length) creepPool.idleEmptyTraners.pop()?.addTask(upgradeFillTask) //直接调用fillResource会自动去massStore取能量
+
 
             //nuker factory todo  每次判断length防止不必要的cpu浪费
             if(creepPool.idleEmptyTraners.length){}
@@ -299,10 +308,11 @@ const highLevelStrategy = {
         if(workerCount + room.creeps("transporter",false).length === 0) {
             spawnWorker()
         }
-        // 如果有工地 或一个都没有 或能量溢出  就生成worker
+        // 有工地时  一个都没有 或能量溢出  就生成worker
         else if(room.get<ConstructionSite[]>(LOOK_CONSTRUCTION_SITES).length && (workerCount < 1 || energyOver)){
             spawnWorker()
         }
+        //能量有富裕时生成worker
         else if(room.storage && (room.storage.store[RESOURCE_ENERGY] - 300000 ) / 50000 > workerCount){
             spawnWorker()
         }

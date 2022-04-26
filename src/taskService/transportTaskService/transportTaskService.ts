@@ -1,5 +1,5 @@
 import { link } from "fs";
-import { Data, RegName, ServiceName } from "taskService";
+import { Data, RegName, ServiceData, ServiceName } from "taskService";
 import { BaseTaskNameEntity } from "taskService/baseTaskNameEntity";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { MineralTaskService } from "taskService/mineralTaskService/mineralTaskService";
@@ -16,6 +16,7 @@ export class TransportTaskService extends BaseTaskService{
     actions!: TransportTaskAction;
 
     private _pickupTaskCacheMap:{[roomName:string]:Task[]} = {}
+    private _pickupCacheTime:number = 0
 
     genMassStoreEnergyTranTask(room:Room,energyCount:number = 6600):Task[]{
         if(room.storage && room.storage.store.energy >= 2000){
@@ -37,8 +38,9 @@ export class TransportTaskService extends BaseTaskService{
         for(let target of [room.storage,room.terminal]){
             if(!target) continue;
             const currentCount = Math.min(target.store[resourceType] ?? 0,carryAbleCount)
+
             carryAbleCount -= currentCount
-            if(currentCount > 0) tasks.push(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("transportResource"),{
+            if(currentCount) tasks.push(TaskHelper.genTaskWithTarget(target,new TransportTaskNameEntity("transportResource"),{
                 resourceType,resourceCount:currentCount
             },regNameEntity))
 
@@ -71,12 +73,14 @@ export class TransportTaskService extends BaseTaskService{
     takeCachedPickupTranTask(room:Room,idleCreeps:Creep[],onlyEnergy:boolean = false){
         let pickTasks = this._pickupTaskCacheMap[room.name] ?? []
         //捡起资源 性能消耗高  9tick更新一次task
-        if(Game.time + room.hashCode() % 9 == 0){
+        if(!this._pickupCacheTime || this._pickupCacheTime == 3){
             const service = Container.get(MineralTaskService)
             pickTasks = this.genPickupTranTask(room,onlyEnergy).concat(service.genTranMineralTask(room))
+            this._pickupCacheTime = 0;
         }
-        if(idleCreeps.length > 0 && pickTasks.length > 0) idleCreeps.pop()?.addTask(pickTasks.pop())
+        if(idleCreeps.length > 0 && pickTasks.length > 0) idleCreeps.pop()?.addTask(pickTasks.shift())
         this._pickupTaskCacheMap[room.name] = pickTasks;
+        this._pickupCacheTime += 1;
     }
 
     genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
@@ -123,16 +127,18 @@ export class TransportTaskService extends BaseTaskService{
         const tranData = tranMap[STRUCTURE_STORAGE]
         const tasks:Task[] = []
 
+        room._used = room._used ?? {}
         let needTran = 0
-        for(let sourceData of _.values<Data>(sourceMap)){
+        const serviceData:Data[] = _.values(sourceMap)
+        for(let sourceData of serviceData){
             const container = sourceData.containerId ? Game.getObjectById<StructureContainer>(sourceData.containerId) : undefined
             const linkA = sourceData.linkIdA ? Game.getObjectById<StructureLink>(sourceData.linkIdA) : undefined
             const linkB = sourceData.linkIdB ? Game.getObjectById<StructureLink>(sourceData.linkIdB) : undefined
             if(!needTran && container)
-                needTran = container.store[RESOURCE_ENERGY] && (linkA && linkB && (linkA.store.getFreeCapacity() === 0 && linkB.store.getFreeCapacity() === 0)) ? 0 : 800
+                needTran = container.store[RESOURCE_ENERGY] && (linkA && linkB && (linkA.store.getFreeCapacity(RESOURCE_ENERGY) === 0 && linkB.store.getFreeCapacity(RESOURCE_ENERGY) === 0)) ? 0 : 800
         }
         let centerLink = tranData.linkIdA ? Game.getObjectById<StructureLink>(tranData.linkIdA) : undefined
-        if(needTran && centerLink && centerLink.store.getUsedCapacity() !== 0 && !room._used[centerLink.id]){
+        if(needTran && centerLink && centerLink.store.getUsedCapacity(RESOURCE_ENERGY) !== 0 && !room._used[centerLink.id]){
             if(room.storage){
                 tasks.push(TaskHelper.genTaskWithTarget(room.storage,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
                 tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))

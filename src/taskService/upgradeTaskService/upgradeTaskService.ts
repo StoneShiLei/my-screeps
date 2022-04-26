@@ -30,9 +30,9 @@ export class UpgradeTaskService extends BaseTaskService{
     genFillUpgradeEnergyTask(room:Room,carryCap?:number):Task[]{
         const map = room.memory.serviceDataMap.upgradeTaskService
         if(!map || !carryCap) return []
+
         const data = map[STRUCTURE_CONTROLLER]
         room._used = room._used || {}
-
         const container = data.containerId ? Game.getObjectById<StructureContainer>(data.containerId) : undefined
         const upgradelink = data.linkIdA ? Game.getObjectById<StructureLink>(data.linkIdA) : undefined
         if(!upgradelink || upgradelink && upgradelink.store.getUsedCapacity() === 0){
@@ -56,7 +56,6 @@ export class UpgradeTaskService extends BaseTaskService{
             }
 
         }
-
         return []
     }
 
@@ -110,6 +109,7 @@ export class UpgradeTaskService extends BaseTaskService{
         data.y = room.controller.pos.y
         data.roomName = room.name
         data.creeps = map[STRUCTURE_CONTROLLER]?.creeps || []
+        data.pathTime = data.pathTime || 0
 
         map[STRUCTURE_CONTROLLER] = data
         room.memory.serviceDataMap["upgradeTaskService"] = map
@@ -120,7 +120,7 @@ export class UpgradeTaskService extends BaseTaskService{
         if(!tasks.length) return
 
         const service = Container.get(TaskServiceProxy)
-        service.spawnTaskService.trySpawn(room,room.name,"upgrader",-10,tasks,
+        service.spawnTaskService.trySpawn(room,room.name,"upgrader",0,tasks,
         BodyConfig.upgraderBodyConfig.lowLevelUpgraderBodyCalctor,{spawnRoom:room})
     }
 

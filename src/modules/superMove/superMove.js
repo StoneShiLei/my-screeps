@@ -1592,7 +1592,7 @@ Creep.prototype.moveTo=function (...e) {
         this.memory.dontPullMe = false;
         this.memory.lastPos = {x:this.pos.x,y:this.pos.y,time:0}
     }
-    // this.say(this.memory.lastPos.time)
+    // this.say(this.memory.dontPullMe)
     return this.$moveTo(...e)
 };
 

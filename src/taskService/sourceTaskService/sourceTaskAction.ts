@@ -203,7 +203,7 @@ export class SourceTaskAction extends BaseTaskAction {
         if(!em) em = creep.room.find(FIND_HOSTILE_STRUCTURES).filter(s => s.structureType == STRUCTURE_INVADER_CORE).head()
         if(em){
             if(creep.attack(em) == ERR_NOT_IN_RANGE){
-                creep.moveTo(em)
+                creep.goTo(em)
                 creep.heal(creep)
             }
             creep.rangedAttack(em)
@@ -212,14 +212,13 @@ export class SourceTaskAction extends BaseTaskAction {
 
         const injuredCreep = creep.pos.findClosestByPath(FIND_MY_CREEPS,{filter:e=>e.hits != e.hitsMax})
         if(injuredCreep && creep.heal(injuredCreep) == ERR_NOT_IN_RANGE){
-            creep.moveTo(injuredCreep)
-            creep.memory.dontPullMe = true
+            creep.goTo(injuredCreep)
             return
         }
 
         const mineral = creep.topTarget
         if(mineral && !creep.pos.inRangeTo(mineral,3)){
-            creep.moveTo(mineral)
+            creep.goTo(mineral)
         }
     }
 
@@ -232,7 +231,7 @@ export class SourceTaskAction extends BaseTaskAction {
 
         const controller = creep.topTarget as StructureController
         if(controller && creep.reserveController(controller) == ERR_NOT_IN_RANGE){
-            creep.moveTo(controller)
+            creep.goTo(controller)
         }
         creep.memory.dontPullMe = (creep.ticksToLive || 3) % 3 != 0
     }
@@ -324,7 +323,7 @@ export class SourceTaskAction extends BaseTaskAction {
         }
 
         if(BodyConfig.getPartCount(creep,WORK) == 0 || creep.getActiveBodyparts(WORK) == 0 || creep.pos.isBorder()){
-            creep.moveTo(target)
+            creep.goTo(target)
             return
         }
 
@@ -340,13 +339,13 @@ export class SourceTaskAction extends BaseTaskAction {
                 return
             }
             else{
-                creep.moveTo(target)
+                creep.goTo(target)
                 return
             }
         }
         else{
             if(road.hits < road.hitsMax * 0.9) creep.repair(road)
-            if(road.hits > road.hitsMax * 0.8) creep.moveTo(target)
+            if(road.hits > road.hitsMax * 0.8) creep.goTo(target)
         }
     }
 
@@ -378,7 +377,7 @@ export class SourceTaskAction extends BaseTaskAction {
 
             if(container && container.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity(RESOURCE_ENERGY)){
                 const result = creep.withdraw(container,RESOURCE_ENERGY)
-                if(result == ERR_NOT_IN_RANGE) creep.moveTo(container)
+                if(result == ERR_NOT_IN_RANGE) creep.goTo(container)
             }
         }
 

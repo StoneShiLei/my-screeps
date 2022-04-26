@@ -208,7 +208,7 @@ export class BodyConfig{
     }
 
 
-    public static getPartCount(creep?:Creep | null,body?:BodyPartConstant):number{
+    public static getPartCount(creep:Creep | null | undefined,body:BodyPartConstant):number{
         if(!creep || !body) return 0
         const name:BodyPartName = `${body}+` as BodyPartName
         if(!creep.memory.bodyParts) creep.memory.bodyParts = {}

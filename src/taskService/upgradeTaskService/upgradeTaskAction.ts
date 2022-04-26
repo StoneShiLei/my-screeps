@@ -53,7 +53,7 @@ export class UpgradeTaskAction extends BaseTaskAction {
             //少于 1w 的时候暂时不更新
             if(!(creep.memory._concated && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] < 10000) || creep.room.storage.store.getFreeCapacity(RESOURCE_ENERGY)<10000){
                 const result = creep.upgradeController(target as StructureController)
-                if(result === ERR_NOT_IN_RANGE && creep.ticksToLive && creep.ticksToLive % 3 === 0) creep.moveTo(target,{range:3})
+                if(result === ERR_NOT_IN_RANGE && creep.ticksToLive && creep.ticksToLive % 3 === 0) creep.moveTo(target,{range:3,visualizePathStyle:{stroke: '#67ffed'}})
 
                 if(creep.pos.inRangeTo(target,3)){
                     if(!creep.memory._concated){
@@ -81,7 +81,7 @@ export class UpgradeTaskAction extends BaseTaskAction {
             if(link && (link._upgradeUsed || 0) <= link.store[RESOURCE_ENERGY] && link.store[RESOURCE_ENERGY] > 0){
                 const result = creep.withdraw(link,RESOURCE_ENERGY)
                 if(result == ERR_NOT_IN_RANGE){
-                    creep.moveTo(link)
+                    creep.goTo(link)
                     moved = true
                 } else {
                     link._upgradeUsed = (link._upgradeUsed || 0) + creep.store.getFreeCapacity(RESOURCE_ENERGY)
@@ -95,7 +95,7 @@ export class UpgradeTaskAction extends BaseTaskAction {
             else if(container && (!link || creep.store.getUsedCapacity(RESOURCE_ENERGY) <= BodyConfig.getPartCount(creep,WORK))){
                 const result = creep.withdraw(container,RESOURCE_ENERGY)
                 if(result == ERR_NOT_IN_RANGE){
-                    creep.moveTo(container)
+                    creep.goTo(container)
                     moved = true
                 }
             }
@@ -104,7 +104,7 @@ export class UpgradeTaskAction extends BaseTaskAction {
 
 
         if(!moved && container && !creep.pos.isEqualTo(container) && data.creeps.length <= 1){
-            creep.moveTo(container)
+            creep.goTo(container)
         }
 
         if(creep.ticksToLive && creep.ticksToLive % 7 == 0){
@@ -151,7 +151,9 @@ export class UpgradeTaskAction extends BaseTaskAction {
             creep.doWorkWithTopTask()
         }
 
-        if(creep.ticksToLive && creep.ticksToLive % 3 === 0) creep.memory.dontPullMe = false
+        if(creep.ticksToLive && creep.ticksToLive % 2 == 0){
+            creep.memory.dontPullMe = false
+        }
     }
 
 

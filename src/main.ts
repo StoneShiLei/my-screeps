@@ -149,10 +149,10 @@ export const loop = app.run
 
 declare global {
   export interface RoomMemory{
-    _test:number
+    _test?:number
   }
 
   export interface CreepMemory{
-    _test:boolean
+    _test?:boolean
   }
 }

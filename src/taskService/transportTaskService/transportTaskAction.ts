@@ -40,7 +40,6 @@ export class TransportTaskAction extends BaseTaskAction{
         }
         const result = creep.withdraw(target,opt.resourceType,amount)
         if(result === OK){
-
             //阻塞锁  防止1tick多任务时进行无效的拿起和放下操作
             creep._moveResourceActiveOK = true
 
@@ -75,13 +74,14 @@ export class TransportTaskAction extends BaseTaskAction{
 
         const room = target.room
         const fromStorage = opt.fromStorage !== undefined ? opt.fromStorage : true
-        const carryAbleCount = opt.resourceCount ?? 0
+        const carryAbleCount = opt.resourceCount ?? creep.store.getFreeCapacity(RESOURCE_ENERGY)
 
         //没能量时优先取房间内大容量存储建筑内的能量
         if(!creep._moveResourceActiveOK && creep.storeIsEmpty() && creep.room.my && fromStorage &&
-        creep.room.storage && !room.isRoomMassStore(target) && room.roomMassStroeUsedCapacity(opt.resourceType) >= carryAbleCount){
+        creep.room.storage && creep.room.storage.my && !room.isRoomMassStore(target) && room.roomMassStroeUsedCapacity(opt.resourceType) >= carryAbleCount){
             const taskService = Container.get(TaskServiceProxy)
             const newTasks = taskService.transportTaskService.genMassStoreTranTask(room,opt.resourceType,carryAbleCount)
+
             if(newTasks.length) creep.addTask(newTasks).doWorkWithTopTask()
             else creep.popTopTask().doWorkWithTopTask()
             return

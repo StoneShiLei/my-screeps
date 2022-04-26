@@ -74,7 +74,7 @@ export class RoomManager extends BaseManager{
             //房间运营策略
             if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
             else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
-            else roomLevelStrategy.middleLevel(room)
+            else roomLevelStrategy.highLevel(room)
 
 
 
