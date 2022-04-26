@@ -43,6 +43,7 @@ export class RoomManager extends BaseManager{
         Object.values(Game.rooms).forEach(room => {
             const interval = Game.time + room.hashCode()
 
+
             //处理spawn队列
             ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room)  ,room.name)
         })
@@ -80,8 +81,16 @@ export class RoomManager extends BaseManager{
             else roomLevelStrategy.highLevel(room)
 
         }
+
+
+        //处理一些临时的信息
+        const style: TextStyle = { align: 'left', opacity: 0.5 }
+        if(room._spawnQueue) this.tempSpawnQueue = room._spawnQueue
+        const spawnName = this.tempSpawnQueue.map(task => task.name)
+        spawnName.map((log,index) => room.visual.text(log, 1, 3 + index, style))
     }
 
+    tempSpawnQueue:SpawnTask[] = [];
 }
 
 

@@ -58,14 +58,13 @@ export class SpawnTaskService extends BaseTaskService{
         if(!room._spawnQueue) return
 
         room._spawnQueue = _.sortByOrder(room._spawnQueue,(task) => task.priority,'desc')
+
+
         for(let spawnTask of room._spawnQueue){
 
             const body = spawnTask.bodyFunc(spawnTask.bodyFuncArgs)
             const spend = BodyConfig.getBodyCosts(body)
 
-            // console.log(JSON.stringify(spend))
-            // console.log(JSON.stringify(body))
-            // console.log(JSON.stringify(room._spawnQueue))
             if(room._currentEnergyAvailable < spend){
                 room._spawnQueue = []
                 return
