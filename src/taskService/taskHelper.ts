@@ -44,17 +44,35 @@ export class TaskHelper {
         opt:TaskOpt = {},regEntity?:BaseTaskNameEntity):Task {
             if(!entity.actionName) throw new Error("actionName is not defined")
             const task:Task = {
-            serviceName:entity.serviceName,
-            actionName:entity.actionName,
-            regServiceName:regEntity?.serviceName,
-            regName:regEntity?.regName,
-            unregName:regEntity?.unregName,
-            targetId:flag.id,
-            roomName:flag.pos.roomName,
-            x:flag.pos.x,
-            y:flag.pos.y,
-            opt:opt
-        }
+                serviceName:entity.serviceName,
+                actionName:entity.actionName,
+                regServiceName:regEntity?.serviceName,
+                regName:regEntity?.regName,
+                unregName:regEntity?.unregName,
+                targetId:flag.id,
+                roomName:flag.pos.roomName,
+                x:flag.pos.x,
+                y:flag.pos.y,
+                opt:opt
+            }
+        return task
+    }
+
+    static genTaskWithAnyData(entity:BaseTaskNameEntity,regEntity?:BaseTaskNameEntity,data?:{[key:string]:any}):Task {
+            if(!entity.actionName) throw new Error("actionName is not defined")
+            const task:Task = {
+                serviceName:entity.serviceName,
+                actionName:entity.actionName,
+                regServiceName:regEntity?.serviceName,
+                regName:regEntity?.regName,
+                unregName:regEntity?.unregName,
+                targetId:'',
+                roomName:'',
+                x:0,
+                y:0,
+                opt:{},
+                anyData:data
+            }
         return task
     }
 }

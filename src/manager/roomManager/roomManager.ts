@@ -45,7 +45,6 @@ export class RoomManager extends BaseManager{
 
             //处理spawn队列
             ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room)  ,room.name)
-
         })
 
         this._firstActive = false;
@@ -62,34 +61,24 @@ export class RoomManager extends BaseManager{
         ErrorHelper.catchError(()=>service.towerTaskService.towerRun(room))
 
         if(interval % 6 === 0 || this._firstActive){
+
             //外矿
             ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room))
+
         }
 
         if(interval % 3 === 0 || this._firstActive){
-
+            //claim
+            ErrorHelper.catchError(()=>service.claimTaskService.claimRun())
             //link互传
-            ErrorHelper.catchError(()=>service.transportTaskService.runTransformLink(room))
+            ErrorHelper.catchError(()=>service.transportTaskService.transformLinkRun(room))
+
 
             //房间运营策略
             if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
             else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
             else roomLevelStrategy.highLevel(room)
 
-
-
-            let hostileCnt = room.find(FIND_HOSTILE_CREEPS,{filter:e => e.owner.username != "Invader" && e.body.filter(e=>e.type==HEAL && e.boost).length >= 5 }).length;
-            if(!hostileCnt)return;
-            // room.controller.pos.createFlag("raL1_W19N21_crossShard_114514")
-            let MyRuinCnt = room.find(FIND_RUINS,{filter:e=>
-                    e.structure.structureType!=STRUCTURE_ROAD
-                    &&e.structure.structureType!=STRUCTURE_CONTAINER
-                    &&e.structure.structureType!=STRUCTURE_RAMPART
-                    &&e.structure.structureType!=STRUCTURE_EXTRACTOR
-                    &&e.structure.structureType!=STRUCTURE_LINK
-                    && (e.structure as OwnedStructure).owner&&(e.structure as OwnedStructure).owner?.username==room.controller?.owner?.username}).length
-            if(!MyRuinCnt)return;
-            room.controller?.activateSafeMode()
         }
     }
 

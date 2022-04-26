@@ -6,6 +6,14 @@ export default function mountModules():AppLifecycleCallbacks{
     superMoveJS();
     structureCache();
     return {
+        born:()=>{
 
+        },
+        tickStart:()=>{
+
+        },
+        tickEnd:()=>{
+
+        },
     }
 }

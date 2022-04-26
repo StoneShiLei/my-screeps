@@ -1,4 +1,5 @@
-import autoPlanner63,{ StructMap } from "autoPlanner63"
+import autoPlanner63,{ StructMap, StructsData } from "autoPlanner63"
+import { Data } from "taskService"
 
 export const autoPlanStrategy = {
     tryAutoBuildLowLevel(room:Room){
@@ -36,37 +37,55 @@ export const autoPlanStrategy = {
             autoPlanner63.HelperVisual.showRoomStructures(show.pos.roomName,Memory.rooms[show.pos.roomName].structMap)
         }
     },
-    // computeAnyRoom(){},
-    // computeRoom(roomObj:RoomObject){
-    //     if(Game.cpu.bucket < 300 || !roomObj.room) return
-    //     const points:RoomObject[] = []
+    computeAnyRoom(){
+        const p = Game.flags["autoBlueprint"]
+        if(!p) return
+        if(Game.cpu.bucket < 300) return
 
-    //     const map = Memory.rooms[roomObj.pos.roomName].serviceDataMap["upgradeTaskService"]
-    //     if(!map || !map[STRUCTURE_CONTROLLER]) return
-    //     const data = map[STRUCTURE_CONTROLLER]
+        if(p.pos.roomName == 'E48S6') return //暂时不计算E48S6
 
-    //     points = points.concat([data])
-    //     const roomStructsData = autoPlanner63.ManagerPlanner.computeManor(roomObj.room.name,)
-    // }
-}
+        const upgradeMap = Memory.rooms[p.pos.roomName]?.serviceDataMap?.upgradeTaskService
+        if(Game.rooms[p.pos.roomName] && upgradeMap && upgradeMap[STRUCTURE_CONTROLLER]){
+            this.computeRoom(p)
+            p.remove()
+            return
+        }
 
-const posCodeNumberMap:{[key:number]:string} = {};
-const posCodeCharMap:{[key:string]:number} = {};
+        let pa = Game.flags.pa;
+        let pb = Game.flags.pb;
+        let pc = Game.flags.pc;
+        let pm = Game.flags.pm;
+        if(p&&pa&&pc&&pm) {
+            let roomStructsData = autoPlanner63.ManagerPlanner.computeManor(p.pos.roomName,[pc,pm,pa,pb])
+            if(roomStructsData){
+                Memory.rooms[roomStructsData.roomName]=Memory.rooms[roomStructsData.roomName]||{}
+                Memory.rooms[roomStructsData.roomName].structMap = roomStructsData.structMap
+            }else console.log("storagePos 位置不合适")
+            p.remove()
+        }
+    },
+    computeRoom(roomObj:RoomObject){
+        if(Game.cpu.bucket < 300) return
+        let points:RoomObject[] = []
 
-(function (){
-    let a ='a'.charCodeAt(0)
-    let A ='A'.charCodeAt(0)
-    for(let i=0;i<25;i++){
-        let b = String.fromCharCode(a+i)
-        let j = 25+i
-        let B = String.fromCharCode(A+i)
-        posCodeNumberMap[i] = b
-        posCodeCharMap[b] = i
-        posCodeNumberMap[j] = B
-        posCodeCharMap[B] = j
+        const upgradeMap = Memory.rooms[roomObj.pos.roomName]?.serviceDataMap?.upgradeTaskService
+        const mineralMap = Memory.rooms[roomObj.pos.roomName]?.serviceDataMap?.mineralTaskService
+        const sourceMap = Memory.rooms[roomObj.pos.roomName]?.serviceDataMap?.sourceTaskService
+
+        if(!upgradeMap || !mineralMap || !sourceMap) return
+
+        const upgradeData = upgradeMap[STRUCTURE_CONTROLLER]
+        const mineralData = mineralMap[STRUCTURE_EXTRACTOR]
+
+        if(!upgradeData || !mineralData) return
+
+        points = points.concat([new RoomObject(upgradeData.x,upgradeData.y,upgradeData.roomName),new RoomObject(mineralData.x,mineralData.y,mineralData.roomName)])
+        points = points.concat(_.values<Data>(sourceMap).map(source => new RoomObject(source.x,source.y,source.roomName)))
+        const roomStructsData = autoPlanner63.ManagerPlanner.computeManor(roomObj.pos.roomName,points)
+
+        Memory.rooms[roomObj.pos.roomName].structMap = roomStructsData.structMap
     }
-}())
-
+}
 
 const _plannStrategy = {
     _traCreateStructs(room:Room,structMap:StructMap,struct:BuildableStructureConstant,structCount:number = 2500){
@@ -104,6 +123,24 @@ const _plannStrategy = {
     }
 }
 
+
+// const posCodeNumberMap:{[key:number]:string} = {};
+// const posCodeCharMap:{[key:string]:number} = {};
+
+// (function (){
+//     let a ='a'.charCodeAt(0)
+//     let A ='A'.charCodeAt(0)
+//     for(let i=0;i<25;i++){
+//         let b = String.fromCharCode(a+i)
+//         let j = 25+i
+//         let B = String.fromCharCode(A+i)
+//         posCodeNumberMap[i] = b
+//         posCodeCharMap[b] = i
+//         posCodeNumberMap[j] = B
+//         posCodeCharMap[B] = j
+//     }
+// }())
+
 // export function decodePosArray(pos:[number,number][]):Array<{x:number,y:number}>{
 //     let out = []
 //     for(let i=0;i<pos.length;i+=2){
@@ -116,10 +153,3 @@ const _plannStrategy = {
 //     return posArray.map(pos => posCodeNumberMap[pos.x] + posCodeNumberMap[pos.y])
 //         .reduce((a,b)=>a+b,"")
 // }
-
-
-declare global{
-    export interface Room{
-        _construct_builed:number
-    }
-}

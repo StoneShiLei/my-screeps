@@ -14,7 +14,7 @@ declare module "autoPlanner63" {
     }
 
     export interface ManagerPlanner{
-        computeManor(roomName:string,flagPos:[RoomObject,RoomObject,RoomObject,RoomObject]):StructsData
+        computeManor(roomName:string,roomObjs:RoomObject[]):StructsData
     }
 
     export type StructsData = {

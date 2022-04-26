@@ -1,12 +1,13 @@
 import { BaseTaskAction } from "taskService/baseTaskAction";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
-import { Inject } from "typescript-ioc";
+import { Inject, Singleton } from "typescript-ioc";
 import { MineralTaskNameEntity } from "./mineralTaskNameEntity";
 import { MineralTaskAction } from "./mineralTaskAction";
 import { filter } from "lodash";
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 
+@Singleton
 export class MineralTaskService extends BaseTaskService{
 
     @Inject

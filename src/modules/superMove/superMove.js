@@ -1491,6 +1491,9 @@ module.exports = {
         delete costMatrixCache[roomName];
         return OK;
     },
+    getAvoidRoomsMap (){
+        return avoidRooms
+    },
     deltePath: function (fromPos, toPos, opts) {   // TODO
         //if(!(fromPos instanceof RoomPosition))
         return 'not implemented'

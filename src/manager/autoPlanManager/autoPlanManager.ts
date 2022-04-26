@@ -2,6 +2,7 @@ import { roomManagerCallbacks } from "manager";
 import { BaseManager } from "manager/BaseManager";
 import { Singleton } from "typescript-ioc";
 import { ErrorHelper } from "utils/erroHelper";
+import { autoPlanStrategy } from "./autoPlanStrategy";
 
 @Singleton
 export class AutoPlanManager extends BaseManager{
@@ -12,8 +13,23 @@ export class AutoPlanManager extends BaseManager{
 
     }
     tickEnd(): void {
-
+        autoPlanStrategy.showRoom();
+        autoPlanStrategy.computeAnyRoom();
     }
 
+    computeRoom(flag:Flag){
+        autoPlanStrategy.computeRoom(flag);
+    }
 
+    tryAutoBuildLowLevel(room:Room){
+        autoPlanStrategy.tryAutoBuildLowLevel(room);
+    }
+
+    tryAutoBuildMiddleLevel(room:Room){
+        autoPlanStrategy.tryAutoBuildMiddleLevel(room);
+    }
+
+    tryAutoBuildHighLevel(room:Room){
+        autoPlanStrategy.tryAutoBuildHighLevel(room);
+    }
 }

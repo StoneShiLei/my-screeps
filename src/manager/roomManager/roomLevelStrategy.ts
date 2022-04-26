@@ -1,16 +1,30 @@
+import { AutoPlanManager } from "manager/autoPlanManager/autoPlanManager"
 import { BodyConfig } from "modules/bodyConfig/bodyConfig"
 import { Data, ServiceData, TaskServiceProxy } from "taskService"
+import { DefenseTaskNameEntity } from "taskService/defenseTaskService/defenseTaskNameEntity"
+import { TaskHelper } from "taskService/taskHelper"
 import { Container } from "typescript-ioc"
 
 const service = Container.get(TaskServiceProxy)
-
+const autoPlanManager = Container.get(AutoPlanManager)
 
 export const roomLevelStrategy = {
     lowLevel:function(room:Room){
+        //尝试建造spawn和ext
+        autoPlanManager.tryAutoBuildLowLevel(room)
 
         //统计资源池
         const idleEmptyCreeps = room.creeps("worker").filter(creep => creep.storeIsEmpty() && creep.isIdle())
         const idleNotEmptyCreeps = room.creeps("worker").filter(creep => !creep.storeHaveOtherResourceType(RESOURCE_ENERGY,true) && creep.isIdle())
+
+        //低能量等级房间防御
+        if(room.get<StructureSpawn[]>('spawn')?.length && room.find(FIND_HOSTILE_CREEPS).filter(e => e.body.filter(e => e.type != MOVE).length).length){
+            if(room.creeps("claimer").length < 3 && room.get<StructureTower[]>("tower")?.length == 0){
+                service.spawnTaskService.trySpawn(room,room.name,"claimer",1000,[TaskHelper.genTaskWithAnyData(new DefenseTaskNameEntity("lowLevelDefense"))],
+                BodyConfig.defenseBodyConfig.lowLevelDefenser,{energy:room.getEnergyCapacityAvailable()})
+            }
+        }
+
 
         //捡起资源任务
         service.transportTaskService.takeCachedPickupTranTask(room,idleEmptyCreeps,false)
@@ -27,7 +41,7 @@ export const roomLevelStrategy = {
                 const creep = idleEmptyCreeps.pop()
                 if(creep) creep.addTask(service.sourceTaskService.genReleaseAbleHarvestTask(data))
                 else if(room.creeps("worker").length < 20){
-                    const spawnRoom = room.getClosestSpawnRoom(7,3,15)
+                    const spawnRoom = service.spawnTaskService.getClosestSpawnRoom(room,7,3,15)
                     if(!spawnRoom || (spawnRoom.name != room.name && room.creeps("worker",false).length >=4)) return
 
                     service.spawnTaskService.trySpawn(spawnRoom,room.name,"worker",999,[],BodyConfig.workerBodyConfig.lowLevelWorkerBodyCalctor,{spawnRoom:spawnRoom})
@@ -56,6 +70,8 @@ export const roomLevelStrategy = {
         })
     },
     middleLevel:function(room:Room){
+        //尝试建造ext conatiner tower storage road
+        autoPlanManager.tryAutoBuildMiddleLevel(room)
 
         //统计creep资源池  !creep.storeHaveOtherResourceType(RESOURCE_ENERGY,true) 指的是 有 且仅有能量的creep
         const idleEmptyWorkers = room.creeps("worker").filter(creep => creep.storeIsEmpty() && creep.isIdle())
@@ -163,6 +179,9 @@ export const roomLevelStrategy = {
 
     },
     highLevel:function(room:Room){
+
+        //建造4级之后的所有建筑物
+        autoPlanManager.tryAutoBuildHighLevel(room)
 
         //统计creep资源池  !creep.storeHaveOtherResourceType(RESOURCE_ENERGY,true) 指的是 有 且仅有能量的creep
         const idleEmptyWorkers = room.creeps("worker").filter(creep => creep.storeIsEmpty() && creep.isIdle())

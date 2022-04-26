@@ -1,5 +1,6 @@
 import { AppLifecycleCallbacks } from "modules/framework/types"
 import { Container } from "typescript-ioc"
+import { AutoPlanManager } from "./autoPlanManager/autoPlanManager"
 import { CreepManager } from "./creepManager/creepManager"
 import { FlagManager } from "./flagManager/flagManager"
 import { RoomManager } from "./roomManager/roomManager"
@@ -37,6 +38,14 @@ export function creepRunner(): (creep: Creep) => void {
 
 export function flagManagerCallbacks():AppLifecycleCallbacks{
     const manager = Container.get(FlagManager)
+    return {
+        tickStart:() => manager.tickStart(),
+        tickEnd:() => manager.tickEnd(),
+    }
+}
+
+export function autoPlanManagerCallbacks():AppLifecycleCallbacks{
+    const manager = Container.get(AutoPlanManager)
     return {
         tickStart:() => manager.tickStart(),
         tickEnd:() => manager.tickEnd(),

@@ -17,7 +17,6 @@ interface Room {
     roomMassStroeUsedCapacity(resourceType:ResourceConstant):number
 
     hiveIsNeedToFill():boolean
-    getClosestSpawnRoom(level:number,minLevel:number,minRoomDistinct:number):Room | undefined
 
     constructionIsNeedBuild():boolean
 

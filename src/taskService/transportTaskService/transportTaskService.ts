@@ -86,8 +86,8 @@ export class TransportTaskService extends BaseTaskService{
     genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{
         room._roomDropRegMap = room._roomDropRegMap ?? {}
 
-        const tombstones = room.find(FIND_TOMBSTONES)
-        const ruins = room.find(FIND_RUINS)
+        const tombstones = room.find(FIND_TOMBSTONES).filter(t => t.store.getUsedCapacity() > 200)
+        const ruins = room.find(FIND_RUINS).filter(t => t.store.getUsedCapacity() > 200)
 
         let drops:(Tombstone | Ruin)[] = tombstones
         drops = drops.concat(ruins).filter(s => !room._roomDropRegMap[s.id])
@@ -150,7 +150,7 @@ export class TransportTaskService extends BaseTaskService{
         return tasks
     }
 
-    runTransformLink(room:Room){
+    transformLinkRun(room:Room){
 
         const upgradeMap = room.memory.serviceDataMap.upgradeTaskService
         const transportMap = room.memory.serviceDataMap.transportTaskService

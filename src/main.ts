@@ -1,13 +1,11 @@
 import { createApp } from "modules/framework";
 import mountAll from "mount"
-import { creepManagerCallbacks, creepRunner, flagManagerCallbacks, roomManagerCallbacks, roomRunner } from "manager";
+import { autoPlanManagerCallbacks, creepManagerCallbacks, creepRunner, flagManagerCallbacks, roomManagerCallbacks, roomRunner } from "manager";
 import mountModules from "modules/index";
-import { TaskHelper } from "taskService/taskHelper";
 import { ErrorHelper } from "utils/erroHelper";
 import { Container } from "typescript-ioc";
 import { TaskServiceProxy } from "taskService";
-import autoPlanner63 ,{StructMap, StructsData} from "autoPlanner63"
-import { SourceTaskNameEntity } from "taskService/sourceTaskService/sourceTaskNameEntity";
+import autoPlanner63 ,{ StructsData} from "autoPlanner63"
 
 
 const app = createApp({
@@ -21,64 +19,52 @@ app.on(mountAll())
 app.on(roomManagerCallbacks())
 app.on(creepManagerCallbacks())
 app.on(flagManagerCallbacks())
+app.on(autoPlanManagerCallbacks())
 
 app.on({
   tickStart: () => {
-
-    let roomStructsData:StructsData | undefined = undefined //放全局变量
-
-    let p = Game.flags.p;
-    let pa = Game.flags.pa;
-    let pb = Game.flags.pb;
-    let pc = Game.flags.pc;
-    let pm = Game.flags.pm;
-
-    if(p) {
-      roomStructsData = autoPlanner63.ManagerPlanner.computeManor(p.pos.roomName,[pc,pm,pa,pb])
-      Game.flags.p.remove()
-  }
-  if(roomStructsData){
-      //这个有点消耗cpu 不看的时候记得关
-      autoPlanner63.HelperVisual.showRoomStructures(roomStructsData.roomName,roomStructsData.structMap)
-  }
-
 
   const service = Container.get(TaskServiceProxy).spawnTaskService
   const room = Game.rooms['E48S6']
 
 
-  if(room.creeps('test')?.length == 0 && room.memory._test && room.memory._test + 1000 < Game.time || !room.memory._test){
-    service.trySpawn(room,room.name,'test',-100,[],(args:BodyCalcFuncArgs) => [CLAIM,CLAIM,MOVE,MOVE],{})
-    room.memory._test = Game.time
-  }
+//   if(room.creeps('test')?.length < 4){
+//     service.trySpawn(room,room.name,'test',10000,[],(args:BodyCalcFuncArgs) => BodyConfig.calcBodyParts({attack:4,ranged_attack:1,heal:1,move:10}),{})
+//   }
 
-  const testCreep = room.creeps('test').head()
-  const pos = new RoomPosition(44,25,'E47S6')
-  if(testCreep){
-    if(!testCreep.pos.isNearTo(pos) && !testCreep.memory._test){
+//   const testCreeps = room.creeps('test')
+//   const pos = new RoomPosition(44,25,'E47S6')
+//   testCreeps.forEach(testCreep =>{
+//     if(testCreep){
+//       if(testCreep.room.name !=  pos.roomName){
+//         testCreep.goTo(pos)
+//         return
+//       }
 
-      testCreep.goTo(pos)
-      return
-    }
+//       let em:Structure | AnyCreep = testCreep.room.find(FIND_HOSTILE_CREEPS).head()
+//       if(!em) em = testCreep.room.find(FIND_HOSTILE_STRUCTURES).filter(s => s.structureType != STRUCTURE_CONTROLLER && s.structureType != STRUCTURE_RAMPART).head()
+//       if(em){
+//           if(testCreep.attack(em) == ERR_NOT_IN_RANGE){
+//             testCreep.goTo(em)
+//             testCreep.heal(testCreep)
+//           }
+//           testCreep.rangedAttack(em)
+//           return
+//       }
+// console.log(em)
+//       const injuredCreep = testCreep.pos.findClosestByPath(FIND_MY_CREEPS,{filter:e=>e.hits != e.hitsMax})
+//       if(injuredCreep && testCreep.heal(injuredCreep) == ERR_NOT_IN_RANGE){
+//         testCreep.goTo(injuredCreep)
+//           return
+//       }
 
-    if(testCreep.pos.isNearTo(pos) && !testCreep.memory._test){
-      const controller = Game.rooms[pos.roomName].controller as StructureController
-      const result = testCreep.attackController(controller)
-      if(result === OK){
-        testCreep.memory._test = true
-      }
-    }
+//       const mineral = testCreep.topTarget
+//       if(mineral && !testCreep.pos.inRangeTo(mineral,3)){
+//         testCreep.goTo(mineral)
+//       }
+//     }
+//   })
 
-
-    const newpos = new RoomPosition(15,18,'E48S6')
-    if(!testCreep.pos.isEqualTo(newpos) && testCreep.memory._test){
-      testCreep.goTo(newpos)
-      return
-    }
-    else{
-      Game.spawns["Spawn1"].recycleCreep(testCreep)
-    }
-  }
 
 
   //@ts-ignore

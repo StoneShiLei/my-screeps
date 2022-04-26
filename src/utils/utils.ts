@@ -68,6 +68,7 @@ export default class Utils{
         // 转发到邮箱
         if (notify) Game.notify(logContent)
 
+        console.log(logContent)
         return OK
     }
 

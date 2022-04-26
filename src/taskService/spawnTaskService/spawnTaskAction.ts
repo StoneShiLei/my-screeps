@@ -3,7 +3,7 @@ import { TaskHelper } from "taskService/taskHelper"
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity"
 import { Singleton } from "typescript-ioc"
 
-export type SpawnActionName = 'fillHive'
+export type SpawnActionName = 'fillHive' | 'recycleCreep'
 export type SpawnRegName = 'registerFillHiveInRoom'
 
 @Singleton
@@ -48,6 +48,29 @@ export class SpawnTaskAction extends BaseTaskAction {
         creep.doWorkWithTopTask()
     }
 
+    recycleCreep(creep:Creep){
+        const task = creep.topTask
 
+        if(creep.mainRoom.name != creep.room.name){
+            creep.goTo(creep.mainRoom.randomPosition())
+            return
+        }
+
+        let spawn = Game.getObjectById<StructureSpawn>(task.targetId)
+        if(!spawn){
+            spawn = creep.mainRoom.get<StructureSpawn[]>("spawn").head()
+            if(spawn) task.targetId = spawn.id
+        }
+
+        if(spawn){
+            creep.say("recycle!")
+            if(!creep.pos.isNearTo(spawn)){
+                creep.goTo(spawn)
+            }
+            else{
+                spawn.recycleCreep(creep)
+            }
+        }
+    }
 
 }

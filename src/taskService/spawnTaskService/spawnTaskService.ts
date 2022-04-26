@@ -1,5 +1,6 @@
 import { roomManagerCallbacks } from "manager";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
+import { superMove } from "modules/superMove";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
 import { Inject, Singleton } from "typescript-ioc";
@@ -87,6 +88,47 @@ export class SpawnTaskService extends BaseTaskService{
 
         room._spawnQueue = []
         return
+    }
+
+    getClosestSpawnRoom(room:Room | string,level:number = 7,minLevel:number=4,minRoomDistinct:number = 10):Room | undefined{
+        const roomName = room instanceof Room ? room.name : room
+
+
+        if(Game.rooms[roomName] && Game.rooms[roomName].get<StructureSpawn[]>("spawn").length > 0 && Game.rooms[roomName].level >= level) return Game.rooms[roomName];
+
+
+        type RoteResult = Array<{
+            exit: ExitConstant;
+            room: string;
+        }>
+        const avoidRooms = superMove.getAvoidRoomsMap()
+        const opts:RouteOptions = {
+            routeCallback(roomName: string): number {
+                if(avoidRooms[roomName]) return Infinity
+                return 1;
+            }
+        }
+        const getDistinct = function(roomName1:string,roomName2:string):RoteResult | null{
+            let distance: number= Game.map.getRoomLinearDistance(roomName1,roomName2,false)
+            if(distance >= minRoomDistinct)return null
+
+            const routeResult = Game.map.findRoute(roomName1,roomName2,opts)
+            if(routeResult == ERR_NO_PATH) return null
+            return routeResult
+        }
+
+        let resultRoom:Room | undefined = undefined;
+        type DistinctType = [Room,RoteResult | null];
+        while(!resultRoom&&level >= minLevel){
+            const rooms = _.values<Room>(Game.rooms).filter(r => r.my && r.find(FIND_MY_SPAWNS).length && r.level >= level)
+            const route:DistinctType[] = rooms.map(r => [r,getDistinct(roomName,r.name)])
+            const temp = _.filter(route,(r) => r[1]!=null && r[1].length <= minRoomDistinct)
+            resultRoom = temp.sort((a:DistinctType,b:DistinctType) => (a[1]?.length ?? 0) - (b[1]?.length ?? 0)).map(r =>r[0]).head()
+            level--
+        }
+        if(resultRoom) return resultRoom
+        else if(Game.rooms[roomName] && Game.rooms[roomName].get<StructureSpawn[]>("spawn").length > 0 ) return Game.rooms[roomName];
+        else return undefined
     }
 
     private genName(){

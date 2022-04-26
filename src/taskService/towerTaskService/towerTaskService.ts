@@ -27,6 +27,13 @@ export class TowerTaskService extends BaseTaskService{
     }
 
     towerRun(room:Room){
+        const service = Container.get(TaskServiceProxy)
+
+        //检查安全模式是否需要开启
+        service.defenseTaskService.checkSafeMode(room)
+        //检查是否需要主动防御
+        service.defenseTaskService.checkNeedDefense(room)
+
         if(!room.get<StructureTower[]>("tower").length) return
 
         if(!this._lastUpdateMap[room.name] || this._lastUpdateMap[room.name] <= 0){
@@ -97,9 +104,17 @@ export class TowerTaskService extends BaseTaskService{
     update(room:Room){
         this._lastUpdateMap[room.name] = (this._lastUpdateMap[room.name] || 0) -1
 
+        let roadNeedRepair:{[key:number]:number} | undefined = undefined
+        if(room.memory.structMap && room.memory.structMap[STRUCTURE_ROAD]){
+            const roadPos = room.memory.structMap[STRUCTURE_ROAD]
+            roadNeedRepair = {}
+            roadPos.forEach(pos =>{ if(roadNeedRepair) roadNeedRepair[pos[0]*50 + pos[1]] = 1})
+        }
+
         this._needRepairsRoomMap[room.name] = room.find<AnyStructure>(FIND_STRUCTURES)
             .filter(s => s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART)
             .filter(s => s.hits < s.hitsMax * 0.8 && s.hits < 10000000)
+            .filter(s => (!roadNeedRepair || roadNeedRepair[s.pos.x*50 + s.pos.y]) || s.structureType != STRUCTURE_ROAD)
             .sort((a,b) => a.hits - b.hitsMax)
             .map(e => e.id)
     }

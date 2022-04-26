@@ -171,6 +171,17 @@ const upgraderBodyConfig:BodyConfigCalctor = {
     }
 }
 
+const defenseBodyConfig:BodyConfigCalctor = {
+    lowLevelDefenser:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const energy = args.energy
+        if(!energy) throw new Error("args.energy is null")
+
+        const attackCost = BodyConfig.getBodyCosts([ATTACK,ATTACK,ATTACK,MOVE])
+        const count = Math.floor(energy / attackCost)
+        return BodyConfig.calcBodyParts({move:count * 3,attack:count});
+    }
+}
+
 
 export class BodyConfig{
 
@@ -178,6 +189,7 @@ export class BodyConfig{
     static harvesterBodyConfig:BodyConfigCalctor = harvesterBodyConfig
     static upgraderBodyConfig:BodyConfigCalctor = upgraderBodyConfig
     static transporterBodyConfig:BodyConfigCalctor = transporterBodyConfig
+    static defenseBodyConfig:BodyConfigCalctor = defenseBodyConfig
 
 
     public static getBodyCosts(body:BodyPartConstant[]){

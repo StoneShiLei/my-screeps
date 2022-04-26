@@ -36,4 +36,19 @@ export class FlagManager extends BaseManager{
     tickEnd(): void {
 
     }
+
+
+    getFlagsByPrefix(prefix:string):Flag[]{
+        if(!Game._flagPrefixMap){
+            const map:FlagPreFixMap = Game._flagPrefixMap = {}
+            _.values<Flag>(Game.flags).forEach(flag => {
+                const p = flag.getPrefix()
+                if(p){
+                    if(map[p]) map[p].push(flag)
+                    else map[p] = [flag]
+                }
+            })
+        }
+        return Game._flagPrefixMap[prefix] || []
+    }
 }

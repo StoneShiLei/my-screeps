@@ -1,3 +1,4 @@
+import { superMove } from "modules/superMove"
 import { TaskServiceProxy } from "taskService"
 import { Inject } from "typescript-ioc"
 import Utils from "utils/utils"
@@ -128,39 +129,6 @@ export class RoomExtension extends Room {
 
     hiveIsNeedToFill():boolean{
         return this.energyAvailable + (this._hiveEnergySending ?? 0) < this.energyCapacityAvailable;
-    }
-
-    getClosestSpawnRoom(level:number = 7,minLevel:number=4,minRoomDistinct:number = 10):Room | undefined{
-
-        const spawns = this.get('spawn') as StructureSpawn[]
-        if(spawns && spawns.length > 0 && this.level >= level) return this;
-
-
-        type RoteResult = Array<{
-            exit: ExitConstant;
-            room: string;
-        }>
-        const getDistinct = function(roomName1:string,roomName2:string):RoteResult | null{
-            let distance: number= Game.map.getRoomLinearDistance(roomName1,roomName2,false)
-            if(distance >= minRoomDistinct)return null
-
-            const routeResult = Game.map.findRoute(roomName1,roomName2)
-            if(routeResult == ERR_NO_PATH) return null
-            return routeResult
-        }
-
-        let resultRoom:Room | undefined = undefined;
-        type DistinctType = [Room,RoteResult | null];
-        while(!resultRoom&&level >= minLevel){
-            const rooms = _.values<Room>(Game.rooms).filter(r => r.my && r.find(FIND_MY_SPAWNS).length && r.level >= level)
-            const route:DistinctType[] = rooms.map(r => [r,getDistinct(this.name,r.name)])
-            const temp = _.filter(route,(r) => r[1]!=null && r[1].length <= minRoomDistinct)
-            resultRoom = temp.sort((a:DistinctType,b:DistinctType) => (a[1]?.length ?? 0) - (b[1]?.length ?? 0)).map(r =>r[0]).head()
-            level--
-        }
-        if(resultRoom) return resultRoom
-        else if(spawns && spawns.length > 0) return this
-        else return undefined
     }
 
     constructionIsNeedBuild():boolean{

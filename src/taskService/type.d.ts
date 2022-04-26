@@ -9,7 +9,7 @@ interface Room {
     }
 }
 
-type Role = "worker" | "transporter" | "energyHarvester" | "upgrader" | "scouter" | "reserver" | "outterHarDefenser" | "outterHarTransporter" | 'test'
+type Role = "worker" | "transporter" | "energyHarvester" | "upgrader" | "scouter" | "reserver" | "outterHarDefenser" | "outterHarTransporter" | "claimer" | 'test' | 'lowLevelDefenser'
 
 
 interface Task {
@@ -23,6 +23,7 @@ interface Task {
     x:number;
     y:number;
     opt?:TaskOpt;
+    anyData?:{[key:string]:any}
 }
 
 type TaskFunction = (creep:Creep) => void
