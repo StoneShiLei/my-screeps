@@ -49,7 +49,11 @@ export class RoomExtension extends Room {
     }
 
     updateRoomInfo():void{
-        const level = this.controller?.level ?? 0
+        if(!this.my){
+            this.memory.roomLevel = 'low'
+            return
+        }
+        const level = this.level ?? 0
         if(level < 3) this.memory.roomLevel = 'low'
         else if(level < 4 || !this.storage || !this.storage.my) this.memory.roomLevel = 'middle'
         else this.memory.roomLevel = 'high'
