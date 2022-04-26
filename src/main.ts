@@ -43,6 +43,44 @@ app.on({
   }
 
 
+  const service = Container.get(TaskServiceProxy).spawnTaskService
+  const room = Game.rooms['E48S6']
+
+
+  if(room.creeps('test')?.length == 0 && room.memory._test && room.memory._test + 1000 < Game.time || !room.memory._test){
+    service.trySpawn(room,room.name,'test',-100,[],(args:BodyCalcFuncArgs) => [CLAIM,CLAIM,MOVE,MOVE],{})
+    room.memory._test = Game.time
+  }
+
+  const testCreep = room.creeps('test').head()
+  const pos = new RoomPosition(44,25,'E47S6')
+  if(testCreep){
+    if(!testCreep.pos.isNearTo(pos) && !testCreep.memory._test){
+
+      testCreep.goTo(pos)
+      return
+    }
+
+    if(testCreep.pos.isNearTo(pos) && !testCreep.memory._test){
+      const controller = Game.rooms[pos.roomName].controller as StructureController
+      const result = testCreep.attackController(controller)
+      if(result === OK){
+        testCreep.memory._test = true
+      }
+    }
+
+
+    const newpos = new RoomPosition(15,18,'E48S6')
+    if(!testCreep.pos.isEqualTo(newpos) && testCreep.memory._test){
+      testCreep.goTo(newpos)
+      return
+    }
+    else{
+      Game.spawns["Spawn1"].recycleCreep(testCreep)
+    }
+  }
+
+
   //@ts-ignore
 //  Game.getObjectById('626687a16ae82b9510fd3175').addTask(TaskHelper.genTaskWithServiceData(Memory.rooms['E49S6'].serviceDataMap.sourceTaskService['5bbcaff69099fc012e63b6e0'],new SourceTaskNameEntity("harvestOutterTransport")))
 
@@ -109,3 +147,12 @@ export const loop = app.run
 
 
 
+declare global {
+  export interface RoomMemory{
+    _test:number
+  }
+
+  export interface CreepMemory{
+    _test:boolean
+  }
+}
