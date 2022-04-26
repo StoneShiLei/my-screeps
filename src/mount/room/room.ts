@@ -51,12 +51,14 @@ export class RoomExtension extends Room {
     updateRoomInfo():void{
         if(!this.my){
             this.memory.roomLevel = 'low'
-            return
         }
-        const level = this.level ?? 0
-        if(level < 3) this.memory.roomLevel = 'low'
-        else if(level < 4 || !this.storage || !this.storage.my) this.memory.roomLevel = 'middle'
-        else this.memory.roomLevel = 'high'
+        else{
+            const level = this.level ?? 0
+            if(level < 3) this.memory.roomLevel = 'low'
+            else if(level < 4 || !this.storage || !this.storage.my) this.memory.roomLevel = 'middle'
+            else this.memory.roomLevel = 'high'
+        }
+
 
         //更新建筑缓存
         this.update()
