@@ -7,6 +7,7 @@ import { TransportTaskNameEntity } from "./transportTaskNameEntity";
 export type TransportActionName = 'transportResource' | 'fillResource' | 'goToNearAndPopTask' | 'pickupResource' | 'goToAndPopTask'
 export type TransportRegName = 'registerTranDrops' | 'reg2'
 
+
 @Singleton
 export class TransportTaskAction extends BaseTaskAction{
 

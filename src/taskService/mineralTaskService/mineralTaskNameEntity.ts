@@ -2,6 +2,7 @@ import { ServiceName, ActionName } from "taskService";
 import { BaseTaskNameEntity } from "taskService/baseTaskNameEntity";
 import { MineralActionName, MineralRegName } from "./mineralTaskAction";
 
+
 export class MineralTaskNameEntity extends BaseTaskNameEntity{
     serviceName: ServiceName;
     actionName?: MineralActionName;

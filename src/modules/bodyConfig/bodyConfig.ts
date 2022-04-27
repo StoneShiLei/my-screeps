@@ -1,3 +1,4 @@
+import { sa } from "modules/stackAnalysis/StackAnalysis";
 
 const outerMaxPartCount = 3;
 const innerMaxPartCount = 3;
@@ -172,7 +173,7 @@ const upgraderBodyConfig:BodyConfigCalctor = {
 }
 
 const defenseBodyConfig:BodyConfigCalctor = {
-    lowLevelDefenser:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+    lowLevelDefenserBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
         const energy = args.energy
         if(!energy) throw new Error("args.energy is null")
 
@@ -182,6 +183,25 @@ const defenseBodyConfig:BodyConfigCalctor = {
     }
 }
 
+const mineralBodyConfig:BodyConfigCalctor = {
+    harvesterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
+        const energy = args.energy
+        if(!energy) throw new Error("args.energy is null")
+
+        if(!energy) throw new Error("args is error")
+
+
+        let current = 0
+        let cost = BodyConfig.getBodyCosts([WORK,WORK,WORK,WORK,MOVE])
+        let num = 0
+        while(current + cost <= energy){
+            num += 1
+            current += cost
+            if(num >= 10) break;
+        }
+        return BodyConfig.calcBodyParts({work:num * 4,move:num});
+    }
+}
 
 export class BodyConfig{
 
@@ -190,6 +210,7 @@ export class BodyConfig{
     static upgraderBodyConfig:BodyConfigCalctor = upgraderBodyConfig
     static transporterBodyConfig:BodyConfigCalctor = transporterBodyConfig
     static defenseBodyConfig:BodyConfigCalctor = defenseBodyConfig
+    static mineralBodyConfig:BodyConfigCalctor = mineralBodyConfig
 
 
     public static getBodyCosts(body:BodyPartConstant[]){

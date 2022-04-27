@@ -12,4 +12,6 @@ interface RoomPosition{
     walkable(withCreep?:boolean): boolean
 
     isBorder(): boolean
+
+    isTerrainWall():boolean
 }

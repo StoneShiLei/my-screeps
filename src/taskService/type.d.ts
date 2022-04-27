@@ -9,7 +9,9 @@ interface Room {
     }
 }
 
-type Role = "worker" | "transporter" | "energyHarvester" | "upgrader" | "scouter" | "reserver" | "outterHarDefenser" | "outterHarTransporter" | "claimer" | 'test' | 'lowLevelDefenser'
+type Role = "worker" | "transporter" | "energyHarvester" | "upgrader" |
+ "scouter" | "reserver" | "outterHarDefenser" | "outterHarTransporter" |
+ "claimer" | 'test' | 'lowLevelDefenser' | "mineralHarvester"
 
 
 interface Task {

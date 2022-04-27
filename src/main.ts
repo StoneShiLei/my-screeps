@@ -1,11 +1,12 @@
-import { createApp } from "modules/framework";
+import { createApp, showCpuCost, switchShowCost } from "modules/framework";
 import mountAll from "mount"
 import { autoPlanManagerCallbacks, creepManagerCallbacks, creepRunner, flagManagerCallbacks, roomManagerCallbacks, roomRunner } from "manager";
 import mountModules from "modules/index";
 import { ErrorHelper } from "utils/erroHelper";
 import { Container } from "typescript-ioc";
 import { TaskServiceProxy } from "taskService";
-import autoPlanner63 ,{ StructsData} from "autoPlanner63"
+import { StackAnalysis } from "modules/stackAnalysis/StackAnalysis";
+
 
 
 const app = createApp({
@@ -20,6 +21,8 @@ app.on(roomManagerCallbacks())
 app.on(creepManagerCallbacks())
 app.on(flagManagerCallbacks())
 app.on(autoPlanManagerCallbacks())
+
+
 
 app.on({
   tickStart: () => {
@@ -128,17 +131,21 @@ app.on({
   }
 })
 
+// switchShowCost('base')
+
+// StackAnalysis.mount()
 export const loop = app.run
+// export const loop = StackAnalysis.wrap(app.run)
 
 
 
 
-declare global {
-  export interface RoomMemory{
-    _test?:number
-  }
+// declare global {
+//   export interface RoomMemory{
+//     _test?:number
+//   }
 
-  export interface CreepMemory{
-    _test?:boolean
-  }
-}
+//   export interface CreepMemory{
+//     _test?:boolean
+//   }
+// }

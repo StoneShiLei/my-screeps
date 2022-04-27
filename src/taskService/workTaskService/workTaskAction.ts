@@ -4,6 +4,7 @@ import { Singleton } from "typescript-ioc";
 export type WorkActionName = 'buildConst' | 'repairStructure'
 export type WorkRegName = 'func31'
 
+
 @Singleton
 export class WorkTaskAction extends BaseTaskAction {
 

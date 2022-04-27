@@ -1,13 +1,14 @@
-import { BaseTaskAction } from "taskService/baseTaskAction";
-import { TaskHelper } from "taskService/taskHelper";
+import { BaseRegName, BaseTaskAction } from "taskService/baseTaskAction";
 import { Singleton } from "typescript-ioc";
-import Utils from "utils/utils";
 
-export type DefenseActionName = 'lowLevelDefense'
-export type DefenseRegName = ''
+export type DefenseActionName = 'lowLevelDefense' | 'repairWall'
+export type DefenseRegName = BaseRegName
+
 
 @Singleton
 export class DefenseTaskAction extends BaseTaskAction {
+
+
 
     lowLevelDefense(creep:Creep){
         const em = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS)
@@ -17,5 +18,22 @@ export class DefenseTaskAction extends BaseTaskAction {
             return
         }
         creep.memory.dontPullMe = false
+    }
+
+    repairWall(creep:Creep){
+        if(creep.store[RESOURCE_ENERGY] == 0){
+            creep.popTopTask()
+        }
+
+        const target = creep.topTarget as StructureWall | StructureRampart
+        if(!target || target.hits >= target.hitsMax){
+            creep.popTopTask()
+            return
+        }
+
+        const result = creep.repair(target)
+
+        if(result == ERR_NOT_IN_RANGE) creep.goTo(target)
+        if(creep.ticksToLive && creep.ticksToLive % 3 == 0) creep.memory.dontPullMe = false
     }
 }

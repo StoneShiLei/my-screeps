@@ -1,4 +1,3 @@
-import { link } from "fs";
 import { Data, RegName, ServiceData, ServiceName } from "taskService";
 import { BaseTaskNameEntity } from "taskService/baseTaskNameEntity";
 import { BaseTaskService } from "taskService/baseTaskService";
@@ -8,6 +7,7 @@ import { TaskHelper } from "taskService/taskHelper";
 import { Container, Inject, Singleton } from "typescript-ioc";
 import { TransportTaskAction } from "./transportTaskAction";
 import { TransportTaskNameEntity } from "./transportTaskNameEntity";
+
 
 @Singleton
 export class TransportTaskService extends BaseTaskService{
@@ -140,11 +140,11 @@ export class TransportTaskService extends BaseTaskService{
         let centerLink = tranData.linkIdA ? Game.getObjectById<StructureLink>(tranData.linkIdA) : undefined
         if(needTran && centerLink && centerLink.store.getUsedCapacity(RESOURCE_ENERGY) !== 0 && !room._used[centerLink.id]){
             if(room.storage){
-                tasks.push(TaskHelper.genTaskWithTarget(room.storage,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
-                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+                tasks.push(TaskHelper.genTaskWithTarget(room.storage,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerInRoom")))
+                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerInRoom")))
             }
             else{
-                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+                tasks.push(TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("transportResource"),{resourceType:RESOURCE_ENERGY},new SourceTaskNameEntity(undefined,"registerInRoom")))
             }
         }
         return tasks

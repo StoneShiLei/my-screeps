@@ -21,7 +21,7 @@ export const roomLevelStrategy = {
         if(room.get<StructureSpawn[]>('spawn')?.length && room.find(FIND_HOSTILE_CREEPS).filter(e => e.body.filter(e => e.type != MOVE).length).length){
             if(room.creeps("claimer").length < 3 && room.get<StructureTower[]>("tower")?.length == 0){
                 service.spawnTaskService.trySpawn(room,room.name,"claimer",1000,[TaskHelper.genTaskWithAnyData(new DefenseTaskNameEntity("lowLevelDefense"))],
-                BodyConfig.defenseBodyConfig.lowLevelDefenser,{energy:room.getEnergyCapacityAvailable()})
+                BodyConfig.defenseBodyConfig.lowLevelDefenserBodyCalctor,{energy:room.getEnergyCapacityAvailable()})
             }
         }
 
@@ -312,6 +312,7 @@ const highLevelStrategy = {
         creepPool.idleNotEmptyWorkers.forEach(creep =>{
             if(tranerCount == 0 && !haveIdleTraner && room.hiveIsNeedToFill()) creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
             else if(room.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))
+            else if(service.defenseTaskService.needBuildWallWithWorkerIdle(room) && !room.isDownGrade()) creep.addTask(service.defenseTaskService.genRepairWallTask(room))
             else if(room.level < 8) creep.addTask(service.upgradeTaskService.genUpgradeTask(room))
             else {}
         })
@@ -330,6 +331,16 @@ const highLevelStrategy = {
         // 有工地时  一个都没有 或能量溢出  就生成worker
         else if(room.get<ConstructionSite[]>(LOOK_CONSTRUCTION_SITES).length && (workerCount < 1 || energyOver)){
             spawnWorker()
+        }
+        //8级前优先修墙，如果一个都没有就生一个，保证有人去修墙，如果能量有富裕就多生几个
+        else if(service.defenseTaskService.needBuildWall(room) || Game.cpu.bucket > 8000){
+            if(room.level < 8 && (workerCount < 1 || energyOver)){
+                spawnWorker()
+            }
+            else if(((room.storage && room.storage.store[RESOURCE_ENERGY] > 5000) && workerCount < 1) || energyOver){
+                spawnWorker()
+            }
+            else{}
         }
         //能量有富裕时生成worker
         else if(room.storage && (room.storage.store[RESOURCE_ENERGY] - 300000 ) / 50000 > workerCount){
@@ -363,7 +374,7 @@ const highLevelStrategy = {
     },
 
     trySpawnMineralHarKeeper(room:Room){
-
+        service.mineralTaskService.trySpawnMineralHarvesterKeeper(room)
     },
 
     trySpawnUpgraderKeeper(room:Room){

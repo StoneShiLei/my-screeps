@@ -1,15 +1,15 @@
-import { take } from "lodash";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
-import { BaseTaskAction } from "taskService/baseTaskAction";
+import { BaseRegName, BaseTaskAction } from "taskService/baseTaskAction";
 import { TaskHelper } from "taskService/taskHelper";
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
-import { Container, Singleton } from "typescript-ioc";
+import { Singleton } from "typescript-ioc";
 import { SourceTaskNameEntity } from "./sourceTaskNameEntity";
 
 export type SourceActionName = 'harvestEnergy' | 'harvestEnergyKeeper' | 'harvestEnergyOutterKeeper' | 'updateSourcesInfo' | 'outterRoomDefanse' |
                                 'reserveOutterHarvestRoom'  | 'harvestOutterTranBuildRoad' | 'harvestOutterTransport' |
                                 'scouterToRoom'
-export type SourceRegName = 'registerSources' | 'registerSourcesTranInRoom' | 'registerSourcesTranOutterRoom'
+export type SourceRegName = BaseRegName | 'registerSources' | 'registerSourcesTranOutterRoom'
+
 
 @Singleton
 export class SourceTaskAction extends BaseTaskAction {
@@ -52,14 +52,10 @@ export class SourceTaskAction extends BaseTaskAction {
         }
     }
 
-    registerSourcesTranInRoom(creep:Creep){
-        const room = Game.rooms[creep.memory.roomName]
-        room._used = room._used || {}
-        room._used[creep.topTask.targetId] = 1
-    }
-
     registerSourcesTranOutterRoom(creep:Creep){
         const task = creep.topTask
+        if(!Game.rooms[task.roomName]) return
+
         const map = Game.rooms[task.roomName].memory.serviceDataMap.sourceTaskService
         if(!map) return
         const data = map[task.targetId]

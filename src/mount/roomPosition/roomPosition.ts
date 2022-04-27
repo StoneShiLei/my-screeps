@@ -27,6 +27,14 @@
         return structure && creep
     }
 
+    isTerrainWall(): boolean{
+        return new Room.Terrain(this.roomName).get(this.x,this.y) == TERRAIN_MASK_WALL
+    }
+
+    isBorder(): boolean{
+        return !(this.x > 0 && this.y > 0 && this.x < 49 && this.y < 49)
+    }
+
     /**
      * 获取该位置周围的开采位空位
      */
@@ -46,8 +54,6 @@
         return result
     }
 
-    isBorder(): boolean{
-        return !(this.x > 0 && this.y > 0 && this.x < 49 && this.y < 49)
-    }
+
 
 }

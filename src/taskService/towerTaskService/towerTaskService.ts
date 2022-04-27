@@ -4,9 +4,8 @@ import { Container, Inject, Singleton } from "typescript-ioc";
 import { TowerTaskNameEntity } from "./towerTaskNameEntity";
 import { TowerTaskAction } from "./towerTaskAction";
 import { TaskServiceProxy } from "taskService";
-import { BodyConfig } from "modules/bodyConfig/bodyConfig";
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
-import Utils from "utils/utils";
+
 
 @Singleton
 export class TowerTaskService extends BaseTaskService{
@@ -22,7 +21,7 @@ export class TowerTaskService extends BaseTaskService{
     genFillTowerTask(room:Room):Task[]{
         const needFillTower = room.get<StructureTower[]>("tower").filter(t => t.store[RESOURCE_ENERGY] + (room._used && room._used[t.id] || 0) <= 600)
         const tasks = needFillTower.map(tower => TaskHelper.genTaskWithTarget(tower,new TransportTaskNameEntity("fillResource"),
-        {resourceType:RESOURCE_ENERGY},new TowerTaskNameEntity(undefined,"registerTowerFillInRoom")))
+        {resourceType:RESOURCE_ENERGY},new TowerTaskNameEntity(undefined,"registerTranEnergyInRoom")))
         return tasks
     }
 

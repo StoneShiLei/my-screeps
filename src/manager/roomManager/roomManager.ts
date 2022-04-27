@@ -1,11 +1,9 @@
 import { BaseManager } from "manager/BaseManager";
-import { AppLifecycleCallbacks } from "modules/framework/types";
-import { Container, Inject, Singleton } from "typescript-ioc";
+import { Container, Singleton } from "typescript-ioc";
 import { superMove } from 'modules/superMove'
 import { ErrorHelper } from "utils/erroHelper";
 import { TaskServiceProxy } from "taskService";
 import { roomLevelStrategy } from "./roomLevelStrategy";
-import { first } from "lodash";
 
 @Singleton
 export class RoomManager extends BaseManager{

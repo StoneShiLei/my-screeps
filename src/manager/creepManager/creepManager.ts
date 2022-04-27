@@ -1,4 +1,3 @@
-import { roomManagerCallbacks } from "manager";
 import { BaseManager } from "manager/BaseManager";
 import { Singleton } from "typescript-ioc";
 import { ErrorHelper } from "utils/erroHelper";

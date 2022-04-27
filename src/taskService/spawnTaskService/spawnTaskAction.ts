@@ -6,6 +6,7 @@ import { Singleton } from "typescript-ioc"
 export type SpawnActionName = 'fillHive' | 'recycleCreep'
 export type SpawnRegName = 'registerFillHiveInRoom'
 
+
 @Singleton
 export class SpawnTaskAction extends BaseTaskAction {
 

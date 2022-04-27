@@ -42,7 +42,7 @@ export class UpgradeTaskService extends BaseTaskService{
 
             if(centerLink && upgradelink && upgradelink.store.getUsedCapacity() === 0 && centerLink.store.getUsedCapacity() == 0){
                 return [TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
-                ,new UpgradeTaskNameEntity(undefined,"registerUpgradeTranEnergyInRoom"))]
+                ,new UpgradeTaskNameEntity(undefined,"registerTranEnergyInRoom"))]
             }
 
             if(container){
@@ -51,7 +51,7 @@ export class UpgradeTaskService extends BaseTaskService{
                 const num2 = room._used[container.id] + container.store.getUsedCapacity(RESOURCE_ENERGY)
                 if(num1 < 2000 && num2 < 800){
                     return[TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
-                    ,new UpgradeTaskNameEntity(undefined,"registerUpgradeTranEnergyInRoom"))]
+                    ,new UpgradeTaskNameEntity(undefined,"registerTranEnergyInRoom"))]
                 }
             }
 

@@ -7,6 +7,7 @@ import { Container, Inject, Singleton } from "typescript-ioc";
 import { SourceTaskAction } from "./sourceTaskAction";
 import { SourceTaskNameEntity } from "./sourceTaskNameEntity";
 
+
 @Singleton
 export class SourceTaskService extends BaseTaskService{
 
@@ -42,7 +43,7 @@ export class SourceTaskService extends BaseTaskService{
             if(container && container.store[RESOURCE_ENERGY] > minEnergy && !room._used[container.id]){
                 tasks.push(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("transportResource"),{
                     resourceType:RESOURCE_ENERGY
-                },new SourceTaskNameEntity(undefined,"registerSourcesTranInRoom")))
+                },new SourceTaskNameEntity(undefined,"registerInRoom")))
             }
         }
 
@@ -64,7 +65,6 @@ export class SourceTaskService extends BaseTaskService{
             spawnRoom.creeps("transporter").filter(creep => (creep?.ticksToLive ?? 0)> 300).length == 0) return
 
         const service = Container.get(TaskServiceProxy)
-        // delete room.memory.serviceDataMap?["sourceTaskService"]["undefined"]
         const rm = Memory.rooms[workRoom]
         if(!rm?.serviceDataMap) return
         const sourcesData = rm.serviceDataMap["sourceTaskService"]
@@ -72,7 +72,7 @@ export class SourceTaskService extends BaseTaskService{
 
             const sourceData = sourcesData[sourceDataName]
 
-            // 如果两个多个连在一起死掉一个 (1source 2creep)
+            // 如果两个多个连在一起死掉一个
             let harCreeps = sourceData.creeps.map(creepId => Game.getObjectById<Creep>(creepId)).filter(creep => creep && creep.ticksToLive)
 
             harCreeps.forEach(creepA => {
@@ -91,6 +91,7 @@ export class SourceTaskService extends BaseTaskService{
                 })
             })
 
+            // 清理死掉的creeps
             sourceData.creeps = sourceData.creeps.filter(creepId => Game.getObjectById<Creep>(creepId))
 
             if(sourceData.targetId && (Game.time - (sourceData.spawnTime ?? 0) > 1500 || sourceData.creeps.length === 0)){
@@ -113,7 +114,7 @@ export class SourceTaskService extends BaseTaskService{
             if(defenser) return
             const service = Container.get(TaskServiceProxy)
             const  task = TaskHelper.genTaskWithTarget(harRoom.get<Mineral>("mineral"),new SourceTaskNameEntity("outterRoomDefanse"))
-            service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarDefenser",priority,[task],BodyConfig.harvesterBodyConfig.harvesterBodyCalctor,{energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:true})
+            service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"outterHarDefenser",priority,[task],BodyConfig.harvesterBodyConfig.outterHarDefenseBodyCalctor,{energy:spawnRoom.getEnergyCapacityAvailable(),isOutRoom:true})
         }
     }
 

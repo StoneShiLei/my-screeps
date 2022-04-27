@@ -1,4 +1,3 @@
-import { superMove } from "modules/superMove"
 import { TaskServiceProxy } from "taskService"
 import { Inject } from "typescript-ioc"
 import Utils from "utils/utils"
@@ -78,6 +77,9 @@ export class RoomExtension extends Room {
 
         //更新mineral配套设施缓存
         this._taskService.mineralTaskService.update(this)
+
+        //更新围墙建筑缓存
+        this._taskService.defenseTaskService.update(this)
     }
 
 

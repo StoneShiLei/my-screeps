@@ -1,4 +1,5 @@
 
+
 export class FlagExtension extends Flag{
 
     idGetter():Id<Flag>{

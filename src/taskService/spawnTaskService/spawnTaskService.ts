@@ -8,6 +8,7 @@ import Utils from "utils/utils";
 import { SpawnTaskAction } from "./spawnTaskAction";
 import { SpawnTaskNameEntity } from "./spawnTaskNameEntity";
 
+
 @Singleton
 export class SpawnTaskService extends BaseTaskService{
 

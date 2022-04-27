@@ -7,6 +7,7 @@ import Utils from "utils/utils";
 export type ClaimActionName = 'claimRoom'
 export type ClaimRegName = ''
 
+
 @Singleton
 export class ClaimTaskAction extends BaseTaskAction {
 

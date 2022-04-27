@@ -1,9 +1,10 @@
 import { BodyConfig } from "modules/bodyConfig/bodyConfig"
-import { BaseTaskAction } from "taskService/baseTaskAction"
+import { BaseRegName, BaseTaskAction } from "taskService/baseTaskAction"
 import { Singleton } from "typescript-ioc"
 
 export type UpgradeActionName = 'upgrade' | 'upgradeKeeper'
-export type UpgradeRegName = 'registerUpgrade' | 'unregisterUpgrade' | 'registerUpgradeTranEnergyInRoom'
+export type UpgradeRegName = BaseRegName | 'registerUpgrade' | 'unregisterUpgrade'
+
 
 @Singleton
 export class UpgradeTaskAction extends BaseTaskAction {
@@ -22,14 +23,6 @@ export class UpgradeTaskAction extends BaseTaskAction {
         if(!map) return
         const data = map[STRUCTURE_CONTROLLER]
         data.creeps = _.without(data.creeps,creep.id)
-    }
-
-
-    registerUpgradeTranEnergyInRoom(creep:Creep){
-        const room = Game.rooms[creep.memory.roomName]
-        room._used = room._used || {}
-        const id:string = creep.topTask.targetId
-        room._used[id] = (room._used[id] || 0) + BodyConfig.getPartCount(creep,CARRY) * 50
     }
 
     upgradeKeeper(creep:Creep){

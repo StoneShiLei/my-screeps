@@ -1,11 +1,11 @@
-import { BaseTaskAction } from "taskService/baseTaskAction";
 import { BaseTaskService } from "taskService/baseTaskService";
 import { TaskHelper } from "taskService/taskHelper";
-import { Inject } from "typescript-ioc";
+import { Inject, Singleton } from "typescript-ioc";
 import { WorkTaskNameEntity } from "./workTaskNameEntity";
 import { WorkTaskAction } from "./workTaskAction";
-import { filter } from "lodash";
 
+
+@Singleton
 export class WorkTaskService extends BaseTaskService{
 
     @Inject
