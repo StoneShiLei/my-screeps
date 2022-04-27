@@ -21,6 +21,8 @@ export class MineralTaskAction extends BaseTaskAction {
             creep.memory._concated = true
             data.spawnTime = data.spawnTime || 0
             data.spawnTime -= Game.time - data.spawnTime - 10
+            map[STRUCTURE_EXTRACTOR] = data
+            creep.room.memory.serviceDataMap.mineralTaskService = map
         }
         creep.popTopTask()
         creep.doWorkWithTopTask()
@@ -47,17 +49,17 @@ export class MineralTaskAction extends BaseTaskAction {
             creep.goTo(task)
             return
         }
-
         const mineral = creep.topTarget as Mineral
         if(!mineral) return
         const map = creep.room.memory.serviceDataMap.mineralTaskService
         if(!map) return
         const data = map[STRUCTURE_EXTRACTOR]
         if(!data) return
+
         const container = data.containerId ? Game.getObjectById<StructureContainer>(data.containerId):undefined
         if(!container) return
 
-        if(container.pos.isEqualTo(creep)){
+        if(!container.pos.isEqualTo(creep)){
             creep.addTask(TaskHelper.genTaskWithTarget(container,new MineralTaskNameEntity("updateMineralInfo")))
             creep.addTask(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("goToAndPopTask")))
             creep.doWorkWithTopTask()

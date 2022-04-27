@@ -259,13 +259,12 @@ const highLevelStrategy = {
             if(creep?.storeIsEmpty()) creep.addTask(massStoreTasks)
         }
 
+
+        //----------------------分配剩余transporter--------------------------
+
         //store不为空的将资源清空到大容量存储对象内
-        creepPool.idleNotEmptyTraners
+        room.creeps("transporter").filter(t => !t.storeIsEmpty() && t.isIdle())
         .forEach(creep => creep.addTask(service.transportTaskService.genFillAllMainRoomMassStoreTask(creep)))
-
-
-
-
 
          //只筛取ttl大于50的搬运工进行以下任务
         creepPool.idleEmptyTraners = _.filter(creepPool.idleEmptyTraners,creep => creep.ticksToLive && creep.ticksToLive > 50)
