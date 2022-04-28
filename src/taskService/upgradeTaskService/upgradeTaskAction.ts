@@ -66,9 +66,6 @@ export class UpgradeTaskAction extends BaseTaskAction {
         let moved = false;
         let isWithdrawLink = false
 
-
-
-
         //如果没满的情况下 拿全部的这样才能快速填满container
         if(creep.store.getUsedCapacity(RESOURCE_ENERGY) <= BodyConfig.getPartCount(creep,WORK) * (containerNotFull ? 2000 : 1) ){
             if(link && (link._upgradeUsed || 0) <= link.store[RESOURCE_ENERGY] && link.store[RESOURCE_ENERGY] > 0){
