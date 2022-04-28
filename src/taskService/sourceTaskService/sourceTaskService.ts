@@ -159,6 +159,7 @@ export class SourceTaskService extends BaseTaskService{
 
 
     outterHarvestRun(room:Room){
+        if((Game.time + room.hashCode()) % 6 !== 0) return
         if(!room.storage) return;
         const roomHarFlags = room.flags("har")
         if(!roomHarFlags?.length) return

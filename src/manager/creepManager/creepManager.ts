@@ -11,35 +11,30 @@ export class CreepManager extends BaseManager{
             if(!Game.creeps[name]){
                 //清除缓存
                 delete Memory.creeps[name]
+                continue
             }
-            else{
-                const roomName = Memory.creeps[name].roomName
 
-                if(roomName){
-                    //更新room的creeps列表
-                    const creep = Game.creeps[name]
-                    if(!creeps[roomName]) creeps[roomName] = []
-                    creeps[roomName].push(creep)
-
-                    //调用Service的Register
-                    ErrorHelper.catchError(()=>creep.registerMyTasks())
-                }
+            const roomName = Memory.creeps[name].roomName
+            if(roomName){
+                //更新room的creeps列表
+                const creep = Game.creeps[name]
+                if(!creeps[roomName]) creeps[roomName] = []
+                creeps[roomName].push(creep)
             }
         }
+
         _.keys(creeps).forEach(roomName =>{
             const room = Game.rooms[roomName]
-            if(room){
-                room.setCreeps(creeps[roomName])
-            }
+            if(room) room.setCreeps(creeps[roomName])
         })
     }
     tickEnd(): void {
 
     }
-    run(target: Creep): void {
-        const creep = target;
-        // creep.sayTopTask()
-        creep.doWorkWithTopTask()
+    run(creep: Creep): void {
+        ErrorHelper.catchError(()=> creep.registerMyTasks(),creep.name)
+
+        if(!creep.spawning) ErrorHelper.catchError(()=>creep.doWorkWithTopTask(),creep.name)
     }
 
 }

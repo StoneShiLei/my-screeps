@@ -10,6 +10,9 @@ const autoPlanManager = Container.get(AutoPlanManager)
 
 export const roomLevelStrategy = {
     lowLevel:function(room:Room){
+        const interval = Game.time + room.hashCode()
+        if(interval % 3 != 0) return
+
         //尝试建造spawn和ext
         autoPlanManager.tryAutoBuildLowLevel(room)
 
@@ -70,6 +73,9 @@ export const roomLevelStrategy = {
         })
     },
     middleLevel:function(room:Room){
+        const interval = Game.time + room.hashCode()
+        if(interval % 3 != 0) return
+
         //尝试建造ext conatiner tower storage road
         autoPlanManager.tryAutoBuildMiddleLevel(room)
 
@@ -179,6 +185,8 @@ export const roomLevelStrategy = {
 
     },
     highLevel:function(room:Room){
+        const interval = Game.time + room.hashCode()
+        if(interval % 3 != 0) return
 
         //建造4级之后的所有建筑物
         autoPlanManager.tryAutoBuildHighLevel(room)

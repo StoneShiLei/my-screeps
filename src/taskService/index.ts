@@ -5,6 +5,8 @@ import { DefenseActionName, DefenseRegName, DefenseTaskAction } from "./defenseT
 import { DefenseTaskService } from "./defenseTaskService/defenseTaskService";
 import { MineralActionName, MineralRegName, MineralTaskAction } from "./mineralTaskService/mineralTaskAction";
 import { MineralTaskService } from "./mineralTaskService/mineralTaskService";
+import { ResourceBalanceActionName, ResourceBalanceRegName, ResourceBalanceTaskAction } from "./resourceBalanceTaskService/resourceBalanceTaskAction";
+import { ResourceBalanceTaskService } from "./resourceBalanceTaskService/resourceBalanceTaskService";
 import { SourceActionName, SourceRegName, SourceTaskAction } from "./sourceTaskService/sourceTaskAction";
 import { SourceTaskService } from "./sourceTaskService/sourceTaskService";
 import { SpawnActionName, SpawnRegName, SpawnTaskAction } from "./spawnTaskService/spawnTaskAction";
@@ -48,19 +50,28 @@ export class TaskServiceProxy {
 
     @Inject
     defenseTaskService!:DefenseTaskService
+
+    @Inject
+    resourceBalanceTaskService!:ResourceBalanceTaskService
 }
 
 export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService |
  UpgradeTaskService | SourceTaskService | TowerTaskService | MineralTaskService | ClaimTaskService |
- DefenseTaskService
+ DefenseTaskService | ResourceBalanceTaskService
 
 export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction |
-SourceTaskAction | TowerTaskAction | MineralTaskAction | DefenseTaskAction
+SourceTaskAction | TowerTaskAction | MineralTaskAction | DefenseTaskAction | ResourceBalanceTaskAction
 
 
-export type ServiceName = "defenseTaskService" | "spawnTaskService" | "workTaskService" | "transportTaskService" | "upgradeTaskService" | "sourceTaskService" | "towerTaskService" | "mineralTaskService" | "claimTaskService"
-export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName | TowerActionName | MineralActionName | ClaimActionName | DefenseActionName
-export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName | MineralRegName | ClaimRegName | DefenseRegName
+export type ServiceName = "defenseTaskService" | "spawnTaskService" | "workTaskService" | "transportTaskService" |
+"upgradeTaskService" | "sourceTaskService" | "towerTaskService" | "mineralTaskService" | "claimTaskService" |
+"resourceBalanceTaskService"
+
+export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName |
+TowerActionName | MineralActionName | ClaimActionName | DefenseActionName | ResourceBalanceActionName
+
+export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName |
+ MineralRegName | ClaimRegName | DefenseRegName | ResourceBalanceRegName
 
 
 

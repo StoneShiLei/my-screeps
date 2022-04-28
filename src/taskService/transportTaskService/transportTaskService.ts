@@ -152,6 +152,9 @@ export class TransportTaskService extends BaseTaskService{
 
     transformLinkRun(room:Room){
 
+        const interval = Game.time + room.hashCode()
+        if(interval % 3 !== 0) return
+
         const upgradeMap = room.memory.serviceDataMap.upgradeTaskService
         const transportMap = room.memory.serviceDataMap.transportTaskService
         const sourceMap = room.memory.serviceDataMap.sourceTaskService

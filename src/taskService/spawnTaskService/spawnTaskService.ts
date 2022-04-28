@@ -46,6 +46,8 @@ export class SpawnTaskService extends BaseTaskService{
         spawnRoom._spawnQueue.push({
             priority: priority,
             name: name,
+            role:role,
+            workRoom:targetRoomName,
             spawnOptions: opts,
             bodyFunc: bodyFunc,
             bodyFuncArgs: bodyFuncArgs,
@@ -54,9 +56,10 @@ export class SpawnTaskService extends BaseTaskService{
     }
 
     handleSpawn(room:Room){
+        if(!room.my) return
         if(!room._spawnMap) room._spawnMap = {}
         if(room._currentEnergyAvailable===null || room._currentEnergyAvailable === undefined) room._currentEnergyAvailable = room.getEnergyAvailable();
-        if(!room._spawnQueue) return
+        if(!room._spawnQueue || !room._spawnQueue.length) return
 
         room._spawnQueue = _.sortByOrder(room._spawnQueue,(task) => task.priority,'desc')
 
@@ -85,6 +88,7 @@ export class SpawnTaskService extends BaseTaskService{
                 room._currentEnergyAvailable -= spend;
             }
         }
+
 
         room._spawnQueue = []
         return

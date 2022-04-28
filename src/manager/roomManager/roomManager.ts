@@ -9,86 +9,73 @@ import { roomLevelStrategy } from "./roomLevelStrategy";
 export class RoomManager extends BaseManager{
 
     private _firstActive:boolean = true;
+    private _spawnQueue:SpawnTask[] | undefined = []
 
     tickStart(): void {
-        const service = Container.get(TaskServiceProxy)
-
         Object.values(Game.rooms).forEach(room => {
             const interval = Game.time + room.hashCode()
-
 
             if(interval % 301 === 0 || this._firstActive){
 
                 //更新房间寻路缓存
-                ErrorHelper.catchError(()=>superMove.deletePathInRoom(room.name))
+                ErrorHelper.catchError(()=>superMove.deletePathInRoom(room.name),room.name)
             }
 
             if(interval % 31 === 0 || this._firstActive){
 
                 //更新房间信息
-                ErrorHelper.catchError(()=>room.updateRoomInfo())
-
-
-
-                if(room.storage && room.storage.store.getFreeCapacity() <= 0) console.log(`${room.name} storage is full`)
+                ErrorHelper.catchError(()=>room.updateRoomInfo(),room.name)
+                if(room.storage && room.storage.my && room.storage.store.getFreeCapacity() <= 0) console.log(`${room.name} storage is full`)
             }
+
          })
 
     }
     tickEnd(): void {
         const service = Container.get(TaskServiceProxy)
 
-        Object.values(Game.rooms).forEach(room => {
-            const interval = Game.time + room.hashCode()
+        //claim
+        ErrorHelper.catchError(()=>service.claimTaskService.claimRun())
+
+        Object.values(Game.rooms).forEach(room =>{
+            if(!room.my) return;
+
+            //资源平衡
+            ErrorHelper.catchError(()=>service.resourceBalanceTaskService.resourceBalanceRun(room),room.name)
+
+            //处理一些临时的信息
+            if(room._spawnQueue?.length) this._spawnQueue = _.sortByOrder(room._spawnQueue,s => s.priority,'desc')
+            const spawnName = this._spawnQueue?.map(task => `权重：${task.priority},角色：${task.role},工作地点：${task.workRoom}`)
+            spawnName?.map((log,index) => room.visual.text(log, 1, 3 + index, { align: 'left', opacity: 0.5 }))
 
 
             //处理spawn队列
-            ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room)  ,room.name)
+            ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room) ,room.name)
+
         })
+
 
         this._firstActive = false;
     }
     run(room: Room): void {
-
-
         if(!room.my) return;
 
         const service = Container.get(TaskServiceProxy)
-        const interval = Game.time + room.hashCode()
 
         //炮塔
-        ErrorHelper.catchError(()=>service.towerTaskService.towerRun(room))
+        ErrorHelper.catchError(()=>service.towerTaskService.towerRun(room),room.name)
 
-        if(interval % 6 === 0 || this._firstActive){
+        //link互传
+        ErrorHelper.catchError(()=>service.transportTaskService.transformLinkRun(room),room.name)
 
-            //外矿
-            ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room))
+        //房间运营策略
+        if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
+        else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
+        else roomLevelStrategy.highLevel(room)
 
-        }
-
-        if(interval % 3 === 0 || this._firstActive){
-            //claim
-            ErrorHelper.catchError(()=>service.claimTaskService.claimRun())
-            //link互传
-            ErrorHelper.catchError(()=>service.transportTaskService.transformLinkRun(room))
-
-
-            //房间运营策略
-            if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
-            else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
-            else roomLevelStrategy.highLevel(room)
-
-        }
-
-
-        //处理一些临时的信息
-        const style: TextStyle = { align: 'left', opacity: 0.5 }
-        if(room._spawnQueue) this.tempSpawnQueue = room._spawnQueue
-        const spawnName = this.tempSpawnQueue.map(task => task.name)
-        spawnName.map((log,index) => room.visual.text(log, 1, 3 + index, style))
+        //外矿
+        ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room),room.name)
     }
-
-    tempSpawnQueue:SpawnTask[] = [];
 }
 
 

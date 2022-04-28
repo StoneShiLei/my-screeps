@@ -21,6 +21,8 @@ type SpawnMap = {
 interface SpawnTask {
     priority:number
     name:string
+    role:Role
+    workRoom:string
     spawnOptions:SpawnOptions
     bodyFunc:BodyCalcFunc
     bodyFuncArgs:BodyCalcFuncArgs
