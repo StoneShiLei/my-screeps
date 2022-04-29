@@ -69,7 +69,7 @@ export class ClaimTaskService extends BaseTaskService{
                 const claimer = spawnRoom.creeps("claimer",false).filter(e => e.topTask.roomName == flag.pos.roomName).head()
                 if(!claimer){
                     const task = TaskHelper.genTaskWithServiceData(controllerData,new ClaimTaskNameEntity("claimRoom"))
-                    service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"scouter",1000,[task],(args:BodyCalcFuncArgs)=> [CLAIM,MOVE,MOVE],{})
+                    service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"claimer",0,[task],(args:BodyCalcFuncArgs)=> [CLAIM,MOVE,MOVE],{})
                 }
             }
         }

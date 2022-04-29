@@ -13,16 +13,11 @@ export class ClaimTaskAction extends BaseTaskAction {
 
     claimRoom(creep:Creep){
         const task = creep.topTask
-        const flag = Game.flags[task.targetId]
-        if(!flag){
-            Utils.log("flag not found",[task.targetId],false,"yellow")
-            return
-        }
-
+        const pos = new RoomPosition(task.x,task.y,task.roomName);
         if(creep.hitsMax != creep.hits && (creep.room.controller && creep.pos.isNearTo(creep.room.controller || !creep.room.controller))) creep.heal(creep)
 
-        if(creep.room.name != flag.pos.roomName){
-            creep.goTo(flag)
+        if(creep.room.name != pos.roomName){
+            creep.goTo(pos)
             return
         }
 
@@ -46,7 +41,7 @@ export class ClaimTaskAction extends BaseTaskAction {
                         creep.popTopTask().addTask(TaskHelper.genTaskWithAnyData(new SpawnTaskNameEntity("recycleCreep")))
                     }
 
-                    if(creep.memory._signed && creep.signController(creep.room.controller,"I want this!") == OK) creep.memory._signed = true
+                    if(!creep.memory._signed && creep.signController(creep.room.controller,"I want this!") == OK) creep.memory._signed = true
                 }
             }
         }

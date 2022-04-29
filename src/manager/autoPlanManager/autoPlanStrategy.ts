@@ -55,7 +55,7 @@ export const autoPlanStrategy = {
         let pb = Game.flags.pb;
         let pc = Game.flags.pc;
         let pm = Game.flags.pm;
-        if(p&&pa&&pc&&pm) {
+        if(p&&pa&&pb&&pc&&pm) {
             let roomStructsData = autoPlanner63.ManagerPlanner.computeManor(p.pos.roomName,[pc,pm,pa,pb])
             if(roomStructsData){
                 Memory.rooms[roomStructsData.roomName]=Memory.rooms[roomStructsData.roomName]||{}

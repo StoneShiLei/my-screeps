@@ -22,7 +22,7 @@ interface SpawnTask {
     priority:number
     name:string
     role:Role
-    workRoom:string
+    tasks:Task[]
     spawnOptions:SpawnOptions
     bodyFunc:BodyCalcFunc
     bodyFuncArgs:BodyCalcFuncArgs

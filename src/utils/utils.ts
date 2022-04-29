@@ -119,6 +119,21 @@ export default class Utils{
     }
 
 
+    /**
+     * 获取store内的资源类型列表
+     * @param anyStoreStructure
+     * @returns
+     */
+    static getResourceTypeList(store:StoreDefinition):ResourceConstant[]{
+        const t:ResourceConstant[] = []
+        for(let k in store){
+            if(store[k as ResourceConstant] > 0){
+                t.push(k as ResourceConstant)
+            }
+        }
+        return t
+    }
+
 }
 
 

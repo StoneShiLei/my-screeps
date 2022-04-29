@@ -47,7 +47,7 @@ export class SpawnTaskService extends BaseTaskService{
             priority: priority,
             name: name,
             role:role,
-            workRoom:targetRoomName,
+            tasks:tasks,
             spawnOptions: opts,
             bodyFunc: bodyFunc,
             bodyFuncArgs: bodyFuncArgs,

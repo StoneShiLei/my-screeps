@@ -190,7 +190,7 @@ export class SourceTaskService extends BaseTaskService{
             }
             else{
                 const harRoom = Game.rooms[flag.pos.roomName]
-                if((Game.time + room.hashCode()) % 30 == 0 && harRoom) harRoom.updateRoomInfo()
+                if((Game.time + room.hashCode()) % 30 == 0 && harRoom) service.sourceTaskService.update(room)
 
                 // 先生claimer 再生 har 保证能量获取效率 没有视野会先生 har
                 if(harRoom && !harRoom.my){
@@ -206,12 +206,14 @@ export class SourceTaskService extends BaseTaskService{
                 this.trySpawnOutterHarvesterKeeper(flag.pos.roomName,room,harvesterPriority)
                 this.trySpawnOutterTransporter(flag.pos.roomName,room,transporterPriority)
             }
+
+            //下一个外矿房间的角色生成优先级全员降低100
+            scouterPriority -= 100
+            reserverPriority -= 100
+            harvesterPriority -= 100
+            transporterPriority -= 100
         })
-        //下一个外矿房间的角色生成优先级全员降低100
-        scouterPriority -= 100
-        reserverPriority -= 100
-        harvesterPriority -= 100
-        transporterPriority -= 100
+
     }
 
     update(room:Room){

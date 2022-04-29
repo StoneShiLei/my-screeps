@@ -5,9 +5,10 @@ import { BaseTaskNameEntity } from "./baseTaskNameEntity";
 export class TaskHelper {
 
 
-    static genTaskWithTarget(target:TaskTarget,entity:BaseTaskNameEntity,
+    static genTaskWithTarget(target:TaskTarget | undefined,entity:BaseTaskNameEntity,
         opt?:TaskOpt,regEntity?:BaseTaskNameEntity):Task {
         if(!entity.actionName) throw new Error("actionName is not defined")
+        if(!target) throw new Error("target is not defined")
         const task:Task = {
             serviceName:entity.serviceName,
             actionName:entity.actionName,
@@ -44,6 +45,7 @@ export class TaskHelper {
     static genTaskWithFlag(flag:Flag,entity:BaseTaskNameEntity,
         opt:TaskOpt = {},regEntity?:BaseTaskNameEntity):Task {
             if(!entity.actionName) throw new Error("actionName is not defined")
+
             const task:Task = {
                 serviceName:entity.serviceName,
                 actionName:entity.actionName,

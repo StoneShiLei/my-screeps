@@ -37,24 +37,6 @@ export class RoomManager extends BaseManager{
         //claim
         ErrorHelper.catchError(()=>service.claimTaskService.claimRun())
 
-        Object.values(Game.rooms).forEach(room =>{
-            if(!room.my) return;
-
-            //资源平衡
-            ErrorHelper.catchError(()=>service.resourceBalanceTaskService.resourceBalanceRun(room),room.name)
-
-            //处理一些临时的信息
-            if(room._spawnQueue?.length) this._spawnQueue = _.sortByOrder(room._spawnQueue,s => s.priority,'desc')
-            const spawnName = this._spawnQueue?.map(task => `权重：${task.priority},角色：${task.role},工作地点：${task.workRoom}`)
-            spawnName?.map((log,index) => room.visual.text(log, 1, 3 + index, { align: 'left', opacity: 0.5 }))
-
-
-            //处理spawn队列
-            ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room) ,room.name)
-
-        })
-
-
         this._firstActive = false;
     }
     run(room: Room): void {
@@ -69,12 +51,24 @@ export class RoomManager extends BaseManager{
         ErrorHelper.catchError(()=>service.transportTaskService.transformLinkRun(room),room.name)
 
         //房间运营策略
-        if(room.memory.roomLevel == 'low') roomLevelStrategy.lowLevel(room)
-        else if(room.memory.roomLevel == 'middle') roomLevelStrategy.middleLevel(room)
-        else roomLevelStrategy.highLevel(room)
+        if(room.memory.roomLevel == 'low') ErrorHelper.catchError(()=>roomLevelStrategy.lowLevel(room),room.name)
+        else if(room.memory.roomLevel == 'middle') ErrorHelper.catchError(()=>roomLevelStrategy.middleLevel(room),room.name)
+        else ErrorHelper.catchError(()=>roomLevelStrategy.highLevel(room),room.name)
 
         //外矿
-        ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room),room.name)
+        if(!room.flags("stopRemote")?.length) ErrorHelper.catchError(()=>service.sourceTaskService.outterHarvestRun(room),room.name)
+
+        //资源平衡
+        ErrorHelper.catchError(()=>service.resourceBalanceTaskService.resourceBalanceRun(room),room.name)
+
+
+        //处理一些临时的信息
+        if(room._spawnQueue?.length) this._spawnQueue = _.sortByOrder(room._spawnQueue,s => s.priority,'desc')
+        const spawnName = this._spawnQueue?.map(task => `权重：${task.priority},角色：${task.role},工作地点：${task.tasks.length ? task.tasks.last().roomName : room.name}`)
+        spawnName?.map((log,index) => room.visual.text(log, 1, 3 + index, { align: 'left', opacity: 0.5 }))
+
+        //处理spawn队列
+        ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room) ,room.name)
     }
 }
 

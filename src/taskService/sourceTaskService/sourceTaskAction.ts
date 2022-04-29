@@ -1,5 +1,7 @@
+import { filter, result } from "lodash";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
 import { BaseRegName, BaseTaskAction } from "taskService/baseTaskAction";
+import { SpawnTaskNameEntity } from "taskService/spawnTaskService/spawnTaskNameEntity";
 import { TaskHelper } from "taskService/taskHelper";
 import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 import { Singleton } from "typescript-ioc";
@@ -226,9 +228,20 @@ export class SourceTaskAction extends BaseTaskAction {
         }
 
         const controller = creep.topTarget as StructureController
-        if(controller && creep.reserveController(controller) == ERR_NOT_IN_RANGE){
+        if(controller && creep.reserveController(controller) != OK){
             creep.goTo(controller)
+
+            if(controller.pos.isNearTo(creep)){
+                const result = creep.attackController(controller)
+                if(result == OK || result == ERR_TIRED){
+                    if(creep.ticksToLive && creep.ticksToLive > 350 && creep.mainRoom){
+                        creep.popTopTask().addTask(TaskHelper.genTaskWithAnyData(new SpawnTaskNameEntity("recycleCreep")))
+                    }
+                }
+            }
         }
+        if(!creep.memory._signed && creep.signController(controller,"I want harvest this!") == OK) creep.memory._signed = true
+
         creep.memory.dontPullMe = (creep.ticksToLive || 3) % 3 != 0
     }
 
@@ -268,25 +281,18 @@ export class SourceTaskAction extends BaseTaskAction {
         }
         else{}
 
-        if(container && !container.pos.isEqualTo(creep)){
-            creep.addTask(TaskHelper.genTaskWithTarget(source,new SourceTaskNameEntity("updateSourcesInfo")))
-            creep.addTask(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("goToAndPopTask")))
-            creep.doWorkWithTopTask()
-            return
-        }
-        else if(source && !source.pos.isNearTo(creep)){
-            creep.addTask(TaskHelper.genTaskWithTarget(source,new SourceTaskNameEntity("updateSourcesInfo")))
-            creep.addTask(TaskHelper.genTaskWithTarget(source,new TransportTaskNameEntity("goToNearAndPopTask")))
-            creep.doWorkWithTopTask()
-        }
-        else{}
-
         if((source.energy + 100) / source.energyCapacity > (source.ticksToRegeneration || 300) / 300 && source.energy){
            creep.harvest(source)
         }
 
         if(!container&& creep.ticksToLive  && creep.ticksToLive % 7 == 0){
-            creep.pos.createConstructionSite(STRUCTURE_CONTAINER)
+            const site = source.pos.findInRange(FIND_MY_CONSTRUCTION_SITES,1,{filter:s => s.structureType == STRUCTURE_CONTAINER})
+            if(!site?.length){
+                creep.pos.createConstructionSite(STRUCTURE_CONTAINER)
+            }
+            else{
+                creep.goTo(site[0])
+            }
         }
 
         if(creep.store.getFreeCapacity(RESOURCE_ENERGY) < BodyConfig.getPartCount(creep,WORK) * 2){
@@ -400,7 +406,6 @@ export class SourceTaskAction extends BaseTaskAction {
         }
 
         if(!Memory.rooms[creep.room.name] || !Memory.rooms[creep.room.name]?.serviceDataMap?.sourceTaskService){
-            console.log(creep.room.name)
             creep.room.updateRoomInfo()
         }
         else{
