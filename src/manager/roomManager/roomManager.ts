@@ -9,7 +9,7 @@ import { roomLevelStrategy } from "./roomLevelStrategy";
 export class RoomManager extends BaseManager{
 
     private _firstActive:boolean = true;
-    private _spawnQueue:SpawnTask[] | undefined = []
+    private _spawnQueue:{[roomName:string]:SpawnTask[] | undefined} = {}
 
     tickStart(): void {
         Object.values(Game.rooms).forEach(room => {
@@ -37,6 +37,18 @@ export class RoomManager extends BaseManager{
         //claim
         ErrorHelper.catchError(()=>service.claimTaskService.claimRun())
 
+        _.values<Room>(Game.rooms).forEach(room => {
+            if(!room.my) return
+
+            //处理一些临时的信息
+            if(room._spawnQueue?.length) this._spawnQueue[room.name] = _.sortByOrder(room._spawnQueue,s => s.priority,'desc')
+            const spawnName = this._spawnQueue[room.name]?.map(task => `权重：${task.priority},角色：${task.role},工作地点：${task.tasks.length ? task.tasks.last().roomName : room.name}`)
+            spawnName?.map((log,index) => room.visual.text(log, 1, 3 + index, { align: 'left', opacity: 0.5 }))
+
+            //处理spawn队列
+            ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room) ,room.name)
+        })
+
         this._firstActive = false;
     }
     run(room: Room): void {
@@ -60,15 +72,6 @@ export class RoomManager extends BaseManager{
 
         //资源平衡
         ErrorHelper.catchError(()=>service.resourceBalanceTaskService.resourceBalanceRun(room),room.name)
-
-
-        //处理一些临时的信息
-        if(room._spawnQueue?.length) this._spawnQueue = _.sortByOrder(room._spawnQueue,s => s.priority,'desc')
-        const spawnName = this._spawnQueue?.map(task => `权重：${task.priority},角色：${task.role},工作地点：${task.tasks.length ? task.tasks.last().roomName : room.name}`)
-        spawnName?.map((log,index) => room.visual.text(log, 1, 3 + index, { align: 'left', opacity: 0.5 }))
-
-        //处理spawn队列
-        ErrorHelper.catchError(()=> service.spawnTaskService.handleSpawn(room) ,room.name)
     }
 }
 

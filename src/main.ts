@@ -7,6 +7,7 @@ import { Container } from "typescript-ioc";
 import { TaskServiceProxy } from "taskService";
 import { StackAnalysis } from "modules/stackAnalysis/StackAnalysis";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
+import { StructMap } from "autoPlanner63";
 
 
 
@@ -78,21 +79,37 @@ app.on({
   }
 })
 
-// switchShowCost('base')
 
+
+app.on({
+  tickStart:()=>{
+
+    // const struct:StructMap = {
+    //   constructedWall:[[2,14],[2,15],[6,19],[6,20],[8,23],[9,23],[10,23],[31,26],[43,26],[44,25],[46,12],[46,11],[46,10]],
+    //   rampart:[[6,21],[30,26],[43,25],[46,13]],
+    //   spawn:[],
+    //   extension:[],
+    //   link:[],
+    //   road:[],
+    //   storage:[],
+    //   tower:[],
+    //   observer:[],
+    //   powerSpawn:[],
+    //   extractor:[],
+    //   terminal:[],
+    //   lab:[],
+    //   container:[],
+    //   nuker:[],
+    //   factory:[],
+    // }
+
+    // const room = Game.rooms['E48S6']
+    // room.memory.structMap = struct
+  }
+})
+
+
+// switchShowCost('base')
 // StackAnalysis.mount()
 export const loop = app.run
 // export const loop = StackAnalysis.wrap(app.run)
-
-
-
-
-// declare global {
-//   export interface RoomMemory{
-//     _test?:number
-//   }
-
-//   export interface CreepMemory{
-//     _test?:boolean
-//   }
-// }

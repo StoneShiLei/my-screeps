@@ -167,7 +167,7 @@ export class SourceTaskService extends BaseTaskService{
         //外矿房间角色生成优先级是最低的
         //防止影响房间内运营 默认按 defenser-45 -> scouter-50 -> reserver-55 -> harvester-60 -> transporter-65
         //从第二个房间开始除了defenser 其他角色优先级-=100
-        let defenserPriority = -45
+        let defenserPriority = 950
         let scouterPriority = -50
         let reserverPriority = -55
         let harvesterPriority = -60

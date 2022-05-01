@@ -22,8 +22,8 @@ export const roomLevelStrategy = {
 
         //低能量等级房间防御
         if(room.get<StructureSpawn[]>('spawn')?.length && room.find(FIND_HOSTILE_CREEPS).filter(e => e.body.filter(e => e.type != MOVE).length).length){
-            if(room.creeps("claimer").length < 3 && room.get<StructureTower[]>("tower")?.length == 0){
-                service.spawnTaskService.trySpawn(room,room.name,"claimer",1000,[TaskHelper.genTaskWithAnyData(new DefenseTaskNameEntity("lowLevelDefense"))],
+            if(room.creeps("lowLevelDefenser").length < 3 && room.get<StructureTower[]>("tower")?.length == 0){
+                service.spawnTaskService.trySpawn(room,room.name,"lowLevelDefenser",1000,[TaskHelper.genTaskWithAnyData(new DefenseTaskNameEntity("lowLevelDefense"))],
                 BodyConfig.defenseBodyConfig.lowLevelDefenserBodyCalctor,{energy:room.getEnergyCapacityAvailable()})
             }
         }
@@ -64,7 +64,7 @@ export const roomLevelStrategy = {
             else if(fillTowerTasks.length > 0){
                 creep.addTask(fillTowerTasks.shift())
             }
-            else if(room.level > 1 && room.constructionIsNeedBuild() && !room.isDownGrade()){
+            else if(room.level > 1 && creep.mainRoom.constructionIsNeedBuild() && !room.isDownGrade()){
                 creep.addTask(service.workTaskService.genBuildTask(creep))
             }
             else {
@@ -178,7 +178,7 @@ export const roomLevelStrategy = {
         }
         idleNotEmptyWorkers.forEach(creep =>{
             if(room.hiveIsNeedToFill()) creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
-            else if(room.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))
+            else if(creep.mainRoom?.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))
             else creep.addTask(service.upgradeTaskService.genUpgradeTask(room))
         })
 
@@ -290,7 +290,7 @@ const highLevelStrategy = {
         service.transportTaskService.takeCachedPickupTranTask(room,creepPool.idleEmptyTraners,false)
 
         //填充剩余资源的任务
-        if(massStoreTasks.length && creepPool.idleEmptyTraners.length){
+        if(massStoreTasks.length && creepPool.idleEmptyTraners.length || true){
             //运送升级能量
             const upgradeFillTask = service.upgradeTaskService.genFillUpgradeEnergyTask(room,BodyConfig.getPartCount(creepPool.idleEmptyTraners.head(),CARRY)* 50)
             if(upgradeFillTask.length) creepPool.idleEmptyTraners.pop()?.addTask(upgradeFillTask) //直接调用fillResource会自动去massStore取能量
@@ -317,8 +317,9 @@ const highLevelStrategy = {
         })
 
         creepPool.idleNotEmptyWorkers.forEach(creep =>{
+
             if(tranerCount == 0 && !haveIdleTraner && room.hiveIsNeedToFill()) creep.addTask(service.spawnTaskService.genFillHiveTask(creep,room))
-            else if(room.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))
+            else if(creep.mainRoom?.constructionIsNeedBuild() && !room.isDownGrade()) creep.addTask(service.workTaskService.genBuildTask(creep))
             else if(service.defenseTaskService.needBuildWallWithWorkerIdle(room) && !room.isDownGrade()) creep.addTask(service.defenseTaskService.genRepairWallTask(room))
             else if(room.level < 8) creep.addTask(service.upgradeTaskService.genUpgradeTask(room))
             else {}

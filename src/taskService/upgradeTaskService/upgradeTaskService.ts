@@ -35,12 +35,11 @@ export class UpgradeTaskService extends BaseTaskService{
         room._used = room._used || {}
         const container = data.containerId ? Game.getObjectById<StructureContainer>(data.containerId) : undefined
         const upgradelink = data.linkIdA ? Game.getObjectById<StructureLink>(data.linkIdA) : undefined
-        if(!upgradelink || upgradelink && upgradelink.store.getUsedCapacity() === 0){
+        if(!upgradelink || upgradelink && upgradelink.store.getUsedCapacity(RESOURCE_ENERGY) === 0){
             const tranMap = room.memory.serviceDataMap.transportTaskService
             const centerLinkId = tranMap ? tranMap[STRUCTURE_STORAGE].linkIdA : undefined
             const centerLink = centerLinkId ? Game.getObjectById<StructureLink>(centerLinkId) : undefined
-
-            if(centerLink && upgradelink && upgradelink.store.getUsedCapacity() === 0 && centerLink.store.getUsedCapacity() == 0){
+            if(centerLink && upgradelink && upgradelink.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && centerLink.store.getUsedCapacity(RESOURCE_ENERGY) == 0){
                 return [TaskHelper.genTaskWithTarget(centerLink,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
                 ,new UpgradeTaskNameEntity(undefined,"registerTranEnergyInRoom"))]
             }

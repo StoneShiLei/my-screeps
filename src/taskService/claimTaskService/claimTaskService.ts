@@ -17,13 +17,14 @@ export class ClaimTaskService extends BaseTaskService{
     actions!: ClaimTaskAction;
 
     claimRun(){
+        if(Game.time % 3 != 0) return
         const flagManager = Container.get(FlagManager)
         const autoPlanManager = Container.get(AutoPlanManager)
         const service = Container.get(TaskServiceProxy)
 
         const flags = flagManager.getFlagsByPrefix("claim")
-
         for(let flag of flags){
+
             if(Game.rooms[flag.pos.roomName] && Game.rooms[flag.pos.roomName].my && Game.rooms[flag.pos.roomName].get<StructureSpawn[]>("spawn")?.length > 0) flag.remove()
 
             if(!Memory.rooms[flag.pos.roomName] || !Memory.rooms[flag.pos.roomName]?.serviceDataMap?.sourceTaskService){
@@ -36,7 +37,6 @@ export class ClaimTaskService extends BaseTaskService{
                 const roomName = flag.getRoomName()
                 if(roomName && Game.rooms[roomName] && Game.rooms[roomName].my) spawnRoom = Game.rooms[roomName]
 
-
                 const scouter = spawnRoom.creeps('scouter',false).filter(e => e.topTask.roomName == flag.pos.roomName).head()
                 if(!scouter){
                     const task = TaskHelper.genTaskWithFlag(flag,new SourceTaskNameEntity("scouterToRoom"))
@@ -47,10 +47,10 @@ export class ClaimTaskService extends BaseTaskService{
                 if(!Memory.rooms[flag.pos.roomName].structMap){
                     //创建蓝图
                     autoPlanManager.computeRoom(flag)
-                    return
+                    continue
                 }
 
-                if(Game.rooms[flag.pos.roomName] && Game.rooms[flag.pos.roomName].my) return;
+                if(Game.rooms[flag.pos.roomName] && Game.rooms[flag.pos.roomName].my) continue;
 
                 let spawnRoom = service.spawnTaskService.getClosestSpawnRoom(flag.pos.roomName,7,3,15)
                 if(!spawnRoom){
@@ -67,6 +67,7 @@ export class ClaimTaskService extends BaseTaskService{
                 }
                 const controllerData = controllerMap[STRUCTURE_CONTROLLER]
                 const claimer = spawnRoom.creeps("claimer",false).filter(e => e.topTask.roomName == flag.pos.roomName).head()
+
                 if(!claimer){
                     const task = TaskHelper.genTaskWithServiceData(controllerData,new ClaimTaskNameEntity("claimRoom"))
                     service.spawnTaskService.trySpawn(spawnRoom,spawnRoom.name,"claimer",0,[task],(args:BodyCalcFuncArgs)=> [CLAIM,MOVE,MOVE],{})

@@ -3,13 +3,13 @@ import { Data } from "taskService"
 
 export const autoPlanStrategy = {
     tryAutoBuildLowLevel(room:Room){
-        if(Game.time + room.hashCode() % 150 == 0 && Game.cpu.bucket > 50 && room.memory.structMap){
+        if((Game.time + room.hashCode()) % 150 == 0 && Game.cpu.bucket > 50 && room.memory.structMap){
             _plannStrategy._traCreateStructs(room,room.memory.structMap,STRUCTURE_SPAWN)
             _plannStrategy._traCreateStructs(room,room.memory.structMap,STRUCTURE_EXTENSION)
         }
     },
     tryAutoBuildMiddleLevel(room:Room){
-        if(Game.time + room.hashCode() % 150 == 0 && Game.cpu.bucket > 50 && room.memory.structMap){
+        if((Game.time + room.hashCode()) % 150 == 0 && Game.cpu.bucket > 50 && room.memory.structMap){
             _plannStrategy._traCreateStructs(room,room.memory.structMap,STRUCTURE_EXTENSION)
             _plannStrategy._traCreateStructs(room,room.memory.structMap,STRUCTURE_CONTAINER,3)
             _plannStrategy._traCreateStructs(room,room.memory.structMap,STRUCTURE_TOWER)
@@ -103,7 +103,6 @@ const _plannStrategy = {
 
             if(needBuild){
                 const pos = structMap[struct]
-
                 _.take(pos,structCount).forEach(p=>{
                     this._tryCreateCons(new RoomPosition(p[0],p[1],room.name),struct)
                 })

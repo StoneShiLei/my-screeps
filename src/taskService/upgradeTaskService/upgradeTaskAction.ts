@@ -28,18 +28,18 @@ export class UpgradeTaskAction extends BaseTaskAction {
     upgradeKeeper(creep:Creep){
         const target = creep.topTarget
 
-        const map = Memory.rooms[creep.memory.roomName].serviceDataMap['upgradeTaskService']
+        const map = creep.mainRoom.memory.serviceDataMap['upgradeTaskService']
         if(!map || !target){
             creep.popTopTask().doWorkWithTopTask()
             return
         }
+
         const data = map[STRUCTURE_CONTROLLER]
         if(creep.ticksToLive && creep.ticksToLive < (data.pathTime || 0)){
             creep.unregisterMyTopTask()
             creep.popTopTask().doWorkWithTopTask()
             return
         }
-
 
 
         if(creep.store[RESOURCE_ENERGY] > 0){
@@ -129,14 +129,13 @@ export class UpgradeTaskAction extends BaseTaskAction {
             }
         }
 
-        const room = Game.rooms[creep.memory.roomName]
-        if(creep.store[RESOURCE_ENERGY] == 0 || room.controller?.upgradeBlocked){
+        if(creep.store[RESOURCE_ENERGY] == 0 || creep.mainRoom.controller?.upgradeBlocked){
             creep.popTopTask()
             creep.doWorkWithTopTask()
         }
 
         // 如果有工地则不升级
-        if(creep.ticksToLive && creep.ticksToLive % 100 === 0 && creep.room.find(FIND_CONSTRUCTION_SITES).length > 0){
+        if(creep.ticksToLive && creep.ticksToLive % 300 === 0 && creep.room.find(FIND_CONSTRUCTION_SITES).length > 0){
             creep.popTopTask()
             creep.doWorkWithTopTask()
         }

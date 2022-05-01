@@ -23,6 +23,9 @@ export class ClaimTaskAction extends BaseTaskAction {
 
         if(creep.room.my){
             creep.say("claim OK")
+            if(creep.ticksToLive && creep.ticksToLive > 350 && creep.mainRoom){
+                creep.popTopTask().addTask(TaskHelper.genTaskWithAnyData(new SpawnTaskNameEntity("recycleCreep")))
+            }
             return
         }
 

@@ -75,10 +75,9 @@ export class MineralTaskService extends BaseTaskService{
         const extractor = room.get<StructureExtractor>(STRUCTURE_EXTRACTOR)
         if(container &&  extractor && room.get<number>(mineral.mineralType) < 100000 &&
         (Game.time - (data.spawnTime || 0) > 1500 || data.creeps?.length == 0)){
-            // const tasks =
             const service = Container.get(SpawnTaskService)
 
-            service.trySpawn(room,room.name,"mineralHarvester",-10,
+            service.trySpawn(room,room.name,"mineralHarvester",0,
             [TaskHelper.genTaskWithServiceData(data,new MineralTaskNameEntity("harvestMineralKeeper"),undefined,new MineralTaskNameEntity(undefined,"registerMineral"))],
             BodyConfig.mineralBodyConfig.harvesterBodyCalctor,{energy:room.getEnergyCapacityAvailable()})
         }

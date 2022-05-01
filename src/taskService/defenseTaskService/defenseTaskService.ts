@@ -141,7 +141,7 @@ export class DefenseTaskService extends BaseTaskService{
 
         //核弹防御
         const nukes = room.find(FIND_NUKES)
-        needRepairs = needRepairs.flat().filter(Boolean)
+        needRepairs = _.flatten(needRepairs).filter(Boolean)
         const nukeHitsMap:{[key:string]:number} = {}
         if(nukes.length){
             needRepairs.forEach((e) => nukes.forEach(n =>{
@@ -153,6 +153,8 @@ export class DefenseTaskService extends BaseTaskService{
         }
 
         this._needRepairWallMap[room.name] = needRepairs.sort((a, b) => a.hits-(nukeHitsMap[a.id]||0) - b.hits+(nukeHitsMap[b.id]||0)).map(e => e.id)
+
+        console.log(this._needRepairWallMap[room.name].map(a => Game.getObjectById<Structure>(a as string)?.hits).join(','))
     }
 
 
