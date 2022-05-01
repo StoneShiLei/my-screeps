@@ -11,17 +11,16 @@ export class WorkTaskAction extends BaseTaskAction {
 
     buildConst(creep:Creep){
         const target = creep.topTarget as ConstructionSite
+        const task = creep.topTask
 
         if(!target || creep.storeIsEmpty()) {
             creep.popTopTask()
-            creep.doWorkWithTopTask()
         }
 
         const result = creep.build(target)
 
         //造完建筑之后看下是不是rampart，是的话更新房间wall信息
         if(!target){
-            const task = creep.topTask
             const structures = new RoomPosition(task.x,task.y,task.roomName).lookFor(LOOK_STRUCTURES)
             if(structures.length > 0){
                 const rampart = structures?.filter(s => s.structureType == STRUCTURE_RAMPART)?.head()
@@ -34,7 +33,6 @@ export class WorkTaskAction extends BaseTaskAction {
 
         if(result === ERR_NOT_OWNER){
             creep.popTopTask()
-            creep.doWorkWithTopTask()
         }
 
         if(result === ERR_NOT_IN_RANGE) creep.goTo(target)

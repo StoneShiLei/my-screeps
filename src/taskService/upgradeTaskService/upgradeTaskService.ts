@@ -48,6 +48,7 @@ export class UpgradeTaskService extends BaseTaskService{
                 room._used[container.id] = room._used[container.id] ?? 0
                 const num1 = room._used[container.id] + container.store[RESOURCE_ENERGY] + Math.min(1000,Math.max(carryCap-400,0))
                 const num2 = room._used[container.id] + container.store.getUsedCapacity(RESOURCE_ENERGY)
+
                 if(num1 < 2000 && num2 < 800){
                     return[TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("fillResource"),{resourceType:RESOURCE_ENERGY}
                     ,new UpgradeTaskNameEntity(undefined,"registerTranEnergyInRoom"))]

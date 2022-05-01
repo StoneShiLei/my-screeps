@@ -154,7 +154,7 @@ export class DefenseTaskService extends BaseTaskService{
 
         this._needRepairWallMap[room.name] = needRepairs.sort((a, b) => a.hits-(nukeHitsMap[a.id]||0) - b.hits+(nukeHitsMap[b.id]||0)).map(e => e.id)
 
-        console.log(this._needRepairWallMap[room.name].map(a => Game.getObjectById<Structure>(a as string)?.hits).join(','))
+        // console.log(this._needRepairWallMap[room.name].map(a => Game.getObjectById<Structure>(a as string)?.hits).join(','))
     }
 
 

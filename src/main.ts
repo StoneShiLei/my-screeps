@@ -8,6 +8,8 @@ import { TaskServiceProxy } from "taskService";
 import { StackAnalysis } from "modules/stackAnalysis/StackAnalysis";
 import { BodyConfig } from "modules/bodyConfig/bodyConfig";
 import { StructMap } from "autoPlanner63";
+import { TaskHelper } from "taskService/taskHelper";
+import { TransportTaskNameEntity } from "taskService/transportTaskService/transportTaskNameEntity";
 
 
 
@@ -84,6 +86,18 @@ app.on({
 app.on({
   tickStart:()=>{
 
+    // const room = Game.rooms['E48S6']
+    // room.creeps("transporter").filter(c => c.isIdle() && c.storeIsEmpty())
+    // .pop()?.addTask([
+    //   TaskHelper.genTaskWithTarget(Game.getObjectById<StructureLab>("6269bff8f398464588f8ddee") as TaskTarget,new TransportTaskNameEntity("fillResource"),{resourceType:"energy" ,resourceCount:2000}),
+    //   TaskHelper.genTaskWithTarget(Game.getObjectById<StructureLab>("6269a942b3441f2e70b6253f") as TaskTarget,new TransportTaskNameEntity("transportResource"),{resourceType:"energy" ,resourceCount:2000})
+    // ])
+
+    // const creep = Game.getObjectById<Creep>("626eb6cf3f39440103cd77e8")
+    // if(creep) creep.goTo(Game.getObjectById<StructureLab>('6269bff8f398464588f8ddee') as StructureLab)
+    // @ts-ignore
+    Game.getObjectById("6269bff8f398464588f8ddee").runReaction(Game.getObjectById("6269a7a7358e93ca6e459c2c"),Game.getObjectById("6269d9fef2de037b5e3421b9"))
+    // Game.getObjectById("626eb6cf3f39440103cd77e8").moveTo(Game.getObjectById('6269bff8f398464588f8ddee').pos)
     // const struct:StructMap = {
     //   constructedWall:[[2,14],[2,15],[6,19],[6,20],[8,23],[9,23],[10,23],[31,26],[43,26],[44,25],[46,12],[46,11],[46,10]],
     //   rampart:[[6,21],[30,26],[43,25],[46,13]],
