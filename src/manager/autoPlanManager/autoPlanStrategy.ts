@@ -93,10 +93,11 @@ const _plannStrategy = {
         if(structMap[struct]){
             let needBuild = false
             const roomStruct = room.get(struct)
+
             if(roomStruct instanceof Array){
                 if(structCount > roomStruct.length) needBuild = true
             }
-            else if(roomStruct && (roomStruct as BuildableStructureConstant)){
+            else if(!roomStruct){
                 needBuild = true
             }
             else{}
