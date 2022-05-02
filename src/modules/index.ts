@@ -1,6 +1,7 @@
 import { superMoveJS } from "./superMove";
 import { structureCache } from "./structureCache";
 import { AppLifecycleCallbacks } from "./framework/types";
+import watch from "watch-client";
 
 export default function mountModules():AppLifecycleCallbacks{
     superMoveJS();
@@ -14,7 +15,7 @@ export default function mountModules():AppLifecycleCallbacks{
 
         },
         tickEnd:()=>{
-
+            // watch()
         },
     }
 }

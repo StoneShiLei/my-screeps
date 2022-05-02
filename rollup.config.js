@@ -31,7 +31,7 @@ export default {
     screeps({config: cfg, dryRun: cfg == null}),
     copy({
       targets: [
-          { src: "./src/utils/watch-client.js", dest: "./dist/" },
+          { src: "./src/modules/multimeter/watch-client.js", dest: "./dist/" },
           { src: "./src/modules/superMove/superMove.js", dest: "./dist/" },
           { src: "./src/modules/structureCache/structureCache.js", dest: "./dist/" },
           { src: "./src/modules/autoPlanner63/autoPlanner63.js", dest: "./dist/" },

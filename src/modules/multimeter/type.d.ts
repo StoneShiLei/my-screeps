@@ -1,0 +1,2 @@
+
+declare module "watch-client"
