@@ -16,7 +16,6 @@ export class TransportTaskService extends BaseTaskService{
     actions!: TransportTaskAction;
 
     private _pickupTaskCacheMap:{[roomName:string]:Task[]} = {}
-    private _pickupCacheTime:number = 0
 
     genMassStoreEnergyTranTask(room:Room,energyCount:number = 6600):Task[]{
         if(room.storage && room.storage.store.energy >= 2000){
@@ -73,14 +72,12 @@ export class TransportTaskService extends BaseTaskService{
     takeCachedPickupTranTask(room:Room,idleCreeps:Creep[],onlyEnergy:boolean = false){
         let pickTasks = this._pickupTaskCacheMap[room.name] ?? []
         //捡起资源 性能消耗高  9tick更新一次task
-        if(!this._pickupCacheTime || this._pickupCacheTime == 3){
+        if((Game.time + room.hashCode()) % 9 == 0){
             const service = Container.get(MineralTaskService)
             pickTasks = this.genPickupTranTask(room,onlyEnergy).concat(service.genTranMineralTask(room))
-            this._pickupCacheTime = 0;
         }
         if(idleCreeps.length > 0 && pickTasks.length > 0) idleCreeps.pop()?.addTask(pickTasks.shift())
         this._pickupTaskCacheMap[room.name] = pickTasks;
-        this._pickupCacheTime += 1;
     }
 
     genPickupTranTask(room:Room,onlyEnergy:boolean = false):Task[]{

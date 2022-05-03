@@ -34,7 +34,6 @@ export class MineralTaskService extends BaseTaskService{
                 task.push(TaskHelper.genTaskWithTarget(container,new TransportTaskNameEntity("transportResource"),{resourceType:type as ResourceConstant},new MineralTaskNameEntity(undefined,"registerInRoom")))
             })
         }
-
         return task
     }
 
