@@ -120,6 +120,10 @@ app.on({
     // }
 
     // room.memory.structMap = struct
+
+    if(Game.cpu.bucket == 10000) {
+      Game.cpu.generatePixel();
+    }
   }
 })
 

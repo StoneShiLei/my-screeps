@@ -20,6 +20,9 @@ export class CreepManager extends BaseManager{
                 const creep = Game.creeps[name]
                 if(!creeps[roomName]) creeps[roomName] = []
                 creeps[roomName].push(creep)
+
+                //注册每个creep的任务
+                ErrorHelper.catchError(()=> creep.registerMyTasks(),creep.name)
             }
         }
 
@@ -32,8 +35,6 @@ export class CreepManager extends BaseManager{
 
     }
     run(creep: Creep): void {
-        ErrorHelper.catchError(()=> creep.registerMyTasks(),creep.name)
-
         if(!creep.spawning) ErrorHelper.catchError(()=>creep.doWorkWithTopTask(),creep.name)
     }
 

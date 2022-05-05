@@ -29,7 +29,6 @@ export class SourceTaskService extends BaseTaskService{
     genEnergyTranTask(room:Room,minEnergy:number = 1200):Task[]{
         const rm = room.memory
         room._used = room._used || {}
-
         let tasks:Task[] = []
 
         if(!rm) return tasks

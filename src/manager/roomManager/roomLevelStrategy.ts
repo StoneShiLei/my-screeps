@@ -279,10 +279,11 @@ const highLevelStrategy = {
 
         // 8级以下或没有6个link的时候才需要搬运工去搬运能量
         if(room.creeps("energyHarvester").length && room.get<StructureLink[]>(STRUCTURE_LINK).length < 6 || room.level < 8){
-            const tranSourceLinkTasks = service.sourceTaskService.genEnergyTranTask(room)
-            while(creepPool.idleEmptyTraners.length && tranSourceLinkTasks.length){
+            const tranSourceTasks = service.sourceTaskService.genEnergyTranTask(room)
+
+            while(creepPool.idleEmptyTraners.length && tranSourceTasks.length){
                 const creep = creepPool.idleEmptyTraners.pop()
-                creep?.addTask(tranSourceLinkTasks.shift())
+                creep?.addTask(tranSourceTasks.shift())
             }
         }
 
