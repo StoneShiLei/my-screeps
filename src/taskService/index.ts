@@ -3,6 +3,8 @@ import { ClaimActionName, ClaimRegName } from "./claimTaskService/claimTaskActio
 import { ClaimTaskService } from "./claimTaskService/claimTaskService";
 import { DefenseActionName, DefenseRegName, DefenseTaskAction } from "./defenseTaskService/defenseTaskAction";
 import { DefenseTaskService } from "./defenseTaskService/defenseTaskService";
+import { LabActionName, LabRegName } from "./labTaskService/labTaskAction";
+import { LabTaskService } from "./labTaskService/labTaskService";
 import { MineralActionName, MineralRegName, MineralTaskAction } from "./mineralTaskService/mineralTaskAction";
 import { MineralTaskService } from "./mineralTaskService/mineralTaskService";
 import { ResourceBalanceActionName, ResourceBalanceRegName, ResourceBalanceTaskAction } from "./resourceBalanceTaskService/resourceBalanceTaskAction";
@@ -53,11 +55,14 @@ export class TaskServiceProxy {
 
     @Inject
     resourceBalanceTaskService!:ResourceBalanceTaskService
+
+    @Inject
+    labTaskService!:LabTaskService
 }
 
 export type TaskService = SpawnTaskService | WorkTaskService | TransportTaskService |
  UpgradeTaskService | SourceTaskService | TowerTaskService | MineralTaskService | ClaimTaskService |
- DefenseTaskService | ResourceBalanceTaskService
+ DefenseTaskService | ResourceBalanceTaskService | LabTaskService;
 
 export type TaskAction = SpawnTaskAction | WorkTaskAction | TransportTaskAction | UpgradeTaskAction |
 SourceTaskAction | TowerTaskAction | MineralTaskAction | DefenseTaskAction | ResourceBalanceTaskAction
@@ -65,13 +70,13 @@ SourceTaskAction | TowerTaskAction | MineralTaskAction | DefenseTaskAction | Res
 
 export type ServiceName = "defenseTaskService" | "spawnTaskService" | "workTaskService" | "transportTaskService" |
 "upgradeTaskService" | "sourceTaskService" | "towerTaskService" | "mineralTaskService" | "claimTaskService" |
-"resourceBalanceTaskService"
+"resourceBalanceTaskService" | "labTaskService"
 
 export type ActionName = SpawnActionName | WorkActionName | TransportActionName | UpgradeActionName | SourceActionName |
-TowerActionName | MineralActionName | ClaimActionName | DefenseActionName | ResourceBalanceActionName
+TowerActionName | MineralActionName | ClaimActionName | DefenseActionName | ResourceBalanceActionName | LabActionName
 
 export type RegName = SpawnRegName | WorkRegName | TransportRegName | UpgradeRegName | SourceRegName | TowerRegName |
- MineralRegName | ClaimRegName | DefenseRegName | ResourceBalanceRegName
+ MineralRegName | ClaimRegName | DefenseRegName | ResourceBalanceRegName | LabRegName
 
 
 
@@ -103,5 +108,11 @@ export type Data = {
     containerId?:string,
     linkIdA?:string,
     linkIdB?:string,
+
     type?:string,
+
+    centerLabs?:string[],
+    otherLabs?:string[],
+    unboostContainer?:string,
+    labTasks?:string[]
 }

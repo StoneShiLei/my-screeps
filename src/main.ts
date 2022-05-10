@@ -128,6 +128,13 @@ app.on({
 })
 
 
+app.on({
+  tickStart:()=>{
+
+  }
+})
+
+
 // switchShowCost('base')
 // StackAnalysis.mount()
 export const loop = app.run

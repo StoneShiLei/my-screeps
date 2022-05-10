@@ -248,7 +248,7 @@ const highLevelStrategy = {
 
 
         //填充Hive
-        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && room.hiveIsNeedToFill()){
+        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && room.hiveIsNeedToFill() && massStoreTasks.length){
             const creep = creepPool.idleNotEmptyTraners.length
                          ? creepPool.idleNotEmptyTraners.pop()
                          : creepPool.idleEmptyTraners.pop()
@@ -259,7 +259,7 @@ const highLevelStrategy = {
 
         //填充tower
         const fillTowerTasks = service.towerTaskService.genFillTowerTask(room)
-        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && fillTowerTasks.length){
+        while(creepPool.idleNotEmptyTraners.length + creepPool.idleEmptyTraners.length && fillTowerTasks.length && massStoreTasks.length){
             const creep = creepPool.idleNotEmptyTraners.length
             ? creepPool.idleNotEmptyTraners.pop()
             : creepPool.idleEmptyTraners.pop()
