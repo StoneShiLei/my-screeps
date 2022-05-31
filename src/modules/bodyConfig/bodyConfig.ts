@@ -1,6 +1,6 @@
 import { sa } from "modules/stackAnalysis/StackAnalysis";
 
-const outerMaxPartCount = 3;
+const outerMaxPartCount = 4;
 const innerMaxPartCount = 3;
 
 
@@ -11,7 +11,7 @@ const workerBodyConfig:BodyConfigCalctor = {
         if(!args || !args.spawnRoom) throw new Error("args.spawnRoom is null")
         const room = args.spawnRoom
         let totalEnergy = room.getEnergyCapacityAvailable()
-        if(room.creeps("worker").length < 2) totalEnergy = room.getEnergyAvailable()
+        if(room.creeps("worker").length < 1) totalEnergy = room.getEnergyAvailable()
 
         let body = [WORK,CARRY,MOVE,MOVE]
         let bodyEnergy = BodyConfig.getBodyCosts(body)
@@ -28,7 +28,7 @@ const workerBodyConfig:BodyConfigCalctor = {
         if(!args || !args.spawnRoom) throw new Error("args.spawnRoom is null")
         const room = args.spawnRoom
         let totalEnergy = room.getEnergyCapacityAvailable()
-        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 2) totalEnergy = room.getEnergyAvailable()
+        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 1) totalEnergy = room.getEnergyAvailable()
 
         let body = [WORK,CARRY,MOVE]
         let bodyEnergy = BodyConfig.getBodyCosts(body)
@@ -44,7 +44,7 @@ const workerBodyConfig:BodyConfigCalctor = {
         const room = args.spawnRoom
         let totalEnergy = room.getEnergyCapacityAvailable()
         let body = BodyConfig.calcBodyParts({work:30,carry:10,move:10})
-        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 2 || BodyConfig.getBodyCosts(body) > totalEnergy){
+        if(room.creeps("worker",false).length + room.creeps("transporter",false).length < 1 || BodyConfig.getBodyCosts(body) > totalEnergy){
             return workerBodyConfig.middleLevelWorkerBodyCalctor(args)
         }
         return body
@@ -58,7 +58,7 @@ const harvesterBodyConfig:BodyConfigCalctor = {
         const energy = args.energy
         // const level = args.level
         // const data = args.data
-        if(isOutRoom === undefined || !energy) throw new Error("args is error")
+        if(isOutRoom === undefined || energy === undefined) throw new Error("args is error")
 
 
         const maxPart =  isOutRoom ? outerMaxPartCount : innerMaxPartCount
@@ -78,8 +78,8 @@ const harvesterBodyConfig:BodyConfigCalctor = {
     outterTransporterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
         const energy = args.energy
         const maxPart = args.maxPart
-        if(!energy) throw new Error("args.energy is undefinded")
-        if(!maxPart) throw new Error("args.maxPart is undefinded")
+        if(energy=== undefined) throw new Error("args.energy is undefinded")
+        if(maxPart=== undefined) throw new Error("args.maxPart is undefinded")
 
         let current = 0
         let cost = BodyConfig.getBodyCosts([CARRY,CARRY,MOVE])
@@ -96,8 +96,8 @@ const harvesterBodyConfig:BodyConfigCalctor = {
     outterBuildTransporterBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
         const energy = args.energy
         const maxPart = args.maxPart
-        if(!energy) throw new Error("args.energy is undefinded")
-        if(!maxPart) throw new Error("args.maxPart is undefinded")
+        if(energy=== undefined) throw new Error("args.energy is undefinded")
+        if(maxPart=== undefined) throw new Error("args.maxPart is undefinded")
 
         let current = 0
         let cost = BodyConfig.getBodyCosts([CARRY,CARRY,MOVE])
@@ -117,7 +117,7 @@ const harvesterBodyConfig:BodyConfigCalctor = {
 
     outterReverserBodyCalctor:function(args:BodyCalcFuncArgs):BodyPartConstant[]{
         const energy = args.energy
-        if(!energy) throw new Error("args.energy is undefinded")
+        if(energy=== undefined) throw new Error("args.energy is undefinded")
 
         let current = 0
         let cost = BodyConfig.getBodyCosts([CLAIM,MOVE])
