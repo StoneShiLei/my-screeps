@@ -63,7 +63,6 @@ export class SpawnTaskService extends BaseTaskService{
 
         room._spawnQueue = _.sortByOrder(room._spawnQueue,(task) => task.priority,'desc')
 
-
         for(let spawnTask of room._spawnQueue){
 
             const body = spawnTask.bodyFunc(spawnTask.bodyFuncArgs)

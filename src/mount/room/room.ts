@@ -100,6 +100,7 @@ export class RoomExtension extends Room {
 
         const extEnergyCount = exts.filter(ext => ext.isActive()).reduce((a,b) => a + b.store[RESOURCE_ENERGY],0)
         const spawnEnergyCount = spawns.filter(spawn => spawn.isActive()).reduce((a,b) => a + b.store[RESOURCE_ENERGY],0)
+
         return extEnergyCount + spawnEnergyCount
     }
 
@@ -109,8 +110,9 @@ export class RoomExtension extends Room {
         const exts = this.get(STRUCTURE_EXTENSION) as StructureExtension[]
         const spawns = this.get(STRUCTURE_SPAWN) as StructureSpawn[]
 
-        const extEnergyCount = exts.filter(ext => ext.isActive()).reduce((a,b) => a + b.store.getCapacity<RESOURCE_ENERGY>(),0)
-        const spawnEnergyCount = spawns.filter(spawn => spawn.isActive()).reduce((a,b) => a + b.store.getCapacity<RESOURCE_ENERGY>(),0)
+        const extEnergyCount = exts.filter(ext => ext.isActive()).reduce((a,b) => a + b.store.getCapacity("energy"),0)
+        const spawnEnergyCount = spawns.filter(spawn => spawn.isActive()).reduce((a,b) => a + b.store.getCapacity("energy"),0)
+
         return extEnergyCount + spawnEnergyCount
     }
 
